@@ -1,0 +1,2030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Notifications - Smart Fit</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --primary-color: #3A86FF;
+            --primary-dark: #2667CC;
+            --secondary-color: #8338EC;
+            --success-color: #38B000;
+            --warning-color: #FF9E00;
+            --danger-color: #FF006E;
+            --info-color: #00BBF9;
+            --dark-color: #2B2D42;
+            --light-color: #f8f9fa;
+            --fitness-orange: #FF9E00;
+            --fitness-teal: #009688;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--dark-color), #1a1a1a);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 25px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+        
+        .sidebar-header h3 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-header h3 i {
+            margin-right: 10px;
+        }
+        
+        .user-profile-sidebar {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .user-avatar-sidebar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0 auto 15px;
+            border: 4px solid rgba(255,255,255,0.2);
+        }
+        
+        .user-profile-sidebar h5 {
+            color: white;
+            margin-bottom: 5px;
+        }
+        
+        .user-profile-sidebar p {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .membership-badge {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+            height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+        
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding-left: 25px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(58, 134, 255, 0.15);
+            color: white;
+            font-weight: 600;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .sidebar-menu i {
+            width: 25px;
+            margin-right: 12px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .sidebar-footer {
+            padding: 20px;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-footer .btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 25px;
+            transition: all 0.3s;
+            min-width: 0;
+        }
+        
+        /* Header */
+        .dashboard-header {
+            background-color: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .header-left h4 {
+            color: var(--dark-color);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .header-left p {
+            color: #6c757d;
+            margin: 0;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 3px 10px rgba(58, 134, 255, 0.3);
+        }
+        
+        .user-details h6 {
+            margin: 0;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .user-details small {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(58, 134, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        
+        .page-header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .page-header h2 {
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .page-header p {
+            margin-bottom: 20px;
+            opacity: 0.9;
+            font-size: 1.1rem;
+            max-width: 600px;
+        }
+        
+        /* Notifications Container */
+        .notifications-container {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+            margin-bottom: 30px;
+        }
+        
+        .notifications-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 20px 25px;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+        }
+        
+        .notifications-header h5 {
+            margin: 0;
+            color: var(--dark-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .notifications-header h5 i {
+            color: var(--primary-color);
+        }
+        
+        .notification-count {
+            background: var(--primary-color);
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        /* Notification Tabs */
+        .notification-tabs {
+            display: flex;
+            background: #f8f9fa;
+            border-bottom: 1px solid #e0e0e0;
+            overflow-x: auto;
+        }
+        
+        .notification-tab {
+            padding: 15px 25px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            font-weight: 600;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.3s;
+            white-space: nowrap;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .notification-tab:hover {
+            background-color: rgba(58, 134, 255, 0.05);
+            color: var(--primary-color);
+        }
+        
+        .notification-tab.active {
+            background-color: white;
+            color: var(--primary-color);
+            border-bottom: 3px solid var(--primary-color);
+        }
+        
+        .notification-tab .badge {
+            background: var(--danger-color);
+            color: white;
+            font-size: 0.7rem;
+            padding: 2px 8px;
+            border-radius: 10px;
+        }
+        
+        /* Notifications List */
+        .notifications-list {
+            max-height: 600px;
+            overflow-y: auto;
+        }
+        
+        .notification-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 20px 25px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s;
+            position: relative;
+        }
+        
+        .notification-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .notification-item.unread {
+            background-color: rgba(58, 134, 255, 0.05);
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .notification-item:last-child {
+            border-bottom: none;
+        }
+        
+        .notification-icon {
+            width: 45px;
+            height: 45px;
+            min-width: 45px;
+            border-radius: 50%;
+            background-color: rgba(58, 134, 255, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary-color);
+            font-size: 1.2rem;
+        }
+        
+        .notification-icon.workout {
+            background-color: rgba(58, 134, 255, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .notification-icon.achievement {
+            background-color: rgba(255, 158, 0, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .notification-icon.trainer {
+            background-color: rgba(56, 176, 0, 0.1);
+            color: var(--success-color);
+        }
+        
+        .notification-icon.nutrition {
+            background-color: rgba(255, 0, 110, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .notification-icon.system {
+            background-color: rgba(0, 187, 249, 0.1);
+            color: var(--info-color);
+        }
+        
+        .notification-content {
+            flex: 1;
+            min-width: 0;
+        }
+        
+        .notification-content h6 {
+            margin: 0;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .notification-content p {
+            margin: 5px 0 0 0;
+            color: #6c757d;
+            font-size: 0.9rem;
+        }
+        
+        .notification-time {
+            color: #6c757d;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+        
+        .notification-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        
+        .notification-more {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            color: #999;
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        .notification-more:hover {
+            color: #333;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h4 {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            color: #999;
+            margin-bottom: 20px;
+        }
+        
+        /* Notification Settings */
+        .notification-settings {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        
+        .settings-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .settings-header h5 {
+            margin: 0;
+            color: var(--dark-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .settings-header h5 i {
+            color: var(--primary-color);
+        }
+        
+        .settings-group {
+            margin-bottom: 25px;
+        }
+        
+        .settings-group h6 {
+            color: var(--dark-color);
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+        
+        .setting-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .setting-item:last-child {
+            border-bottom: none;
+        }
+        
+        .setting-info {
+            flex: 1;
+        }
+        
+        .setting-title {
+            font-weight: 600;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        
+        .setting-description {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        /* Toggle Switch */
+        .toggle-switch {
+            position: relative;
+            display: inline-block;
+            width: 50px;
+            height: 24px;
+        }
+        
+        .toggle-switch input {
+            opacity: 0;
+            width: 0;
+            height: 0;
+        }
+        
+        .toggle-slider {
+            position: absolute;
+            cursor: pointer;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: #ccc;
+            transition: .4s;
+            border-radius: 34px;
+        }
+        
+        .toggle-slider:before {
+            position: absolute;
+            content: "";
+            height: 16px;
+            width: 16px;
+            left: 4px;
+            bottom: 4px;
+            background-color: white;
+            transition: .4s;
+            border-radius: 50%;
+        }
+        
+        input:checked + .toggle-slider {
+            background-color: var(--primary-color);
+        }
+        
+        input:checked + .toggle-slider:before {
+            transform: translateX(26px);
+        }
+        
+        /* Buttons */
+        .btn-member {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(58, 134, 255, 0.3);
+        }
+        
+        .btn-member:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(58, 134, 255, 0.4);
+        }
+        
+        .btn-member-sm {
+            padding: 5px 15px;
+            font-size: 0.85rem;
+        }
+        
+        .btn-outline-member {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 8px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .btn-outline-member:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(58, 134, 255, 0.3);
+        }
+        
+        .btn-outline-member-sm {
+            padding: 5px 15px;
+            font-size: 0.85rem;
+        }
+        
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--dark-color);
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .notification-tabs {
+                flex-wrap: wrap;
+            }
+            
+            .notification-tab {
+                flex: 1;
+                min-width: 120px;
+                justify-content: center;
+            }
+            
+            .notification-item {
+                flex-direction: column;
+            }
+            
+            .notification-icon {
+                margin-bottom: 15px;
+            }
+            
+            .notification-more {
+                position: static;
+                align-self: flex-end;
+            }
+        }
+        
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+        
+        /* Notification Actions Dropdown */
+        .notification-actions-dropdown {
+            display: none;
+            position: absolute;
+            top: 40px;
+            right: 20px;
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+            z-index: 100;
+            min-width: 150px;
+        }
+        
+        .notification-actions-dropdown.show {
+            display: block;
+        }
+        
+        .dropdown-item {
+            padding: 10px 15px;
+            border-bottom: 1px solid #f0f0f0;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .dropdown-item:hover {
+            background-color: #f8f9fa;
+        }
+        
+        .dropdown-item:last-child {
+            border-bottom: none;
+        }
+        
+        .dropdown-item i {
+            margin-right: 10px;
+            width: 16px;
+            text-align: center;
+        }
+        
+        /* Notification Importance */
+        .notification-importance {
+            display: inline-block;
+            width: 8px;
+            height: 8px;
+            border-radius: 50%;
+            margin-right: 5px;
+        }
+        
+        .importance-high {
+            background-color: var(--danger-color);
+        }
+        
+        .importance-medium {
+            background-color: var(--warning-color);
+        }
+        
+        .importance-low {
+            background-color: var(--info-color);
+        }
+        
+        /* Time Indicators */
+        .time-indicator {
+            display: inline-block;
+            padding: 2px 8px;
+            border-radius: 10px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        
+        .time-just-now {
+            background-color: rgba(255, 0, 110, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .time-today {
+            background-color: rgba(58, 134, 255, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .time-yesterday {
+            background-color: rgba(255, 158, 0, 0.1);
+            color: var(--warning-color);
+        }
+        
+        /* Notification Categories */
+        .notification-category {
+            display: inline-block;
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            margin-left: 10px;
+        }
+        
+        .category-workout {
+            background-color: rgba(58, 134, 255, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .category-achievement {
+            background-color: rgba(255, 158, 0, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .category-system {
+            background-color: rgba(0, 187, 249, 0.1);
+            color: var(--info-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-dumbbell"></i> Smart Fit</h3>
+                <small class="text-light">Member Dashboard</small>
+            </div>
+            
+            <div class="user-profile-sidebar">
+                <div class="user-avatar-sidebar">JD</div>
+                <h5>John Doe</h5>
+                <p>Fitness Enthusiast</p>
+                <span class="membership-badge">
+                    <i class="fas fa-crown me-2"></i>PREMIUM MEMBER
+                </span>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="member-dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="member-workouts.html"><i class="fas fa-dumbbell"></i> <span>My Workouts</span></a></li>
+                    <li><a href="member-progress.html"><i class="fas fa-chart-line"></i> <span>Progress Tracking</span></a></li>
+                    <li><a href="member-nutrition.html"><i class="fas fa-apple-alt"></i> <span>Nutrition Plan</span></a></li>
+                    <li><a href="member-schedule.html"><i class="fas fa-calendar-alt"></i> <span>Schedule</span></a></li>
+                    <li><a href="member-trainers.html"><i class="fas fa-user-tie"></i> <span>Trainers</span></a></li>
+                    <li><a href="member-achievements.html"><i class="fas fa-trophy"></i> <span>Achievements</span></a></li>
+                    <li><a href="member-notifications.html" class="active"><i class="fas fa-bell"></i> <span>Notifications</span> <span class="badge bg-danger" style="margin-left: auto;">12</span></a></li>
+                    <li><a href="member-settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="../../index.html" class="btn btn-member">
+                    <i class="fas fa-home"></i> <span>Back to Site</span>
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Mobile Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div>
+                        <h4><i class="fas fa-bell me-2"></i> Notifications</h4>
+                        <p class="text-muted mb-0">Stay updated with your fitness journey and important alerts</p>
+                    </div>
+                </div>
+                
+                <div class="user-info">
+                    <div class="user-avatar">JD</div>
+                    <div class="user-details">
+                        <h6 class="mb-0">John Doe</h6>
+                        <small class="text-muted">Day 28 Streak • 2,850 Points</small>
+                    </div>
+                    <a href="member-dashboard.html" class="btn-outline-member">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </header>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-header-content">
+                    <h2><i class="fas fa-bell me-2"></i> Your Notifications</h2>
+                    <p>Stay informed about workout reminders, achievements, messages from trainers, and important updates from Smart Fit.</p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <button class="btn btn-member" onclick="markAllAsRead()">
+                            <i class="fas fa-check-double me-2"></i> Mark All as Read
+                        </button>
+                        <button class="btn-outline-member" style="color: white; border-color: white;" onclick="clearAllNotifications()">
+                            <i class="fas fa-trash me-2"></i> Clear All
+                        </button>
+                        <button class="btn-outline-member" style="color: white; border-color: white;" onclick="openNotificationSettings()">
+                            <i class="fas fa-cog me-2"></i> Settings
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Notifications Container -->
+            <div class="notifications-container">
+                <div class="notifications-header">
+                    <h5><i class="fas fa-bell"></i> Notifications <span class="notification-count" id="unreadCount">12 unread</span></h5>
+                    <div class="d-flex gap-2">
+                        <button class="btn-outline-member btn-outline-member-sm" onclick="refreshNotifications()">
+                            <i class="fas fa-sync-alt"></i> Refresh
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Notification Tabs -->
+                <div class="notification-tabs">
+                    <button class="notification-tab active" data-tab="all">
+                        <i class="fas fa-inbox"></i> All
+                        <span class="badge" id="allCount">12</span>
+                    </button>
+                    <button class="notification-tab" data-tab="unread">
+                        <i class="fas fa-envelope"></i> Unread
+                        <span class="badge" id="unreadTabCount">12</span>
+                    </button>
+                    <button class="notification-tab" data-tab="workout">
+                        <i class="fas fa-dumbbell"></i> Workouts
+                        <span class="badge" id="workoutCount">5</span>
+                    </button>
+                    <button class="notification-tab" data-tab="achievement">
+                        <i class="fas fa-trophy"></i> Achievements
+                        <span class="badge" id="achievementCount">3</span>
+                    </button>
+                    <button class="notification-tab" data-tab="trainer">
+                        <i class="fas fa-user-tie"></i> Trainer
+                        <span class="badge" id="trainerCount">2</span>
+                    </button>
+                    <button class="notification-tab" data-tab="system">
+                        <i class="fas fa-cog"></i> System
+                        <span class="badge" id="systemCount">2</span>
+                    </button>
+                </div>
+                
+                <!-- Notifications List -->
+                <div class="notifications-list" id="notificationsList">
+                    <!-- Notifications will be loaded here -->
+                </div>
+                
+                <!-- Empty State -->
+                <div class="empty-state" id="emptyState" style="display: none;">
+                    <div class="empty-state-icon">
+                        <i class="fas fa-bell-slash"></i>
+                    </div>
+                    <h4>No notifications yet</h4>
+                    <p>You're all caught up! New notifications will appear here.</p>
+                    <button class="btn btn-member" onclick="loadSampleNotifications()">
+                        <i class="fas fa-bell me-2"></i> Load Sample Notifications
+                    </button>
+                </div>
+            </div>
+
+            <!-- Notification Settings -->
+            <div class="notification-settings">
+                <div class="settings-header">
+                    <h5><i class="fas fa-cog"></i> Notification Settings</h5>
+                    <button class="btn-outline-member btn-outline-member-sm" onclick="saveNotificationSettings()">
+                        <i class="fas fa-save me-2"></i> Save Settings
+                    </button>
+                </div>
+                
+                <div class="settings-group">
+                    <h6>Notification Types</h6>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-title">Workout Reminders</div>
+                            <div class="setting-description">Get reminders for scheduled workouts and classes</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="workoutReminders" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-title">Achievement Alerts</div>
+                            <div class="setting-description">Get notified when you unlock new achievements</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="achievementAlerts" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-title">Trainer Messages</div>
+                            <div class="setting-description">Receive messages and feedback from your trainers</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="trainerMessages" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-title">Nutrition Tips</div>
+                            <div class="setting-description">Daily nutrition tips and meal reminders</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="nutritionTips" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-title">Progress Updates</div>
+                            <div class="setting-description">Weekly progress reports and milestone alerts</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="progressUpdates" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="settings-group">
+                    <h6>Notification Preferences</h6>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-title">Push Notifications</div>
+                            <div class="setting-description">Receive push notifications on your device</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="pushNotifications" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-title">Email Notifications</div>
+                            <div class="setting-description">Receive notifications via email</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="emailNotifications">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-title">Sound Alerts</div>
+                            <div class="setting-description">Play sound when receiving notifications</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="soundAlerts" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                    
+                    <div class="setting-item">
+                        <div class="setting-info">
+                            <div class="setting-title">Quiet Hours</div>
+                            <div class="setting-description">Silence notifications during night hours (10 PM - 7 AM)</div>
+                        </div>
+                        <label class="toggle-switch">
+                            <input type="checkbox" id="quietHours">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+                
+                <div class="d-flex justify-content-between mt-4">
+                    <button class="btn-outline-member" onclick="resetNotificationSettings()">
+                        <i class="fas fa-undo me-2"></i> Reset to Default
+                    </button>
+                    <button class="btn btn-member" onclick="testNotification()">
+                        <i class="fas fa-bell me-2"></i> Test Notification
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        });
+        
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        });
+        
+        // Notification Data
+        let notifications = [];
+        let currentFilter = 'all';
+        
+        // Sample Notifications Data
+        const sampleNotifications = [
+            {
+                id: 1,
+                type: 'workout',
+                icon: 'fas fa-dumbbell',
+                title: 'Workout Reminder',
+                message: 'Your Full Body Strength workout starts in 30 minutes. Get ready to crush it!',
+                time: '10 minutes ago',
+                read: false,
+                importance: 'high',
+                category: 'workout',
+                timeIndicator: 'just-now',
+                actions: ['mark-read', 'snooze', 'delete']
+            },
+            {
+                id: 2,
+                type: 'achievement',
+                icon: 'fas fa-trophy',
+                title: 'Achievement Unlocked!',
+                message: 'Congratulations! You\'ve reached a 28-day workout streak. Keep up the amazing work!',
+                time: '2 hours ago',
+                read: true,
+                importance: 'medium',
+                category: 'achievement',
+                timeIndicator: 'today',
+                actions: ['mark-unread', 'share', 'delete']
+            },
+            {
+                id: 3,
+                type: 'trainer',
+                icon: 'fas fa-user-tie',
+                title: 'Trainer Message',
+                message: 'Trainer Alex: "Great progress on your squats today! Your form has improved significantly."',
+                time: '5 hours ago',
+                read: false,
+                importance: 'medium',
+                category: 'trainer',
+                timeIndicator: 'today',
+                actions: ['reply', 'mark-read', 'delete']
+            },
+            {
+                id: 4,
+                type: 'nutrition',
+                icon: 'fas fa-apple-alt',
+                title: 'Nutrition Tip',
+                message: 'Remember to drink at least 8 glasses of water today. Hydration is key for optimal performance!',
+                time: 'Yesterday',
+                read: true,
+                importance: 'low',
+                category: 'nutrition',
+                timeIndicator: 'yesterday',
+                actions: ['mark-unread', 'delete']
+            },
+            {
+                id: 5,
+                type: 'workout',
+                icon: 'fas fa-running',
+                title: 'Workout Completed',
+                message: 'Great job completing your HIIT Cardio Blast workout! You burned 600 calories.',
+                time: 'Yesterday',
+                read: true,
+                importance: 'medium',
+                category: 'workout',
+                timeIndicator: 'yesterday',
+                actions: ['mark-unread', 'view-details', 'delete']
+            },
+            {
+                id: 6,
+                type: 'system',
+                icon: 'fas fa-cog',
+                title: 'System Update',
+                message: 'New features available! Check out the updated progress tracking dashboard.',
+                time: '2 days ago',
+                read: false,
+                importance: 'low',
+                category: 'system',
+                timeIndicator: 'yesterday',
+                actions: ['view-update', 'mark-read', 'delete']
+            },
+            {
+                id: 7,
+                type: 'achievement',
+                icon: 'fas fa-fire',
+                title: 'New Personal Record!',
+                message: 'You set a new personal record in Bench Press: 85 kg! Amazing progress!',
+                time: '3 days ago',
+                read: true,
+                importance: 'high',
+                category: 'achievement',
+                timeIndicator: '',
+                actions: ['celebrate', 'share', 'delete']
+            },
+            {
+                id: 8,
+                type: 'workout',
+                icon: 'fas fa-calendar-alt',
+                title: 'Schedule Update',
+                message: 'Your training session with Trainer Sarah has been rescheduled to tomorrow at 6 PM.',
+                time: '3 days ago',
+                read: false,
+                importance: 'high',
+                category: 'workout',
+                timeIndicator: '',
+                actions: ['confirm', 'reschedule', 'delete']
+            },
+            {
+                id: 9,
+                type: 'system',
+                icon: 'fas fa-exclamation-triangle',
+                title: 'Maintenance Alert',
+                message: 'Scheduled maintenance this Sunday from 2 AM to 4 AM. The app may be temporarily unavailable.',
+                time: '4 days ago',
+                read: true,
+                importance: 'medium',
+                category: 'system',
+                timeIndicator: '',
+                actions: ['mark-unread', 'remind-me', 'delete']
+            },
+            {
+                id: 10,
+                type: 'trainer',
+                icon: 'fas fa-user-tie',
+                title: 'Progress Review',
+                message: 'Trainer Mike has reviewed your progress report. Check out his feedback and recommendations.',
+                time: '5 days ago',
+                read: true,
+                importance: 'medium',
+                category: 'trainer',
+                timeIndicator: '',
+                actions: ['view-feedback', 'mark-unread', 'delete']
+            },
+            {
+                id: 11,
+                type: 'nutrition',
+                icon: 'fas fa-utensils',
+                title: 'Meal Plan Updated',
+                message: 'Your personalized meal plan has been updated based on your recent progress.',
+                time: '6 days ago',
+                read: true,
+                importance: 'low',
+                category: 'nutrition',
+                timeIndicator: '',
+                actions: ['view-plan', 'mark-unread', 'delete']
+            },
+            {
+                id: 12,
+                type: 'workout',
+                icon: 'fas fa-dumbbell',
+                title: 'New Workout Available',
+                message: 'Check out the new "Core Crusher" workout added to your recommended routines.',
+                time: '1 week ago',
+                read: true,
+                importance: 'low',
+                category: 'workout',
+                timeIndicator: '',
+                actions: ['view-workout', 'mark-unread', 'delete']
+            }
+        ];
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            loadNotifications();
+            setupNotificationTabs();
+            loadNotificationSettings();
+        });
+        
+        // Load Notifications
+        function loadNotifications() {
+            // Load from localStorage or use sample data
+            const savedNotifications = localStorage.getItem('smartfit_notifications');
+            
+            if (savedNotifications) {
+                notifications = JSON.parse(savedNotifications);
+            } else {
+                notifications = [...sampleNotifications];
+                saveNotifications();
+            }
+            
+            renderNotifications();
+            updateNotificationCounts();
+        }
+        
+        // Save Notifications to localStorage
+        function saveNotifications() {
+            localStorage.setItem('smartfit_notifications', JSON.stringify(notifications));
+        }
+        
+        // Render Notifications
+        function renderNotifications() {
+            const notificationsList = document.getElementById('notificationsList');
+            const emptyState = document.getElementById('emptyState');
+            
+            // Filter notifications based on current tab
+            let filteredNotifications = notifications;
+            
+            if (currentFilter === 'unread') {
+                filteredNotifications = notifications.filter(n => !n.read);
+            } else if (currentFilter !== 'all') {
+                filteredNotifications = notifications.filter(n => n.type === currentFilter);
+            }
+            
+            // Sort by read status and time (unread first, then by recency)
+            filteredNotifications.sort((a, b) => {
+                if (a.read !== b.read) return a.read ? 1 : -1;
+                return new Date(b.time) - new Date(a.time);
+            });
+            
+            // Show empty state if no notifications
+            if (filteredNotifications.length === 0) {
+                notificationsList.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            // Show notifications list
+            notificationsList.style.display = 'block';
+            emptyState.style.display = 'none';
+            
+            // Clear current list
+            notificationsList.innerHTML = '';
+            
+            // Add notifications to list
+            filteredNotifications.forEach(notification => {
+                const notificationItem = createNotificationItem(notification);
+                notificationsList.appendChild(notificationItem);
+            });
+        }
+        
+        // Create Notification Item
+        function createNotificationItem(notification) {
+            const item = document.createElement('div');
+            item.className = `notification-item ${notification.read ? '' : 'unread'}`;
+            item.dataset.id = notification.id;
+            
+            // Get icon class based on type
+            let iconClass = '';
+            switch(notification.type) {
+                case 'workout': iconClass = 'notification-icon workout'; break;
+                case 'achievement': iconClass = 'notification-icon achievement'; break;
+                case 'trainer': iconClass = 'notification-icon trainer'; break;
+                case 'nutrition': iconClass = 'notification-icon nutrition'; break;
+                case 'system': iconClass = 'notification-icon system'; break;
+            }
+            
+            // Get importance indicator
+            let importanceIndicator = '';
+            if (notification.importance) {
+                importanceIndicator = `<span class="notification-importance importance-${notification.importance}"></span>`;
+            }
+            
+            // Get time indicator
+            let timeIndicator = '';
+            if (notification.timeIndicator) {
+                timeIndicator = `<span class="time-indicator time-${notification.timeIndicator}">${notification.timeIndicator.replace('-', ' ')}</span>`;
+            }
+            
+            // Get category badge
+            let categoryBadge = '';
+            if (notification.category) {
+                categoryBadge = `<span class="notification-category category-${notification.category}">${notification.category}</span>`;
+            }
+            
+            item.innerHTML = `
+                <div class="${iconClass}">
+                    <i class="${notification.icon}"></i>
+                </div>
+                <div class="notification-content">
+                    <h6>
+                        ${importanceIndicator}
+                        ${notification.title}
+                        ${timeIndicator}
+                        ${categoryBadge}
+                    </h6>
+                    <p>${notification.message}</p>
+                    <div class="notification-time">
+                        <i class="far fa-clock me-1"></i> ${notification.time}
+                    </div>
+                    <div class="notification-actions">
+                        <button class="btn-outline-member btn-outline-member-sm" onclick="toggleReadStatus(${notification.id})">
+                            <i class="fas fa-${notification.read ? 'envelope' : 'envelope-open'} me-1"></i>
+                            ${notification.read ? 'Mark as Unread' : 'Mark as Read'}
+                        </button>
+                    </div>
+                </div>
+                <div class="notification-more" onclick="showNotificationActions(${notification.id}, event)">
+                    <i class="fas fa-ellipsis-v"></i>
+                </div>
+            `;
+            
+            // Add click handler to mark as read
+            item.addEventListener('click', (e) => {
+                // Don't trigger if clicking on action buttons
+                if (!e.target.closest('.notification-actions') && !e.target.closest('.notification-more')) {
+                    markAsRead(notification.id);
+                    // In real app, this might open notification details
+                    showNotificationDetails(notification.id);
+                }
+            });
+            
+            return item;
+        }
+        
+        // Setup Notification Tabs
+        function setupNotificationTabs() {
+            const tabs = document.querySelectorAll('.notification-tab');
+            
+            tabs.forEach(tab => {
+                tab.addEventListener('click', () => {
+                    // Remove active class from all tabs
+                    tabs.forEach(t => t.classList.remove('active'));
+                    
+                    // Add active class to clicked tab
+                    tab.classList.add('active');
+                    
+                    // Update current filter
+                    currentFilter = tab.dataset.tab;
+                    
+                    // Re-render notifications
+                    renderNotifications();
+                });
+            });
+        }
+        
+        // Update Notification Counts
+        function updateNotificationCounts() {
+            const unreadCount = notifications.filter(n => !n.read).length;
+            const workoutCount = notifications.filter(n => n.type === 'workout').length;
+            const achievementCount = notifications.filter(n => n.type === 'achievement').length;
+            const trainerCount = notifications.filter(n => n.type === 'trainer').length;
+            const systemCount = notifications.filter(n => n.type === 'system').length;
+            
+            // Update counters
+            document.getElementById('unreadCount').textContent = `${unreadCount} unread`;
+            document.getElementById('allCount').textContent = notifications.length;
+            document.getElementById('unreadTabCount').textContent = unreadCount;
+            document.getElementById('workoutCount').textContent = workoutCount;
+            document.getElementById('achievementCount').textContent = achievementCount;
+            document.getElementById('trainerCount').textContent = trainerCount;
+            document.getElementById('systemCount').textContent = systemCount;
+            
+            // Update sidebar badge
+            updateSidebarBadge(unreadCount);
+        }
+        
+        // Update Sidebar Badge
+        function updateSidebarBadge(count) {
+            const sidebarBadge = document.querySelector('.sidebar-menu .badge');
+            if (sidebarBadge) {
+                sidebarBadge.textContent = count;
+                if (count === 0) {
+                    sidebarBadge.style.display = 'none';
+                } else {
+                    sidebarBadge.style.display = 'flex';
+                }
+            }
+        }
+        
+        // Mark as Read
+        function markAsRead(id) {
+            const notification = notifications.find(n => n.id === id);
+            if (notification && !notification.read) {
+                notification.read = true;
+                saveNotifications();
+                renderNotifications();
+                updateNotificationCounts();
+                showToast('Notification marked as read');
+            }
+        }
+        
+        // Mark as Unread
+        function markAsUnread(id) {
+            const notification = notifications.find(n => n.id === id);
+            if (notification && notification.read) {
+                notification.read = false;
+                saveNotifications();
+                renderNotifications();
+                updateNotificationCounts();
+                showToast('Notification marked as unread');
+            }
+        }
+        
+        // Toggle Read Status
+        function toggleReadStatus(id) {
+            const notification = notifications.find(n => n.id === id);
+            if (notification) {
+                if (notification.read) {
+                    markAsUnread(id);
+                } else {
+                    markAsRead(id);
+                }
+            }
+        }
+        
+        // Delete Notification
+        function deleteNotification(id) {
+            notifications = notifications.filter(n => n.id !== id);
+            saveNotifications();
+            renderNotifications();
+            updateNotificationCounts();
+            showToast('Notification deleted');
+        }
+        
+        // Mark All as Read
+        function markAllAsRead() {
+            let changed = false;
+            notifications.forEach(notification => {
+                if (!notification.read) {
+                    notification.read = true;
+                    changed = true;
+                }
+            });
+            
+            if (changed) {
+                saveNotifications();
+                renderNotifications();
+                updateNotificationCounts();
+                showToast('All notifications marked as read');
+            } else {
+                showToast('All notifications are already read');
+            }
+        }
+        
+        // Clear All Notifications
+        function clearAllNotifications() {
+            if (confirm('Are you sure you want to clear all notifications?')) {
+                notifications = [];
+                saveNotifications();
+                renderNotifications();
+                updateNotificationCounts();
+                showToast('All notifications cleared');
+            }
+        }
+        
+        // Load Sample Notifications
+        function loadSampleNotifications() {
+            notifications = [...sampleNotifications];
+            saveNotifications();
+            renderNotifications();
+            updateNotificationCounts();
+            showToast('Sample notifications loaded');
+        }
+        
+        // Show Notification Actions Dropdown
+        function showNotificationActions(id, event) {
+            event.stopPropagation();
+            
+            // Remove any existing dropdowns
+            const existingDropdowns = document.querySelectorAll('.notification-actions-dropdown');
+            existingDropdowns.forEach(dropdown => dropdown.remove());
+            
+            // Find notification
+            const notification = notifications.find(n => n.id === id);
+            if (!notification) return;
+            
+            // Create dropdown
+            const dropdown = document.createElement('div');
+            dropdown.className = 'notification-actions-dropdown show';
+            
+            // Add action items
+            const actions = [
+                {
+                    icon: notification.read ? 'fa-envelope' : 'fa-envelope-open',
+                    text: notification.read ? 'Mark as Unread' : 'Mark as Read',
+                    action: () => toggleReadStatus(id)
+                },
+                {
+                    icon: 'fa-trash',
+                    text: 'Delete',
+                    action: () => deleteNotification(id)
+                },
+                {
+                    icon: 'fa-external-link-alt',
+                    text: 'View Details',
+                    action: () => showNotificationDetails(id)
+                }
+            ];
+            
+            // Add custom actions based on notification type
+            if (notification.type === 'workout') {
+                actions.splice(1, 0, {
+                    icon: 'fa-dumbbell',
+                    text: 'Start Workout',
+                    action: () => startWorkoutFromNotification(id)
+                });
+            }
+            
+            if (notification.type === 'achievement') {
+                actions.splice(1, 0, {
+                    icon: 'fa-share',
+                    text: 'Share Achievement',
+                    action: () => shareAchievement(id)
+                });
+            }
+            
+            if (notification.type === 'trainer') {
+                actions.splice(1, 0, {
+                    icon: 'fa-reply',
+                    text: 'Reply to Trainer',
+                    action: () => replyToTrainer(id)
+                });
+            }
+            
+            // Build dropdown HTML
+            let dropdownHTML = '';
+            actions.forEach(action => {
+                dropdownHTML += `
+                    <div class="dropdown-item" onclick="${action.action.name}(${id}); event.stopPropagation();">
+                        <i class="fas ${action.icon}"></i> ${action.text}
+                    </div>
+                `;
+            });
+            
+            dropdown.innerHTML = dropdownHTML;
+            
+            // Position and add dropdown
+            const target = event.currentTarget;
+            const rect = target.getBoundingClientRect();
+            dropdown.style.position = 'fixed';
+            dropdown.style.top = `${rect.bottom + window.scrollY}px`;
+            dropdown.style.right = `${window.innerWidth - rect.right}px`;
+            
+            document.body.appendChild(dropdown);
+            
+            // Close dropdown when clicking elsewhere
+            setTimeout(() => {
+                const closeDropdown = (e) => {
+                    if (!dropdown.contains(e.target) && !target.contains(e.target)) {
+                        dropdown.remove();
+                        document.removeEventListener('click', closeDropdown);
+                    }
+                };
+                document.addEventListener('click', closeDropdown);
+            }, 0);
+        }
+        
+        // Show Notification Details
+        function showNotificationDetails(id) {
+            const notification = notifications.find(n => n.id === id);
+            if (notification) {
+                alert(`Notification Details:\n\nTitle: ${notification.title}\n\nMessage: ${notification.message}\n\nTime: ${notification.time}\n\nType: ${notification.type}\n\nStatus: ${notification.read ? 'Read' : 'Unread'}`);
+            }
+        }
+        
+        // Start Workout from Notification
+        function startWorkoutFromNotification(id) {
+            const notification = notifications.find(n => n.id === id);
+            if (notification) {
+                showToast(`Starting workout: ${notification.title}`);
+                // In real app, this would redirect to workout page
+                window.location.href = 'member-workouts.html';
+            }
+        }
+        
+        // Share Achievement
+        function shareAchievement(id) {
+            const notification = notifications.find(n => n.id === id);
+            if (notification) {
+                const shareText = `I just unlocked an achievement on Smart Fit: ${notification.message}`;
+                
+                if (navigator.share) {
+                    navigator.share({
+                        title: 'My Achievement',
+                        text: shareText,
+                        url: window.location.href
+                    });
+                } else {
+                    navigator.clipboard.writeText(shareText).then(() => {
+                        showToast('Achievement copied to clipboard!');
+                    });
+                }
+            }
+        }
+        
+        // Reply to Trainer
+        function replyToTrainer(id) {
+            const notification = notifications.find(n => n.id === id);
+            if (notification) {
+                const message = prompt('Enter your reply to the trainer:');
+                if (message) {
+                    showToast('Message sent to trainer');
+                    // In real app, this would send message to trainer
+                }
+            }
+        }
+        
+        // Refresh Notifications
+        function refreshNotifications() {
+            // Simulate loading new notifications
+            showToast('Refreshing notifications...');
+            
+            setTimeout(() => {
+                // Check for new notifications (simulated)
+                const newNotification = {
+                    id: notifications.length + 1,
+                    type: 'system',
+                    icon: 'fas fa-sync-alt',
+                    title: 'Refresh Complete',
+                    message: 'Your notifications have been refreshed. No new notifications found.',
+                    time: 'Just now',
+                    read: false,
+                    importance: 'low',
+                    category: 'system',
+                    timeIndicator: 'just-now',
+                    actions: ['mark-read', 'delete']
+                };
+                
+                notifications.unshift(newNotification);
+                saveNotifications();
+                renderNotifications();
+                updateNotificationCounts();
+                showToast('Notifications refreshed');
+            }, 1000);
+        }
+        
+        // Load Notification Settings
+        function loadNotificationSettings() {
+            const settings = JSON.parse(localStorage.getItem('smartfit_notification_settings') || '{}');
+            
+            // Set toggle switches
+            document.getElementById('workoutReminders').checked = settings.workoutReminders !== false;
+            document.getElementById('achievementAlerts').checked = settings.achievementAlerts !== false;
+            document.getElementById('trainerMessages').checked = settings.trainerMessages !== false;
+            document.getElementById('nutritionTips').checked = settings.nutritionTips !== false;
+            document.getElementById('progressUpdates').checked = settings.progressUpdates !== false;
+            document.getElementById('pushNotifications').checked = settings.pushNotifications !== false;
+            document.getElementById('emailNotifications').checked = settings.emailNotifications === true;
+            document.getElementById('soundAlerts').checked = settings.soundAlerts !== false;
+            document.getElementById('quietHours').checked = settings.quietHours === true;
+        }
+        
+        // Save Notification Settings
+        function saveNotificationSettings() {
+            const settings = {
+                workoutReminders: document.getElementById('workoutReminders').checked,
+                achievementAlerts: document.getElementById('achievementAlerts').checked,
+                trainerMessages: document.getElementById('trainerMessages').checked,
+                nutritionTips: document.getElementById('nutritionTips').checked,
+                progressUpdates: document.getElementById('progressUpdates').checked,
+                pushNotifications: document.getElementById('pushNotifications').checked,
+                emailNotifications: document.getElementById('emailNotifications').checked,
+                soundAlerts: document.getElementById('soundAlerts').checked,
+                quietHours: document.getElementById('quietHours').checked
+            };
+            
+            localStorage.setItem('smartfit_notification_settings', JSON.stringify(settings));
+            showToast('Notification settings saved');
+        }
+        
+        // Reset Notification Settings
+        function resetNotificationSettings() {
+            if (confirm('Reset all notification settings to default?')) {
+                localStorage.removeItem('smartfit_notification_settings');
+                loadNotificationSettings();
+                showToast('Notification settings reset to default');
+            }
+        }
+        
+        // Test Notification
+        function testNotification() {
+            // Create test notification
+            const testNotification = {
+                id: notifications.length + 1,
+                type: 'system',
+                icon: 'fas fa-bell',
+                title: 'Test Notification',
+                message: 'This is a test notification to check your notification settings.',
+                time: 'Just now',
+                read: false,
+                importance: 'low',
+                category: 'system',
+                timeIndicator: 'just-now',
+                actions: ['mark-read', 'delete']
+            };
+            
+            notifications.unshift(testNotification);
+            saveNotifications();
+            renderNotifications();
+            updateNotificationCounts();
+            
+            // Show toast
+            showToast('Test notification sent');
+            
+            // Play sound if enabled
+            if (document.getElementById('soundAlerts').checked) {
+                playNotificationSound();
+            }
+        }
+        
+        // Play Notification Sound
+        function playNotificationSound() {
+            // Create and play a simple notification sound
+            const audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            const oscillator = audioContext.createOscillator();
+            const gainNode = audioContext.createGain();
+            
+            oscillator.connect(gainNode);
+            gainNode.connect(audioContext.destination);
+            
+            oscillator.frequency.value = 800;
+            oscillator.type = 'sine';
+            
+            gainNode.gain.setValueAtTime(0, audioContext.currentTime);
+            gainNode.gain.linearRampToValueAtTime(0.1, audioContext.currentTime + 0.1);
+            gainNode.gain.linearRampToValueAtTime(0, audioContext.currentTime + 0.3);
+            
+            oscillator.start(audioContext.currentTime);
+            oscillator.stop(audioContext.currentTime + 0.3);
+        }
+        
+        // Open Notification Settings
+        function openNotificationSettings() {
+            document.querySelector('.notification-settings').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+        
+        // Show Toast Message
+        function showToast(message) {
+            // Remove existing toasts
+            const existingToasts = document.querySelectorAll('.custom-toast');
+            existingToasts.forEach(toast => toast.remove());
+            
+            // Create toast
+            const toast = document.createElement('div');
+            toast.className = 'custom-toast';
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="fas fa-check-circle me-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            // Style toast
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: var(--primary-color);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add to body
+            document.body.appendChild(toast);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease-out forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        // Simulate receiving new notifications periodically
+        function simulateNewNotifications() {
+            setInterval(() => {
+                // 10% chance of new notification
+                if (Math.random() < 0.1) {
+                    const notificationTypes = ['workout', 'achievement', 'trainer', 'system'];
+                    const randomType = notificationTypes[Math.floor(Math.random() * notificationTypes.length)];
+                    
+                    let newNotification;
+                    
+                    switch(randomType) {
+                        case 'workout':
+                            newNotification = {
+                                id: notifications.length + 1,
+                                type: 'workout',
+                                icon: 'fas fa-dumbbell',
+                                title: 'Daily Workout Reminder',
+                                message: 'Don\'t forget your scheduled workout today! Stay consistent for better results.',
+                                time: 'Just now',
+                                read: false,
+                                importance: 'medium',
+                                category: 'workout',
+                                timeIndicator: 'just-now',
+                                actions: ['mark-read', 'snooze', 'delete']
+                            };
+                            break;
+                            
+                        case 'achievement':
+                            newNotification = {
+                                id: notifications.length + 1,
+                                type: 'achievement',
+                                icon: 'fas fa-trophy',
+                                title: 'Weekly Goal Achieved',
+                                message: 'Congratulations! You completed all your weekly workout goals.',
+                                time: 'Just now',
+                                read: false,
+                                importance: 'high',
+                                category: 'achievement',
+                                timeIndicator: 'just-now',
+                                actions: ['celebrate', 'share', 'delete']
+                            };
+                            break;
+                            
+                        case 'trainer':
+                            newNotification = {
+                                id: notifications.length + 1,
+                                type: 'trainer',
+                                icon: 'fas fa-user-tie',
+                                title: 'New Message',
+                                message: 'Your trainer sent you a new message about your progress.',
+                                time: 'Just now',
+                                read: false,
+                                importance: 'medium',
+                                category: 'trainer',
+                                timeIndicator: 'just-now',
+                                actions: ['view-message', 'reply', 'delete']
+                            };
+                            break;
+                            
+                        case 'system':
+                            newNotification = {
+                                id: notifications.length + 1,
+                                type: 'system',
+                                icon: 'fas fa-info-circle',
+                                title: 'App Update Available',
+                                message: 'A new update is available for Smart Fit. Update for new features and improvements.',
+                                time: 'Just now',
+                                read: false,
+                                importance: 'low',
+                                category: 'system',
+                                timeIndicator: 'just-now',
+                                actions: ['update', 'remind-later', 'delete']
+                            };
+                            break;
+                    }
+                    
+                    if (newNotification) {
+                        notifications.unshift(newNotification);
+                        saveNotifications();
+                        
+                        // Only update if on notifications page
+                        if (window.location.pathname.includes('notifications')) {
+                            renderNotifications();
+                            updateNotificationCounts();
+                        }
+                        
+                        // Show notification badge
+                        updateSidebarBadge(notifications.filter(n => !n.read).length);
+                        
+                        // Play sound if enabled
+                        if (document.getElementById('soundAlerts')?.checked) {
+                            playNotificationSound();
+                        }
+                    }
+                }
+            }, 30000); // Check every 30 seconds
+        }
+        
+        // Start simulating notifications
+        setTimeout(() => {
+            simulateNewNotifications();
+        }, 10000);
+    </script>
+</body>
+</html>

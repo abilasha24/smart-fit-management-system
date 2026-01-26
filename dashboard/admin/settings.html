@@ -1,0 +1,2216 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Settings - Smart Fit Admin</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    
+    <!-- Color Picker -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/3.4.0/css/bootstrap-colorpicker.min.css">
+    
+    <style>
+        :root {
+            --primary-color: #4CAF50;
+            --secondary-color: #2E8B57;
+            --dark-color: #343a40;
+            --light-color: #f8f9fa;
+            --warning-color: #ffc107;
+            --danger-color: #dc3545;
+            --info-color: #17a2b8;
+            --sidebar-width: 250px;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: #f5f7fa;
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background-color: var(--dark-color);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 20px;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            text-align: center;
+            background: rgba(0,0,0,0.2);
+        }
+        
+        .sidebar-header h3 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-header h3 i {
+            margin-right: 10px;
+        }
+        
+        .sidebar-header small {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.85rem;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+        }
+        
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 2px;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 12px 20px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background-color: rgba(255,255,255,0.1);
+            color: white;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .sidebar-menu a.active {
+            background-color: var(--primary-color);
+            color: white;
+            border-left: 3px solid white;
+        }
+        
+        .sidebar-menu i {
+            margin-right: 10px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .sidebar-menu .badge {
+            margin-left: auto;
+            font-size: 0.7rem;
+            padding: 3px 8px;
+        }
+        
+        .sidebar-footer {
+            padding: 20px;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-footer .btn {
+            width: 100%;
+            padding: 8px;
+            font-size: 0.9rem;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 20px;
+            transition: all 0.3s;
+            min-width: 0;
+        }
+        
+        /* Header */
+        .dashboard-header {
+            background-color: white;
+            padding: 15px 30px;
+            border-bottom: 1px solid #e0e0e0;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+            margin-bottom: 25px;
+            border-radius: 10px;
+        }
+        
+        .header-left h4 {
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+        
+        .header-left p {
+            color: #6c757d;
+            margin: 0;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.2);
+        }
+        
+        .user-details h6 {
+            margin: 0;
+            font-weight: 600;
+        }
+        
+        .user-details small {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 25px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 15px rgba(76, 175, 80, 0.3);
+        }
+        
+        .page-header h1 {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .page-header p {
+            opacity: 0.9;
+            margin-bottom: 0;
+        }
+        
+        /* Settings Container */
+        .settings-container {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            gap: 30px;
+        }
+        
+        /* Settings Sidebar */
+        .settings-sidebar {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            overflow: hidden;
+        }
+        
+        .settings-nav {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .settings-nav li {
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .settings-nav li:last-child {
+            border-bottom: none;
+        }
+        
+        .settings-nav a {
+            display: flex;
+            align-items: center;
+            padding: 18px 25px;
+            color: #555;
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 4px solid transparent;
+        }
+        
+        .settings-nav a:hover {
+            background-color: #f8f9fa;
+            color: var(--primary-color);
+            border-left: 4px solid rgba(76, 175, 80, 0.3);
+        }
+        
+        .settings-nav a.active {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: var(--primary-color);
+            border-left: 4px solid var(--primary-color);
+            font-weight: 600;
+        }
+        
+        .settings-nav i {
+            margin-right: 12px;
+            width: 20px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        /* Settings Content */
+        .settings-content {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            padding: 0;
+            overflow: hidden;
+        }
+        
+        .settings-header {
+            padding: 25px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .settings-header h2 {
+            margin: 0;
+            color: var(--dark-color);
+            font-size: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .settings-header p {
+            color: #6c757d;
+            margin: 8px 0 0;
+        }
+        
+        .settings-body {
+            padding: 25px;
+        }
+        
+        /* Form Groups */
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: #444;
+            display: block;
+        }
+        
+        .form-control, .form-select {
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s;
+            width: 100%;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.2);
+            outline: none;
+        }
+        
+        .form-text {
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-top: 5px;
+            display: block;
+        }
+        
+        /* Form Sections */
+        .form-section {
+            margin-bottom: 35px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-section:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .form-section-title {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+        
+        /* Buttons */
+        .btn-admin {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: all 0.3s;
+            text-decoration: none;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        }
+        
+        .btn-admin:hover {
+            background: linear-gradient(135deg, var(--secondary-color), var(--primary-color));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(76, 175, 80, 0.4);
+        }
+        
+        .btn-outline-admin {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 5px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .btn-outline-admin:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(76, 175, 80, 0.3);
+        }
+        
+        /* Switch */
+        .form-check {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .form-check-input {
+            width: 50px;
+            height: 26px;
+            margin-right: 15px;
+        }
+        
+        .form-check-label {
+            font-weight: 500;
+            color: #444;
+        }
+        
+        /* Color Picker */
+        .color-picker-container {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .color-preview {
+            width: 40px;
+            height: 40px;
+            border-radius: 6px;
+            border: 2px solid #ddd;
+            cursor: pointer;
+        }
+        
+        /* File Upload */
+        .file-upload {
+            position: relative;
+            display: inline-block;
+            width: 100%;
+        }
+        
+        .file-upload-input {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-upload-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+            border: 2px dashed #ddd;
+            border-radius: 8px;
+            background-color: #f8f9fa;
+            color: #6c757d;
+            text-align: center;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .file-upload-label:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(76, 175, 80, 0.05);
+        }
+        
+        .file-upload-label i {
+            font-size: 2rem;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        /* Theme Preview */
+        .theme-preview {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 15px;
+        }
+        
+        .theme-option {
+            border: 2px solid #eee;
+            border-radius: 8px;
+            overflow: hidden;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .theme-option:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .theme-option.active {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 2px rgba(76, 175, 80, 0.3);
+        }
+        
+        .theme-colors {
+            height: 80px;
+            display: flex;
+        }
+        
+        .theme-colors div {
+            flex: 1;
+        }
+        
+        .theme-name {
+            padding: 10px;
+            text-align: center;
+            background-color: white;
+            font-weight: 500;
+        }
+        
+        /* Settings Footer */
+        .settings-footer {
+            padding: 25px;
+            border-top: 1px solid #eee;
+            background-color: #f8f9fa;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        /* Alert */
+        .alert {
+            padding: 15px 20px;
+            border-radius: 8px;
+            margin-bottom: 25px;
+            border-left: 4px solid;
+        }
+        
+        .alert-success {
+            background-color: rgba(76, 175, 80, 0.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .alert-warning {
+            background-color: rgba(255, 193, 7, 0.1);
+            border-color: var(--warning-color);
+            color: #856404;
+        }
+        
+        .alert-danger {
+            background-color: rgba(220, 53, 69, 0.1);
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+        }
+        
+        /* Tabs */
+        .settings-tabs {
+            display: flex;
+            border-bottom: 2px solid #eee;
+            margin-bottom: 25px;
+            flex-wrap: wrap;
+        }
+        
+        .settings-tab {
+            padding: 12px 25px;
+            border: none;
+            background: none;
+            font-weight: 500;
+            color: #6c757d;
+            cursor: pointer;
+            transition: all 0.3s;
+            border-bottom: 2px solid transparent;
+            margin-bottom: -2px;
+        }
+        
+        .settings-tab:hover {
+            color: var(--primary-color);
+        }
+        
+        .settings-tab.active {
+            color: var(--primary-color);
+            border-bottom-color: var(--primary-color);
+            font-weight: 600;
+        }
+        
+        /* Card Layout */
+        .settings-card {
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            padding: 25px;
+            margin-bottom: 25px;
+        }
+        
+        .settings-card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .settings-card-header h3 {
+            margin: 0;
+            color: var(--dark-color);
+            font-size: 1.3rem;
+        }
+        
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--dark-color);
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 1200px) {
+            .settings-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .settings-sidebar {
+                display: none;
+            }
+            
+            .settings-sidebar.active {
+                display: block;
+                position: fixed;
+                top: 0;
+                left: 0;
+                width: 300px;
+                height: 100vh;
+                z-index: 1100;
+                border-radius: 0;
+            }
+        }
+        
+        @media (max-width: 992px) {
+            .dashboard-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 15px;
+            }
+            
+            .user-info {
+                width: 100%;
+                justify-content: space-between;
+            }
+            
+            .settings-footer {
+                flex-direction: column;
+                align-items: stretch;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .settings-header h2 {
+                font-size: 1.3rem;
+            }
+            
+            .settings-body {
+                padding: 20px;
+            }
+            
+            .settings-footer {
+                padding: 20px;
+            }
+            
+            .theme-preview {
+                grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+            }
+        }
+        
+        @media (max-width: 576px) {
+            .main-content {
+                padding: 15px;
+            }
+            
+            .dashboard-header {
+                padding: 15px;
+            }
+            
+            .page-header {
+                padding: 20px;
+            }
+            
+            .settings-body {
+                padding: 15px;
+            }
+            
+            .settings-tab {
+                padding: 10px 15px;
+                font-size: 0.9rem;
+            }
+            
+            .settings-card {
+                padding: 20px;
+            }
+        }
+        
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+        
+        /* Animation */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .settings-card, .settings-sidebar, .settings-content {
+            animation: fadeIn 0.5s ease-out;
+        }
+        
+        /* Danger Zone */
+        .danger-zone {
+            border: 2px solid var(--danger-color);
+            border-radius: 10px;
+            padding: 25px;
+            background-color: rgba(220, 53, 69, 0.05);
+            margin-top: 40px;
+        }
+        
+        .danger-zone h4 {
+            color: var(--danger-color);
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .danger-zone p {
+            color: #666;
+            margin-bottom: 20px;
+        }
+        
+        .btn-danger {
+            background-color: var(--danger-color);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .btn-danger:hover {
+            background-color: #c82333;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(220, 53, 69, 0.3);
+        }
+        
+        /* Radio Buttons */
+        .radio-group {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .radio-option {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            padding: 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .radio-option:hover {
+            border-color: var(--primary-color);
+            background-color: rgba(76, 175, 80, 0.05);
+        }
+        
+        .radio-option.selected {
+            border-color: var(--primary-color);
+            background-color: rgba(76, 175, 80, 0.1);
+        }
+        
+        .radio-option input[type="radio"] {
+            margin: 0;
+        }
+        
+        .radio-label {
+            flex: 1;
+        }
+        
+        .radio-label strong {
+            display: block;
+            margin-bottom: 5px;
+        }
+        
+        .radio-label small {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        /* Permission Matrix */
+        .permission-table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        
+        .permission-table th {
+            background-color: #f8f9fa;
+            padding: 15px;
+            text-align: left;
+            font-weight: 600;
+            color: var(--dark-color);
+            border-bottom: 2px solid #e0e0e0;
+        }
+        
+        .permission-table td {
+            padding: 15px;
+            border-bottom: 1px solid #e0e0e0;
+            vertical-align: middle;
+        }
+        
+        .permission-table tr:hover {
+            background-color: #f8f9fa;
+        }
+        
+        /* API Keys */
+        .api-key {
+            background-color: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .api-key-info h5 {
+            margin: 0 0 5px;
+            font-size: 1rem;
+        }
+        
+        .api-key-info p {
+            margin: 0;
+            color: #666;
+            font-size: 0.85rem;
+        }
+        
+        .api-key-value {
+            font-family: monospace;
+            background-color: white;
+            padding: 8px 15px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            font-size: 0.9rem;
+            letter-spacing: 1px;
+        }
+        
+        /* Activity Log */
+        .activity-log {
+            max-height: 400px;
+            overflow-y: auto;
+        }
+        
+        .log-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 15px 0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+        
+        .log-item:last-child {
+            border-bottom: none;
+        }
+        
+        .log-icon {
+            width: 40px;
+            height: 40px;
+            min-width: 40px;
+            border-radius: 50%;
+            background-color: rgba(76, 175, 80, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            color: var(--primary-color);
+            font-size: 1rem;
+        }
+        
+        .log-content p {
+            margin: 0;
+            font-weight: 500;
+        }
+        
+        .log-content small {
+            color: #6c757d;
+            display: block;
+            margin-top: 2px;
+        }
+        
+        .log-time {
+            color: #6c757d;
+            font-size: 0.8rem;
+            margin-top: 5px;
+        }
+        
+        /* Backup Status */
+        .backup-status {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .backup-status i {
+            font-size: 1.5rem;
+        }
+        
+        .status-success {
+            color: var(--primary-color);
+        }
+        
+        .status-warning {
+            color: var(--warning-color);
+        }
+        
+        .status-danger {
+            color: var(--danger-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-crown"></i> Admin Panel</h3>
+                <small>Smart Fit Management</small>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="users.html"><i class="fas fa-users"></i> <span>Manage Users</span> <span class="badge bg-danger">24</span></a></li>
+                    <li><a href="workouts.html"><i class="fas fa-dumbbell"></i> <span>Workout Management</span></a></li>
+                    <li><a href="trainers.html"><i class="fas fa-user-tie"></i> <span>Trainers</span> <span class="badge bg-warning">5</span></a></li>
+                    <li><a href="workouts.html"><i class="fas fa-dumbbell"></i> <span>Workouts</span></a></li>
+                    <li><a href="payment.html"><i class="fas fa-credit-card"></i> <span>Payment Management</span></a></li>
+                    <li><a href="analytics.html"><i class="fas fa-chart-line"></i> <span>Analytics</span></a></li>
+                    <li><a href="#" class="active"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="../../index.html" class="btn btn-admin">
+                    <i class="fas fa-home"></i> <span>Back to Site</span>
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Mobile Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+        
+        <!-- Mobile Settings Sidebar Toggle -->
+        <button class="btn-admin" id="settingsNavToggle" style="display: none; position: fixed; bottom: 20px; right: 20px; z-index: 1000;">
+            <i class="fas fa-bars"></i> Settings Menu
+        </button>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div>
+                        <h4>Settings</h4>
+                        <p class="text-muted mb-0">Configure your Smart Fit system</p>
+                    </div>
+                </div>
+                
+                <div class="user-info">
+                    <div class="user-avatar">A</div>
+                    <div class="user-details">
+                        <h6 class="mb-0">Admin User</h6>
+                        <small class="text-muted">Super Administrator</small>
+                    </div>
+                    <a href="../../login.html" class="btn-outline-admin">
+                        <i class="fas fa-sign-out-alt"></i> Logout
+                    </a>
+                </div>
+            </header>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                    <div>
+                        <h1><i class="fas fa-cog"></i> System Settings</h1>
+                        <p>Configure application preferences, security, notifications and more</p>
+                    </div>
+                    <button class="btn btn-admin" onclick="saveAllSettings()">
+                        <i class="fas fa-save"></i> Save All Changes
+                    </button>
+                </div>
+            </div>
+
+            <!-- Settings Container -->
+            <div class="settings-container">
+                <!-- Settings Sidebar -->
+                <aside class="settings-sidebar" id="settingsSidebar">
+                    <ul class="settings-nav">
+                        <li>
+                            <a href="#general" class="active" onclick="showSettingsTab('general')">
+                                <i class="fas fa-sliders-h"></i> General Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#appearance" onclick="showSettingsTab('appearance')">
+                                <i class="fas fa-paint-brush"></i> Appearance
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#notifications" onclick="showSettingsTab('notifications')">
+                                <i class="fas fa-bell"></i> Notifications
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#security" onclick="showSettingsTab('security')">
+                                <i class="fas fa-shield-alt"></i> Security
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#users" onclick="showSettingsTab('users')">
+                                <i class="fas fa-users-cog"></i> User Management
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#payment" onclick="showSettingsTab('payment')">
+                                <i class="fas fa-credit-card"></i> Payment Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#email" onclick="showSettingsTab('email')">
+                                <i class="fas fa-envelope"></i> Email Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#integrations" onclick="showSettingsTab('integrations')">
+                                <i class="fas fa-plug"></i> Integrations
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#backup" onclick="showSettingsTab('backup')">
+                                <i class="fas fa-database"></i> Backup & Restore
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#api" onclick="showSettingsTab('api')">
+                                <i class="fas fa-code"></i> API Settings
+                            </a>
+                        </li>
+                        <li>
+                            <a href="#advanced" onclick="showSettingsTab('advanced')">
+                                <i class="fas fa-tools"></i> Advanced
+                            </a>
+                        </li>
+                    </ul>
+                </aside>
+
+                <!-- Settings Content -->
+                <div class="settings-content">
+                    <!-- General Settings Tab -->
+                    <div id="general" class="settings-tab-content active">
+                        <div class="settings-header">
+                            <h2><i class="fas fa-sliders-h"></i> General Settings</h2>
+                            <p>Configure basic application settings and preferences</p>
+                        </div>
+                        
+                        <div class="settings-body">
+                            <!-- Success Alert (Hidden by default) -->
+                            <div class="alert alert-success" id="successAlert" style="display: none;">
+                                <i class="fas fa-check-circle"></i> Settings saved successfully!
+                            </div>
+                            
+                            <div class="form-section">
+                                <h3 class="form-section-title">Application Information</h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="appName">Application Name</label>
+                                            <input type="text" class="form-control" id="appName" value="Smart Fit Management">
+                                            <small class="form-text">The name displayed throughout the application</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="appUrl">Application URL</label>
+                                            <input type="url" class="form-control" id="appUrl" value="https://smartfit.example.com">
+                                            <small class="form-text">Full URL to access the application</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="appDescription">Application Description</label>
+                                    <textarea class="form-control" id="appDescription" rows="3">Smart Fit Management System - Complete fitness center management solution</textarea>
+                                    <small class="form-text">Brief description of your application</small>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h3 class="form-section-title">Business Information</h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="businessName">Business Name</label>
+                                            <input type="text" class="form-control" id="businessName" value="Smart Fit Gym">
+                                            <small class="form-text">Official business name</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="businessEmail">Business Email</label>
+                                            <input type="email" class="form-control" id="businessEmail" value="contact@smartfit.example.com">
+                                            <small class="form-text">Primary contact email</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="businessPhone">Business Phone</label>
+                                            <input type="tel" class="form-control" id="businessPhone" value="+1 (555) 123-4567">
+                                            <small class="form-text">Primary contact phone number</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="businessAddress">Business Address</label>
+                                            <input type="text" class="form-control" id="businessAddress" value="123 Fitness St, City, State 12345">
+                                            <small class="form-text">Physical business address</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h3 class="form-section-title">Time & Date</h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="timezone">Time Zone</label>
+                                            <select class="form-select" id="timezone">
+                                                <option value="America/New_York" selected>Eastern Time (ET)</option>
+                                                <option value="America/Chicago">Central Time (CT)</option>
+                                                <option value="America/Denver">Mountain Time (MT)</option>
+                                                <option value="America/Los_Angeles">Pacific Time (PT)</option>
+                                                <option value="UTC">UTC</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="dateFormat">Date Format</label>
+                                            <select class="form-select" id="dateFormat">
+                                                <option value="MM/DD/YYYY" selected>MM/DD/YYYY</option>
+                                                <option value="DD/MM/YYYY">DD/MM/YYYY</option>
+                                                <option value="YYYY-MM-DD">YYYY-MM-DD</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="timeFormat">Time Format</label>
+                                            <select class="form-select" id="timeFormat">
+                                                <option value="12" selected>12-hour format</option>
+                                                <option value="24">24-hour format</option>
+                                            </select>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h3 class="form-section-title">System Preferences</h3>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="maintenanceMode">
+                                    <label class="form-check-label" for="maintenanceMode">
+                                        Enable Maintenance Mode
+                                        <small class="form-text d-block">When enabled, only administrators can access the site</small>
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="allowRegistration" checked>
+                                    <label class="form-check-label" for="allowRegistration">
+                                        Allow User Registration
+                                        <small class="form-text d-block">Allow new users to register accounts</small>
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="autoApproveUsers">
+                                    <label class="form-check-label" for="autoApproveUsers">
+                                        Auto-approve New Users
+                                        <small class="form-text d-block">Automatically approve new user registrations</small>
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="showTutorial" checked>
+                                    <label class="form-check-label" for="showTutorial">
+                                        Show Tutorial for New Users
+                                        <small class="form-text d-block">Display onboarding tutorial for new users</small>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-footer">
+                            <button class="btn-outline-admin" onclick="resetSettings()">
+                                <i class="fas fa-undo"></i> Reset to Defaults
+                            </button>
+                            <button class="btn btn-admin" onclick="saveSettings('general')">
+                                <i class="fas fa-save"></i> Save General Settings
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Appearance Tab -->
+                    <div id="appearance" class="settings-tab-content" style="display: none;">
+                        <div class="settings-header">
+                            <h2><i class="fas fa-paint-brush"></i> Appearance Settings</h2>
+                            <p>Customize the look and feel of your application</p>
+                        </div>
+                        
+                        <div class="settings-body">
+                            <div class="form-section">
+                                <h3 class="form-section-title">Theme Selection</h3>
+                                
+                                <div class="theme-preview">
+                                    <div class="theme-option active" onclick="selectTheme('default')">
+                                        <div class="theme-colors">
+                                            <div style="background-color: #4CAF50;"></div>
+                                            <div style="background-color: #2E8B57;"></div>
+                                            <div style="background-color: #343a40;"></div>
+                                        </div>
+                                        <div class="theme-name">Default Green</div>
+                                    </div>
+                                    
+                                    <div class="theme-option" onclick="selectTheme('blue')">
+                                        <div class="theme-colors">
+                                            <div style="background-color: #2196F3;"></div>
+                                            <div style="background-color: #0b7dda;"></div>
+                                            <div style="background-color: #343a40;"></div>
+                                        </div>
+                                        <div class="theme-name">Ocean Blue</div>
+                                    </div>
+                                    
+                                    <div class="theme-option" onclick="selectTheme('purple')">
+                                        <div class="theme-colors">
+                                            <div style="background-color: #9C27B0;"></div>
+                                            <div style="background-color: #7b1fa2;"></div>
+                                            <div style="background-color: #343a40;"></div>
+                                        </div>
+                                        <div class="theme-name">Royal Purple</div>
+                                    </div>
+                                    
+                                    <div class="theme-option" onclick="selectTheme('dark')">
+                                        <div class="theme-colors">
+                                            <div style="background-color: #333;"></div>
+                                            <div style="background-color: #222;"></div>
+                                            <div style="background-color: #111;"></div>
+                                        </div>
+                                        <div class="theme-name">Dark Mode</div>
+                                    </div>
+                                    
+                                    <div class="theme-option" onclick="selectTheme('orange')">
+                                        <div class="theme-colors">
+                                            <div style="background-color: #FF9800;"></div>
+                                            <div style="background-color: #F57C00;"></div>
+                                            <div style="background-color: #343a40;"></div>
+                                        </div>
+                                        <div class="theme-name">Sunset Orange</div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h3 class="form-section-title">Custom Colors</h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="primaryColor">Primary Color</label>
+                                            <div class="color-picker-container">
+                                                <div class="color-preview" id="primaryColorPreview" style="background-color: #4CAF50;"></div>
+                                                <input type="text" class="form-control" id="primaryColor" value="#4CAF50">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="secondaryColor">Secondary Color</label>
+                                            <div class="color-picker-container">
+                                                <div class="color-preview" id="secondaryColorPreview" style="background-color: #2E8B57;"></div>
+                                                <input type="text" class="form-control" id="secondaryColor" value="#2E8B57">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="accentColor">Accent Color</label>
+                                            <div class="color-picker-container">
+                                                <div class="color-preview" id="accentColorPreview" style="background-color: #FFC107;"></div>
+                                                <input type="text" class="form-control" id="accentColor" value="#FFC107">
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h3 class="form-section-title">Logo & Favicon</h3>
+                                
+                                <div class="row">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="logoUpload">Application Logo</label>
+                                            <div class="file-upload">
+                                                <input type="file" class="file-upload-input" id="logoUpload" accept="image/*">
+                                                <label for="logoUpload" class="file-upload-label">
+                                                    <i class="fas fa-cloud-upload-alt"></i>
+                                                    Click to upload logo
+                                                    <br>
+                                                    <small>Recommended: 200x60px, PNG or SVG</small>
+                                                </label>
+                                            </div>
+                                            <small class="form-text">This logo appears in the header and login page</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="faviconUpload">Favicon</label>
+                                            <div class="file-upload">
+                                                <input type="file" class="file-upload-input" id="faviconUpload" accept="image/x-icon,.png">
+                                                <label for="faviconUpload" class="file-upload-label">
+                                                    <i class="fas fa-cloud-upload-alt"></i>
+                                                    Click to upload favicon
+                                                    <br>
+                                                    <small>Recommended: 32x32px, ICO or PNG</small>
+                                                </label>
+                                            </div>
+                                            <small class="form-text">Small icon displayed in browser tabs</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-group">
+                                    <label for="loginBackground">Login Page Background</label>
+                                    <div class="file-upload">
+                                        <input type="file" class="file-upload-input" id="loginBackground" accept="image/*">
+                                        <label for="loginBackground" class="file-upload-label">
+                                            <i class="fas fa-cloud-upload-alt"></i>
+                                            Upload background image
+                                            <br>
+                                            <small>Recommended: 1920x1080px, JPG or PNG</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h3 class="form-section-title">Custom CSS</h3>
+                                
+                                <div class="form-group">
+                                    <label for="customCSS">Custom CSS Code</label>
+                                    <textarea class="form-control" id="customCSS" rows="6" placeholder="/* Add your custom CSS here */"></textarea>
+                                    <small class="form-text">Add custom CSS to override default styles</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-footer">
+                            <button class="btn-outline-admin" onclick="previewChanges()">
+                                <i class="fas fa-eye"></i> Preview Changes
+                            </button>
+                            <button class="btn btn-admin" onclick="saveSettings('appearance')">
+                                <i class="fas fa-save"></i> Save Appearance
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Notifications Tab -->
+                    <div id="notifications" class="settings-tab-content" style="display: none;">
+                        <div class="settings-header">
+                            <h2><i class="fas fa-bell"></i> Notification Settings</h2>
+                            <p>Configure how and when notifications are sent</p>
+                        </div>
+                        
+                        <div class="settings-body">
+                            <div class="settings-tabs">
+                                <button class="settings-tab active" onclick="showNotificationTab('email')">Email Notifications</button>
+                                <button class="settings-tab" onclick="showNotificationTab('push')">Push Notifications</button>
+                                <button class="settings-tab" onclick="showNotificationTab('sms')">SMS Notifications</button>
+                            </div>
+                            
+                            <!-- Email Notifications -->
+                            <div id="emailNotifications" class="notification-tab-content">
+                                <div class="form-section">
+                                    <h3 class="form-section-title">Email Notification Settings</h3>
+                                    
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="emailEnabled" checked>
+                                        <label class="form-check-label" for="emailEnabled">
+                                            Enable Email Notifications
+                                            <small class="form-text d-block">Send notifications via email</small>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="row mt-4">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="fromEmail">From Email Address</label>
+                                                <input type="email" class="form-control" id="fromEmail" value="noreply@smartfit.example.com">
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="fromName">From Name</label>
+                                                <input type="text" class="form-control" id="fromName" value="Smart Fit Management">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <h4 class="mt-4 mb-3">Notification Types</h4>
+                                    
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="newUserEmail" checked>
+                                        <label class="form-check-label" for="newUserEmail">
+                                            New User Registrations
+                                            <small class="form-text d-block">Send email when new users register</small>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="bookingEmail" checked>
+                                        <label class="form-check-label" for="bookingEmail">
+                                            Class Bookings
+                                            <small class="form-text d-block">Send email for class bookings and cancellations</small>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="paymentEmail" checked>
+                                        <label class="form-check-label" for="paymentEmail">
+                                            Payment Notifications
+                                            <small class="form-text d-block">Send email for successful payments and invoices</small>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="systemEmail" checked>
+                                        <label class="form-check-label" for="systemEmail">
+                                            System Notifications
+                                            <small class="form-text d-block">Send email for system alerts and updates</small>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="marketingEmail">
+                                        <label class="form-check-label" for="marketingEmail">
+                                            Marketing Emails
+                                            <small class="form-text d-block">Send promotional and newsletter emails</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Push Notifications -->
+                            <div id="pushNotifications" class="notification-tab-content" style="display: none;">
+                                <div class="form-section">
+                                    <h3 class="form-section-title">Push Notification Settings</h3>
+                                    
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="pushEnabled">
+                                        <label class="form-check-label" for="pushEnabled">
+                                            Enable Push Notifications
+                                            <small class="form-text d-block">Send browser push notifications</small>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="alert alert-warning mt-3">
+                                        <i class="fas fa-exclamation-triangle"></i> Push notifications require HTTPS and browser permission
+                                    </div>
+                                    
+                                    <div class="form-group mt-4">
+                                        <label for="vapidPublic">VAPID Public Key</label>
+                                        <input type="text" class="form-control" id="vapidPublic" placeholder="Enter your VAPID public key">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="vapidPrivate">VAPID Private Key</label>
+                                        <input type="password" class="form-control" id="vapidPrivate" placeholder="Enter your VAPID private key">
+                                    </div>
+                                    
+                                    <button class="btn-outline-admin mt-2">
+                                        <i class="fas fa-key"></i> Generate New Keys
+                                    </button>
+                                </div>
+                            </div>
+                            
+                            <!-- SMS Notifications -->
+                            <div id="smsNotifications" class="notification-tab-content" style="display: none;">
+                                <div class="form-section">
+                                    <h3 class="form-section-title">SMS Notification Settings</h3>
+                                    
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="smsEnabled">
+                                        <label class="form-check-label" for="smsEnabled">
+                                            Enable SMS Notifications
+                                            <small class="form-text d-block">Send SMS text messages</small>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="row mt-4">
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="smsProvider">SMS Provider</label>
+                                                <select class="form-select" id="smsProvider">
+                                                    <option value="">Select Provider</option>
+                                                    <option value="twilio">Twilio</option>
+                                                    <option value="nexmo">Vonage (Nexmo)</option>
+                                                    <option value="aws">Amazon SNS</option>
+                                                    <option value="custom">Custom API</option>
+                                                </select>
+                                            </div>
+                                        </div>
+                                        <div class="col-md-6">
+                                            <div class="form-group">
+                                                <label for="smsFrom">From Number</label>
+                                                <input type="text" class="form-control" id="smsFrom" placeholder="+1234567890">
+                                            </div>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="smsApiKey">API Key</label>
+                                        <input type="password" class="form-control" id="smsApiKey" placeholder="Enter your SMS provider API key">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label for="smsApiSecret">API Secret</label>
+                                        <input type="password" class="form-control" id="smsApiSecret" placeholder="Enter your SMS provider API secret">
+                                    </div>
+                                    
+                                    <div class="form-check mt-4">
+                                        <input class="form-check-input" type="checkbox" id="smsReminders">
+                                        <label class="form-check-label" for="smsReminders">
+                                            Send Class Reminders
+                                            <small class="form-text d-block">Send SMS reminders before scheduled classes</small>
+                                        </label>
+                                    </div>
+                                    
+                                    <div class="form-check">
+                                        <input class="form-check-input" type="checkbox" id="smsPromotions">
+                                        <label class="form-check-label" for="smsPromotions">
+                                            Send Promotional SMS
+                                            <small class="form-text d-block">Send promotional messages (requires user consent)</small>
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section mt-4">
+                                <h3 class="form-section-title">Test Notifications</h3>
+                                
+                                <p>Send a test notification to verify your settings</p>
+                                
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <button class="btn-outline-admin w-100" onclick="sendTestNotification('email')">
+                                            <i class="fas fa-envelope"></i> Test Email
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn-outline-admin w-100" onclick="sendTestNotification('push')">
+                                            <i class="fas fa-bell"></i> Test Push
+                                        </button>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <button class="btn-outline-admin w-100" onclick="sendTestNotification('sms')">
+                                            <i class="fas fa-sms"></i> Test SMS
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-footer">
+                            <button class="btn-outline-admin" onclick="resetNotificationSettings()">
+                                <i class="fas fa-undo"></i> Reset Notifications
+                            </button>
+                            <button class="btn btn-admin" onclick="saveSettings('notifications')">
+                                <i class="fas fa-save"></i> Save Notification Settings
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Security Tab -->
+                    <div id="security" class="settings-tab-content" style="display: none;">
+                        <div class="settings-header">
+                            <h2><i class="fas fa-shield-alt"></i> Security Settings</h2>
+                            <p>Configure security policies and authentication settings</p>
+                        </div>
+                        
+                        <div class="settings-body">
+                            <div class="form-section">
+                                <h3 class="form-section-title">Authentication Settings</h3>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="requireEmailVerification" checked>
+                                    <label class="form-check-label" for="requireEmailVerification">
+                                        Require Email Verification
+                                        <small class="form-text d-block">Users must verify their email address before accessing the system</small>
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="twoFactorAuth">
+                                    <label class="form-check-label" for="twoFactorAuth">
+                                        Enable Two-Factor Authentication
+                                        <small class="form-text d-block">Require 2FA for admin accounts</small>
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="rememberMe" checked>
+                                    <label class="form-check-label" for="rememberMe">
+                                        Enable "Remember Me" Feature
+                                        <small class="form-text d-block">Allow users to stay logged in</small>
+                                    </label>
+                                </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="sessionTimeout">Session Timeout (minutes)</label>
+                                            <input type="number" class="form-control" id="sessionTimeout" min="5" max="1440" value="60">
+                                            <small class="form-text">After this time, users will be automatically logged out</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="maxLoginAttempts">Max Login Attempts</label>
+                                            <input type="number" class="form-control" id="maxLoginAttempts" min="1" max="10" value="5">
+                                            <small class="form-text">Maximum failed login attempts before temporary lockout</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h3 class="form-section-title">Password Policy</h3>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="enforceStrongPasswords" checked>
+                                    <label class="form-check-label" for="enforceStrongPasswords">
+                                        Enforce Strong Passwords
+                                        <small class="form-text d-block">Require passwords to meet complexity requirements</small>
+                                    </label>
+                                </div>
+                                
+                                <div class="row mt-4">
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="minPasswordLength">Minimum Length</label>
+                                            <input type="number" class="form-control" id="minPasswordLength" min="6" max="32" value="8">
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="passwordExpiry">Expiry Days</label>
+                                            <input type="number" class="form-control" id="passwordExpiry" min="0" max="365" value="90">
+                                            <small class="form-text">0 = Never expire</small>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-4">
+                                        <div class="form-group">
+                                            <label for="passwordHistory">Password History</label>
+                                            <input type="number" class="form-control" id="passwordHistory" min="0" max="10" value="3">
+                                            <small class="form-text">Number of previous passwords to remember</small>
+                                        </div>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-check mt-3">
+                                    <input class="form-check-input" type="checkbox" id="requireUppercase" checked>
+                                    <label class="form-check-label" for="requireUppercase">
+                                        Require Uppercase Letters
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="requireLowercase" checked>
+                                    <label class="form-check-label" for="requireLowercase">
+                                        Require Lowercase Letters
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="requireNumbers" checked>
+                                    <label class="form-check-label" for="requireNumbers">
+                                        Require Numbers
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="requireSpecialChars" checked>
+                                    <label class="form-check-label" for="requireSpecialChars">
+                                        Require Special Characters
+                                    </label>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h3 class="form-section-title">IP Security</h3>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="ipWhitelist">
+                                    <label class="form-check-label" for="ipWhitelist">
+                                        Enable IP Whitelist
+                                        <small class="form-text d-block">Only allow access from specific IP addresses</small>
+                                    </label>
+                                </div>
+                                
+                                <div class="form-group mt-3">
+                                    <label for="allowedIPs">Allowed IP Addresses</label>
+                                    <textarea class="form-control" id="allowedIPs" rows="3" placeholder="Enter one IP address per line&#10;Example:&#10;192.168.1.1&#10;10.0.0.0/24"></textarea>
+                                    <small class="form-text">Enter one IP address or CIDR range per line</small>
+                                </div>
+                                
+                                <div class="form-check mt-4">
+                                    <input class="form-check-input" type="checkbox" id="blockFailedIPs">
+                                    <label class="form-check-label" for="blockFailedIPs">
+                                        Block IPs After Failed Attempts
+                                        <small class="form-text d-block">Temporarily block IPs with multiple failed login attempts</small>
+                                    </label>
+                                </div>
+                                
+                                <div class="row mt-3">
+                                    <div class="col-md-6">
+                                        <div class="form-group">
+                                            <label for="blockDuration">Block Duration (minutes)</label>
+                                            <input type="number" class="form-control" id="blockDuration" min="1" max="1440" value="30">
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section">
+                                <h3 class="form-section-title">Security Headers</h3>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="securityHeaders" checked>
+                                    <label class="form-check-label" for="securityHeaders">
+                                        Enable Security Headers
+                                        <small class="form-text d-block">Add security headers to HTTP responses (CSP, HSTS, etc.)</small>
+                                    </label>
+                                </div>
+                                
+                                <div class="form-check">
+                                    <input class="form-check-input" type="checkbox" id="hstsEnabled" checked>
+                                    <label class="form-check-label" for="hstsEnabled">
+                                        Enable HSTS (HTTP Strict Transport Security)
+                                        <small class="form-text d-block">Force browsers to use HTTPS</small>
+                                    </label>
+                                </div>
+                                
+                                <div class="form-group mt-3">
+                                    <label for="cspPolicy">Content Security Policy</label>
+                                    <textarea class="form-control" id="cspPolicy" rows="4">default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data: https:;</textarea>
+                                    <small class="form-text">Define allowed sources for content loading</small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="settings-footer">
+                            <button class="btn-outline-admin" onclick="runSecurityScan()">
+                                <i class="fas fa-shield-alt"></i> Run Security Scan
+                            </button>
+                            <button class="btn btn-admin" onclick="saveSettings('security')">
+                                <i class="fas fa-save"></i> Save Security Settings
+                            </button>
+                        </div>
+                    </div>
+                    
+                    <!-- Additional tabs would continue here... -->
+                    
+                    <!-- Danger Zone -->
+                    <div class="danger-zone mt-5">
+                        <h4><i class="fas fa-exclamation-triangle"></i> Danger Zone</h4>
+                        <p>These actions are irreversible. Please proceed with caution.</p>
+                        
+                        <div class="row">
+                            <div class="col-md-4">
+                                <button class="btn-danger w-100" onclick="clearCache()">
+                                    <i class="fas fa-trash"></i> Clear Cache
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn-danger w-100" onclick="resetAllSettings()">
+                                    <i class="fas fa-bomb"></i> Reset All Settings
+                                </button>
+                            </div>
+                            <div class="col-md-4">
+                                <button class="btn-danger w-100" onclick="deleteAllData()">
+                                    <i class="fas fa-skull-crossbones"></i> Delete All Data
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Color Picker -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-colorpicker/3.4.0/js/bootstrap-colorpicker.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        });
+        
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        });
+
+        // Settings Navigation
+        const settingsNavToggle = document.getElementById('settingsNavToggle');
+        const settingsSidebar = document.getElementById('settingsSidebar');
+        
+        // Show/hide settings sidebar on mobile
+        if (settingsNavToggle && settingsSidebar) {
+            settingsNavToggle.addEventListener('click', () => {
+                settingsSidebar.classList.toggle('active');
+            });
+            
+            // Hide sidebar when clicking outside on mobile
+            document.addEventListener('click', (e) => {
+                if (window.innerWidth <= 1200 && 
+                    !settingsSidebar.contains(e.target) && 
+                    !settingsNavToggle.contains(e.target) && 
+                    settingsSidebar.classList.contains('active')) {
+                    settingsSidebar.classList.remove('active');
+                }
+            });
+        }
+
+        // Show settings tab
+        function showSettingsTab(tabId) {
+            // Hide all tab contents
+            document.querySelectorAll('.settings-tab-content').forEach(tab => {
+                tab.style.display = 'none';
+                tab.classList.remove('active');
+            });
+            
+            // Show selected tab
+            const selectedTab = document.getElementById(tabId);
+            if (selectedTab) {
+                selectedTab.style.display = 'block';
+                selectedTab.classList.add('active');
+            }
+            
+            // Update navigation
+            document.querySelectorAll('.settings-nav a').forEach(link => {
+                link.classList.remove('active');
+                if (link.getAttribute('href') === `#${tabId}`) {
+                    link.classList.add('active');
+                }
+            });
+            
+            // Hide settings sidebar on mobile after selection
+            if (window.innerWidth <= 1200) {
+                settingsSidebar.classList.remove('active');
+            }
+        }
+
+        // Show notification sub-tab
+        function showNotificationTab(tabType) {
+            // Update tabs
+            document.querySelectorAll('.settings-tab').forEach(tab => {
+                tab.classList.remove('active');
+            });
+            event.target.classList.add('active');
+            
+            // Show selected content
+            document.querySelectorAll('.notification-tab-content').forEach(content => {
+                content.style.display = 'none';
+            });
+            
+            document.getElementById(`${tabType}Notifications`).style.display = 'block';
+        }
+
+        // Select theme
+        function selectTheme(themeName) {
+            document.querySelectorAll('.theme-option').forEach(option => {
+                option.classList.remove('active');
+            });
+            event.target.closest('.theme-option').classList.add('active');
+            
+            // Update color inputs based on theme
+            switch(themeName) {
+                case 'default':
+                    document.getElementById('primaryColor').value = '#4CAF50';
+                    document.getElementById('secondaryColor').value = '#2E8B57';
+                    break;
+                case 'blue':
+                    document.getElementById('primaryColor').value = '#2196F3';
+                    document.getElementById('secondaryColor').value = '#0b7dda';
+                    break;
+                case 'purple':
+                    document.getElementById('primaryColor').value = '#9C27B0';
+                    document.getElementById('secondaryColor').value = '#7b1fa2';
+                    break;
+                case 'dark':
+                    document.getElementById('primaryColor').value = '#333';
+                    document.getElementById('secondaryColor').value = '#222';
+                    break;
+                case 'orange':
+                    document.getElementById('primaryColor').value = '#FF9800';
+                    document.getElementById('secondaryColor').value = '#F57C00';
+                    break;
+            }
+            
+            // Update preview
+            updateColorPreview();
+        }
+
+        // Update color preview
+        function updateColorPreview() {
+            const primaryColor = document.getElementById('primaryColor').value;
+            const secondaryColor = document.getElementById('secondaryColor').value;
+            const accentColor = document.getElementById('accentColor').value;
+            
+            document.getElementById('primaryColorPreview').style.backgroundColor = primaryColor;
+            document.getElementById('secondaryColorPreview').style.backgroundColor = secondaryColor;
+            document.getElementById('accentColorPreview').style.backgroundColor = accentColor;
+        }
+
+        // Initialize color pickers
+        function initColorPickers() {
+            // Add event listeners to color inputs
+            document.getElementById('primaryColor').addEventListener('input', updateColorPreview);
+            document.getElementById('secondaryColor').addEventListener('input', updateColorPreview);
+            document.getElementById('accentColor').addEventListener('input', updateColorPreview);
+            
+            // Update preview on page load
+            updateColorPreview();
+        }
+
+        // Save settings
+        function saveSettings(tab) {
+            // Show success message
+            const successAlert = document.getElementById('successAlert');
+            successAlert.style.display = 'block';
+            
+            // Hide after 3 seconds
+            setTimeout(() => {
+                successAlert.style.display = 'none';
+            }, 3000);
+            
+            // In a real application, this would send data to the server
+            console.log(`Saving ${tab} settings...`);
+            
+            // Simulate API call
+            setTimeout(() => {
+                console.log(`${tab} settings saved successfully!`);
+            }, 500);
+        }
+
+        // Save all settings
+        function saveAllSettings() {
+            const tabs = ['general', 'appearance', 'notifications', 'security'];
+            
+            tabs.forEach(tab => {
+                saveSettings(tab);
+            });
+            
+            alert('All settings have been saved successfully!');
+        }
+
+        // Reset settings to defaults
+        function resetSettings() {
+            if (confirm('Are you sure you want to reset general settings to defaults?')) {
+                // Reset form values
+                document.getElementById('appName').value = 'Smart Fit Management';
+                document.getElementById('appUrl').value = 'https://smartfit.example.com';
+                document.getElementById('timezone').value = 'America/New_York';
+                document.getElementById('maintenanceMode').checked = false;
+                document.getElementById('allowRegistration').checked = true;
+                
+                alert('General settings have been reset to defaults.');
+            }
+        }
+
+        // Reset notification settings
+        function resetNotificationSettings() {
+            if (confirm('Reset all notification settings to defaults?')) {
+                document.getElementById('emailEnabled').checked = true;
+                document.getElementById('pushEnabled').checked = false;
+                document.getElementById('smsEnabled').checked = false;
+                
+                alert('Notification settings have been reset.');
+            }
+        }
+
+        // Preview appearance changes
+        function previewChanges() {
+            alert('Appearance changes preview would be shown here.\n\nIn a real application, this would apply the changes temporarily for preview.');
+        }
+
+        // Send test notification
+        function sendTestNotification(type) {
+            let message = '';
+            
+            switch(type) {
+                case 'email':
+                    message = 'Test email notification sent! Check your inbox.';
+                    break;
+                case 'push':
+                    message = 'Test push notification sent! Check your browser.';
+                    break;
+                case 'sms':
+                    message = 'Test SMS notification sent! Check your phone.';
+                    break;
+            }
+            
+            alert(message);
+        }
+
+        // Run security scan
+        function runSecurityScan() {
+            alert('Running security scan...\n\nThis would check for security vulnerabilities in a real application.');
+            
+            // Simulate scan
+            setTimeout(() => {
+                alert('Security scan completed!\n\nNo critical issues found.\n3 minor recommendations:\n1. Enable Two-Factor Authentication\n2. Set up IP whitelist\n3. Update security headers');
+            }, 1500);
+        }
+
+        // Clear cache
+        function clearCache() {
+            if (confirm('Clear all cached data? This may temporarily slow down the application.')) {
+                alert('Cache cleared successfully!');
+            }
+        }
+
+        // Reset all settings
+        function resetAllSettings() {
+            if (confirm('WARNING: This will reset ALL settings to factory defaults. This action cannot be undone. Continue?')) {
+                alert('All settings have been reset to factory defaults. The page will now reload.');
+                setTimeout(() => {
+                    location.reload();
+                }, 1000);
+            }
+        }
+
+        // Delete all data
+        function deleteAllData() {
+            if (confirm('🚨 EXTREME DANGER 🚨\n\nThis will permanently delete ALL data including users, workouts, payments, and settings. This action is IRREVERSIBLE.\n\nType "DELETE ALL" to confirm:')) {
+                const confirmation = prompt('Please type "DELETE ALL" to confirm:');
+                if (confirmation === 'DELETE ALL') {
+                    alert('All data has been permanently deleted. The application will now reset.');
+                    setTimeout(() => {
+                        location.reload();
+                    }, 2000);
+                } else {
+                    alert('Action cancelled. Data was NOT deleted.');
+                }
+            }
+        }
+
+        // Check responsive behavior
+        function checkResponsive() {
+            if (window.innerWidth <= 1200) {
+                settingsNavToggle.style.display = 'block';
+            } else {
+                settingsNavToggle.style.display = 'none';
+                settingsSidebar.classList.remove('active');
+            }
+        }
+
+        // Initialize on page load
+        document.addEventListener('DOMContentLoaded', function() {
+            initColorPickers();
+            checkResponsive();
+            
+            // Handle responsive behavior
+            window.addEventListener('resize', checkResponsive);
+            
+            // File upload preview
+            document.querySelectorAll('.file-upload-input').forEach(input => {
+                input.addEventListener('change', function() {
+                    const label = this.nextElementSibling;
+                    const fileName = this.files[0]?.name || 'No file chosen';
+                    
+                    if (this.files[0]) {
+                        label.innerHTML = `<i class="fas fa-check-circle"></i> ${fileName}<br><small>Click to change</small>`;
+                        label.style.borderColor = '#4CAF50';
+                        label.style.backgroundColor = 'rgba(76, 175, 80, 0.05)';
+                    }
+                });
+            });
+            
+            // Radio option selection
+            document.querySelectorAll('.radio-option').forEach(option => {
+                option.addEventListener('click', function() {
+                    const radio = this.querySelector('input[type="radio"]');
+                    radio.checked = true;
+                    
+                    document.querySelectorAll('.radio-option').forEach(o => {
+                        o.classList.remove('selected');
+                    });
+                    
+                    this.classList.add('selected');
+                });
+            });
+        });
+    </script>
+</body>
+</html>

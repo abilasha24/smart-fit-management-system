@@ -1,0 +1,615 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Nutrition Plans - Trainer</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../../shared.css">
+
+    <!-- ADMIN SIDEBAR CSS (NEW) -->
+    <link rel="stylesheet" href="../assets/css/admin-sidebar.css">
+    
+    <style>
+        .nutrition-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .nutrition-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+            background: #4CAF50;
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+            color: #4CAF50;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .plans-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .plan-card {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+        }
+        
+        .plan-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+        }
+        
+        .plan-header {
+            padding: 25px;
+            color: white;
+            position: relative;
+            min-height: 120px;
+        }
+        
+        .plan-type {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            background: rgba(255,255,255,0.2);
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .plan-title {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .plan-duration {
+            font-size: 0.9rem;
+            opacity: 0.9;
+        }
+        
+        .plan-content {
+            padding: 25px;
+        }
+        
+        .plan-features {
+            margin: 20px 0;
+        }
+        
+        .feature-item {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+        }
+        
+        .feature-item i {
+            color: #4CAF50;
+        }
+        
+        .plan-meta {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 1px solid #eee;
+        }
+        
+        .meta-item {
+            text-align: center;
+        }
+        
+        .meta-value {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #333;
+        }
+        
+        .meta-label {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .plan-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 20px;
+        }
+        
+        .btn-edit-plan {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            flex: 1;
+        }
+        
+        .btn-assign-plan {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 8px;
+            flex: 1;
+        }
+        
+        .btn-delete-plan {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 10px;
+            border-radius: 8px;
+            width: 40px;
+        }
+        
+        .meal-plans-container {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        
+        .meal-plan {
+            margin-bottom: 25px;
+            padding-bottom: 25px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .meal-plan:last-child {
+            margin-bottom: 0;
+            border-bottom: none;
+        }
+        
+        .meal-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+        
+        .meal-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+            color: #333;
+        }
+        
+        .meal-time {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .meal-items {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 15px;
+        }
+        
+        .meal-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+        }
+        
+        .item-name {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .item-details {
+            display: flex;
+            justify-content: space-between;
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .empty-nutrition {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        
+        .empty-nutrition i {
+            font-size: 4rem;
+            color: #4CAF50;
+            opacity: 0.5;
+            margin-bottom: 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .nutrition-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .plans-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .nutrition-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-user-tie"></i> Trainer Panel</h3>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="exercises.html"><i class="fas fa-dumbbell"></i> <span>My Exercises</span></a></li>
+                    <li><a href="members.html"><i class="fas fa-users"></i> <span>My Members</span></a></li>
+                    <li><a href="earnings.html"><i class="fas fa-money-bill"></i> <span>Earnings</span></a></li>
+                    <li><a href="nutrition.html" class="active"><i class="fas fa-apple-alt"></i> <span>Nutrition Plans</span></a></li>
+                    <li><a href="schedule.html"><i class="fas fa-calendar"></i> <span>Schedule</span></a></li>
+                    <li><a href="messages.html"><i class="fas fa-comments"></i> <span>Messages</span></a></li>
+                    <li><a href="profile.html"><i class="fas fa-user"></i> <span>Profile</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="../../index.html" class="btn btn-outline-dashboard btn-sm w-100">
+                    <i class="fas fa-home"></i> <span>Back to Site</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div>
+                    <h4>Nutrition Plans</h4>
+                    <p class="text-muted">Create and manage nutrition plans for members</p>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">AJ</div>
+                    <div>
+                        <h6 class="mb-0">Alex Johnson</h6>
+                        <small class="text-muted">Certified Trainer</small>
+                    </div>
+                    <a href="../../login.html" class="btn btn-outline-dashboard ms-3"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </header>
+
+            <!-- Header Actions -->
+            <div class="nutrition-header">
+                <div>
+                    <h5>Nutrition Plan Library</h5>
+                    <p class="text-muted mb-0">Manage meal plans and nutritional guidance</p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" onclick="viewMealTemplates()">
+                        <i class="fas fa-clipboard-list me-2"></i> Meal Templates
+                    </button>
+                    <button class="btn btn-primary" onclick="createNutritionPlan()">
+                        <i class="fas fa-plus me-2"></i> Create Plan
+                    </button>
+                </div>
+            </div>
+
+            <!-- Stats -->
+            <div class="nutrition-stats">
+                <div class="stat-card">
+                    <div class="stat-number">18</div>
+                    <div class="stat-label">Active Plans</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">42</div>
+                    <div class="stat-label">Members Using</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">95%</div>
+                    <div class="stat-label">Satisfaction Rate</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">24</div>
+                    <div class="stat-label">Recipes Created</div>
+                </div>
+            </div>
+
+            <!-- Nutrition Plans Grid -->
+            <div class="plans-grid">
+                <!-- Weight Loss Plan -->
+                <div class="plan-card">
+                    <div class="plan-header" style="background: linear-gradient(135deg, #4CAF50, #2E7D32);">
+                        <span class="plan-type">Weight Loss</span>
+                        <h3 class="plan-title">Lean & Clean</h3>
+                        <p class="plan-duration">30-Day Program</p>
+                    </div>
+                    <div class="plan-content">
+                        <p>High-protein, moderate-carb plan for sustainable weight loss with energy maintenance.</p>
+                        
+                        <div class="plan-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Calorie Deficit: 500/day</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>High Protein: 35% of calories</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>5 meals per day</span>
+                            </div>
+                        </div>
+                        
+                        <div class="plan-meta">
+                            <div class="meta-item">
+                                <div class="meta-value">1,500</div>
+                                <div class="meta-label">Calories/day</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-value">28</div>
+                                <div class="meta-label">Members</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-value">4.8</div>
+                                <div class="meta-label">Rating</div>
+                            </div>
+                        </div>
+                        
+                        <div class="plan-actions">
+                            <button class="btn-edit-plan" onclick="editPlan(1)">Edit</button>
+                            <button class="btn-assign-plan" onclick="assignPlan(1)">Assign</button>
+                            <button class="btn-delete-plan" onclick="deletePlan(1)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Muscle Gain Plan -->
+                <div class="plan-card">
+                    <div class="plan-header" style="background: linear-gradient(135deg, #2196F3, #1565C0);">
+                        <span class="plan-type">Muscle Gain</span>
+                        <h3 class="plan-title">Mass Builder</h3>
+                        <p class="plan-duration">60-Day Program</p>
+                    </div>
+                    <div class="plan-content">
+                        <p>Calorie surplus plan with optimal macros for muscle growth and recovery.</p>
+                        
+                        <div class="plan-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Calorie Surplus: 300/day</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Protein: 1.8g per kg</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Post-workout nutrition</span>
+                            </div>
+                        </div>
+                        
+                        <div class="plan-meta">
+                            <div class="meta-item">
+                                <div class="meta-value">3,200</div>
+                                <div class="meta-label">Calories/day</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-value">15</div>
+                                <div class="meta-label">Members</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-value">4.7</div>
+                                <div class="meta-label">Rating</div>
+                            </div>
+                        </div>
+                        
+                        <div class="plan-actions">
+                            <button class="btn-edit-plan" onclick="editPlan(2)">Edit</button>
+                            <button class="btn-assign-plan" onclick="assignPlan(2)">Assign</button>
+                            <button class="btn-delete-plan" onclick="deletePlan(2)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Vegan Plan -->
+                <div class="plan-card">
+                    <div class="plan-header" style="background: linear-gradient(135deg, #FF9800, #EF6C00);">
+                        <span class="plan-type">Vegan</span>
+                        <h3 class="plan-title">Plant Power</h3>
+                        <p class="plan-duration">45-Day Program</p>
+                    </div>
+                    <div class="plan-content">
+                        <p>Complete plant-based nutrition plan with all essential amino acids and nutrients.</p>
+                        
+                        <div class="plan-features">
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>100% Plant-based</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>Complete protein sources</span>
+                            </div>
+                            <div class="feature-item">
+                                <i class="fas fa-check-circle"></i>
+                                <span>B12 & Omega-3 focused</span>
+                            </div>
+                        </div>
+                        
+                        <div class="plan-meta">
+                            <div class="meta-item">
+                                <div class="meta-value">2,100</div>
+                                <div class="meta-label">Calories/day</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-value">12</div>
+                                <div class="meta-label">Members</div>
+                            </div>
+                            <div class="meta-item">
+                                <div class="meta-value">4.9</div>
+                                <div class="meta-label">Rating</div>
+                            </div>
+                        </div>
+                        
+                        <div class="plan-actions">
+                            <button class="btn-edit-plan" onclick="editPlan(3)">Edit</button>
+                            <button class="btn-assign-plan" onclick="assignPlan(3)">Assign</button>
+                            <button class="btn-delete-plan" onclick="deletePlan(3)">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sample Meal Plan -->
+            <div class="meal-plans-container">
+                <h5>Today's Sample Meal Plan</h5>
+                <p class="text-muted mb-4">Example from "Lean & Clean" plan</p>
+                
+                <div class="meal-plan">
+                    <div class="meal-header">
+                        <div>
+                            <h6 class="meal-title">Breakfast</h6>
+                            <small class="meal-time">7:00 AM • 380 calories</small>
+                        </div>
+                        <span class="badge bg-success">High Protein</span>
+                    </div>
+                    <div class="meal-items">
+                        <div class="meal-item">
+                            <div class="item-name">Greek Yogurt Bowl</div>
+                            <div class="item-details">
+                                <span>Protein: 28g</span>
+                                <span>Carbs: 22g</span>
+                            </div>
+                        </div>
+                        <div class="meal-item">
+                            <div class="item-name">Mixed Berries</div>
+                            <div class="item-details">
+                                <span>Antioxidants</span>
+                                <span>Fiber: 8g</span>
+                            </div>
+                        </div>
+                        <div class="meal-item">
+                            <div class="item-name">Almonds</div>
+                            <div class="item-details">
+                                <span>Healthy Fats</span>
+                                <span>15g serving</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="meal-plan">
+                    <div class="meal-header">
+                        <div>
+                            <h6 class="meal-title">Lunch</h6>
+                            <small class="meal-time">12:30 PM • 450 calories</small>
+                        </div>
+                        <span class="badge bg-info">Balanced</span>
+                    </div>
+                    <div class="meal-items">
+                        <div class="meal-item">
+                            <div class="item-name">Grilled Chicken Salad</div>
+                            <div class="item-details">
+                                <span>Protein: 35g</span>
+                                <span>Carbs: 18g</span>
+                            </div>
+                        </div>
+                        <div class="meal-item">
+                            <div class="item-name">Quinoa</div>
+                            <div class="item-details">
+                                <span>Complete Protein</span>
+                                <span>1 cup cooked</span>
+                            </div>
+                        </div>
+                        <div class="meal-item">
+                            <div class="item-name">Avocado Dressing</div>
+                            <div class="item-details">
+                                <span>Healthy Fats</span>
+                                <span>Monounsaturated</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        function createNutritionPlan() {
+            alert('Opening nutrition plan creator...');
+        }
+        
+        function viewMealTemplates() {
+            alert('Loading meal templates...');
+        }
+        
+        function editPlan(id) {
+            alert(`Editing nutrition plan #${id}`);
+        }
+        
+        function assignPlan(id) {
+            alert(`Assigning nutrition plan #${id} to members`);
+        }
+        
+        function deletePlan(id) {
+            if (confirm(`Are you sure you want to delete nutrition plan #${id}?`)) {
+                alert(`Nutrition plan #${id} deleted successfully!`);
+            }
+        }
+    </script>
+</body>
+</html>

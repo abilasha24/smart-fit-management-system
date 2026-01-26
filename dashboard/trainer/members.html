@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Members - Trainer</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../../shared.css">
+    
+    <style>
+        .members-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .members-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 5px;
+            height: 100%;
+        }
+        
+        .stat-card:nth-child(1)::before { background: #2196F3; }
+        .stat-card:nth-child(2)::before { background: #4CAF50; }
+        .stat-card:nth-child(3)::before { background: #FF9800; }
+        .stat-card:nth-child(4)::before { background: #9C27B0; }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .stat-change {
+            font-size: 0.85rem;
+            margin-top: 10px;
+        }
+        
+        .stat-change.positive { color: #4CAF50; }
+        .stat-change.negative { color: #f44336; }
+        
+        .members-table-container {
+            background: white;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        
+        .table-header {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .search-box {
+            position: relative;
+            width: 300px;
+        }
+        
+        .search-box input {
+            width: 100%;
+            padding: 10px 15px 10px 40px;
+            border: 1px solid #ddd;
+            border-radius: 25px;
+            font-size: 0.9rem;
+        }
+        
+        .search-box i {
+            position: absolute;
+            left: 15px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: #666;
+        }
+        
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        
+        thead {
+            background: #f8f9fa;
+        }
+        
+        th {
+            padding: 15px 20px;
+            text-align: left;
+            font-weight: 600;
+            color: #333;
+            border-bottom: 2px solid #eee;
+        }
+        
+        td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .member-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .member-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #2196F3;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .member-name {
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .member-plan {
+            display: inline-block;
+            padding: 5px 12px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+        }
+        
+        .plan-premium { background: #E8F5E9; color: #2E7D32; }
+        .plan-standard { background: #E3F2FD; color: #1565C0; }
+        .plan-basic { background: #FFF3E0; color: #EF6C00; }
+        
+        .status-active { color: #4CAF50; }
+        .status-inactive { color: #f44336; }
+        .status-pending { color: #FF9800; }
+        
+        .btn-view {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+        }
+        
+        .btn-send {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 6px 15px;
+            border-radius: 5px;
+            font-size: 0.85rem;
+        }
+        
+        .pagination-container {
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .pagination {
+            margin: 0;
+        }
+        
+        .empty-members {
+            text-align: center;
+            padding: 50px 20px;
+        }
+        
+        @media (max-width: 768px) {
+            .members-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .search-box {
+                width: 100%;
+            }
+            
+            .members-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-user-tie"></i> Trainer Panel</h3>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="exercises.html"><i class="fas fa-dumbbell"></i> <span>My Exercises</span></a></li>
+                    <li><a href="members.html" class="active"><i class="fas fa-users"></i> <span>My Members</span></a></li>
+                    <li><a href="earnings.html"><i class="fas fa-money-bill"></i> <span>Earnings</span></a></li>
+                    <li><a href="nutrition.html"><i class="fas fa-apple-alt"></i> <span>Nutrition Plans</span></a></li>
+                    <li><a href="schedule.html"><i class="fas fa-calendar"></i> <span>Schedule</span></a></li>
+                    <li><a href="messages.html"><i class="fas fa-comments"></i> <span>Messages</span></a></li>
+                    <li><a href="profile.html"><i class="fas fa-user"></i> <span>Profile</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="../../index.html" class="btn btn-outline-dashboard btn-sm w-100">
+                    <i class="fas fa-home"></i> <span>Back to Site</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div>
+                    <h4>My Members</h4>
+                    <p class="text-muted">Manage your members and their progress</p>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">AJ</div>
+                    <div>
+                        <h6 class="mb-0">Alex Johnson</h6>
+                        <small class="text-muted">Certified Trainer</small>
+                    </div>
+                    <a href="../../login.html" class="btn btn-outline-dashboard ms-3"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </header>
+
+            <!-- Header Actions -->
+            <div class="members-header">
+                <div>
+                    <h5>Member Management</h5>
+                    <p class="text-muted mb-0">42 active members • 12 pending requests</p>
+                </div>
+                <button class="btn btn-primary" onclick="addNewMember()">
+                    <i class="fas fa-user-plus me-2"></i> Add New Member
+                </button>
+            </div>
+
+            <!-- Stats -->
+            <div class="members-stats">
+                <div class="stat-card">
+                    <div class="stat-number">42</div>
+                    <div class="stat-label">Total Members</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> 12% from last month
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">85%</div>
+                    <div class="stat-label">Retention Rate</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> 5% increase
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">12</div>
+                    <div class="stat-label">Pending Requests</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> 3 new today
+                    </div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">4.7</div>
+                    <div class="stat-label">Avg Satisfaction</div>
+                    <div class="stat-change positive">
+                        <i class="fas fa-arrow-up"></i> 0.2 improvement
+                    </div>
+                </div>
+            </div>
+
+            <!-- Members Table -->
+            <div class="members-table-container">
+                <div class="table-header">
+                    <h6 class="mb-0">All Members</h6>
+                    <div class="search-box">
+                        <i class="fas fa-search"></i>
+                        <input type="text" placeholder="Search members..." id="searchMembers">
+                    </div>
+                </div>
+                
+                <table>
+                    <thead>
+                        <tr>
+                            <th>Member</th>
+                            <th>Plan</th>
+                            <th>Start Date</th>
+                            <th>Progress</th>
+                            <th>Status</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody id="membersTable">
+                        <!-- Member 1 -->
+                        <tr>
+                            <td>
+                                <div class="member-info">
+                                    <div class="member-avatar">SR</div>
+                                    <div>
+                                        <div class="member-name">Sarah Rodriguez</div>
+                                        <small class="text-muted">sarah@email.com</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="member-plan plan-premium">Premium</span>
+                            </td>
+                            <td>Jan 15, 2024</td>
+                            <td>
+                                <div class="progress" style="height: 8px; width: 120px;">
+                                    <div class="progress-bar bg-success" style="width: 85%"></div>
+                                </div>
+                                <small>85% complete</small>
+                            </td>
+                            <td>
+                                <span class="status-active"><i class="fas fa-circle"></i> Active</span>
+                            </td>
+                            <td>
+                                <button class="btn-view me-1" onclick="viewMember(1)">View</button>
+                                <button class="btn-send" onclick="messageMember(1)">Message</button>
+                            </td>
+                        </tr>
+                        
+                        <!-- Member 2 -->
+                        <tr>
+                            <td>
+                                <div class="member-info">
+                                    <div class="member-avatar">MK</div>
+                                    <div>
+                                        <div class="member-name">Michael Kim</div>
+                                        <small class="text-muted">michael@email.com</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="member-plan plan-standard">Standard</span>
+                            </td>
+                            <td>Mar 22, 2024</td>
+                            <td>
+                                <div class="progress" style="height: 8px; width: 120px;">
+                                    <div class="progress-bar bg-warning" style="width: 45%"></div>
+                                </div>
+                                <small>45% complete</small>
+                            </td>
+                            <td>
+                                <span class="status-active"><i class="fas fa-circle"></i> Active</span>
+                            </td>
+                            <td>
+                                <button class="btn-view me-1" onclick="viewMember(2)">View</button>
+                                <button class="btn-send" onclick="messageMember(2)">Message</button>
+                            </td>
+                        </tr>
+                        
+                        <!-- Member 3 -->
+                        <tr>
+                            <td>
+                                <div class="member-info">
+                                    <div class="member-avatar">EC</div>
+                                    <div>
+                                        <div class="member-name">Emily Chen</div>
+                                        <small class="text-muted">emily@email.com</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="member-plan plan-premium">Premium</span>
+                            </td>
+                            <td>Feb 10, 2024</td>
+                            <td>
+                                <div class="progress" style="height: 8px; width: 120px;">
+                                    <div class="progress-bar bg-success" style="width: 92%"></div>
+                                </div>
+                                <small>92% complete</small>
+                            </td>
+                            <td>
+                                <span class="status-pending"><i class="fas fa-circle"></i> Pending</span>
+                            </td>
+                            <td>
+                                <button class="btn-view me-1" onclick="viewMember(3)">View</button>
+                                <button class="btn-send" onclick="messageMember(3)">Message</button>
+                            </td>
+                        </tr>
+                        
+                        <!-- Member 4 -->
+                        <tr>
+                            <td>
+                                <div class="member-info">
+                                    <div class="member-avatar">DJ</div>
+                                    <div>
+                                        <div class="member-name">David Johnson</div>
+                                        <small class="text-muted">david@email.com</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="member-plan plan-basic">Basic</span>
+                            </td>
+                            <td>Apr 5, 2024</td>
+                            <td>
+                                <div class="progress" style="height: 8px; width: 120px;">
+                                    <div class="progress-bar bg-danger" style="width: 25%"></div>
+                                </div>
+                                <small>25% complete</small>
+                            </td>
+                            <td>
+                                <span class="status-inactive"><i class="fas fa-circle"></i> Inactive</span>
+                            </td>
+                            <td>
+                                <button class="btn-view me-1" onclick="viewMember(4)">View</button>
+                                <button class="btn-send" onclick="messageMember(4)">Message</button>
+                            </td>
+                        </tr>
+                        
+                        <!-- Member 5 -->
+                        <tr>
+                            <td>
+                                <div class="member-info">
+                                    <div class="member-avatar">LW</div>
+                                    <div>
+                                        <div class="member-name">Lisa Wong</div>
+                                        <small class="text-muted">lisa@email.com</small>
+                                    </div>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="member-plan plan-premium">Premium</span>
+                            </td>
+                            <td>Dec 18, 2023</td>
+                            <td>
+                                <div class="progress" style="height: 8px; width: 120px;">
+                                    <div class="progress-bar bg-success" style="width: 100%"></div>
+                                </div>
+                                <small>100% complete</small>
+                            </td>
+                            <td>
+                                <span class="status-active"><i class="fas fa-circle"></i> Active</span>
+                            </td>
+                            <td>
+                                <button class="btn-view me-1" onclick="viewMember(5)">View</button>
+                                <button class="btn-send" onclick="messageMember(5)">Message</button>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+                
+                <div class="pagination-container">
+                    <div class="text-muted">
+                        Showing 1-5 of 42 members
+                    </div>
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination">
+                            <li class="page-item"><a class="page-link" href="#">Previous</a></li>
+                            <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                            <li class="page-item"><a class="page-link" href="#">2</a></li>
+                            <li class="page-item"><a class="page-link" href="#">3</a></li>
+                            <li class="page-item"><a class="page-link" href="#">Next</a></li>
+                        </ul>
+                    </nav>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Search functionality
+        document.getElementById('searchMembers').addEventListener('input', function(e) {
+            const searchTerm = e.target.value.toLowerCase();
+            const rows = document.querySelectorAll('#membersTable tr');
+            
+            rows.forEach(row => {
+                const text = row.textContent.toLowerCase();
+                if (text.includes(searchTerm)) {
+                    row.style.display = '';
+                } else {
+                    row.style.display = 'none';
+                }
+            });
+        });
+        
+        function addNewMember() {
+            alert('Opening new member form...');
+        }
+        
+        function viewMember(id) {
+            alert(`Viewing details for member #${id}`);
+        }
+        
+        function messageMember(id) {
+            alert(`Opening chat with member #${id}`);
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,795 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Workouts & Programs - Smart Fit</title>
+
+  <!-- Bootstrap CSS -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Font Awesome (for icons) -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" />
+
+  <!-- Project CSS -->
+  <link rel="stylesheet" href="css/shared.css" />
+  <link rel="stylesheet" href="css/style.css" />
+
+  <style>
+    /* Workouts Page Styles */
+    .workouts-hero {
+      background: linear-gradient(rgba(4, 148, 16, 0.7), rgba(3, 131, 20, 0.7)),
+        url('https://images.unsplash.com/photo-1536922246289-88c42f957773?ixlib=rb-4.0.3&auto=format&fit=crop&w=1920&q=80');
+      background-size: cover;
+      background-position: center;
+      color: white;
+      padding: 100px 0;
+      text-align: center;
+    }
+
+    .workouts-hero h1 {
+      font-weight: 800;
+      margin-bottom: 20px;
+      text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.5);
+    }
+
+    .workouts-section {
+      padding: 60px 0;
+    }
+
+    /* Filter Section */
+    .filter-section {
+      background: white;
+      border-radius: 15px;
+      padding: 25px;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+      margin-bottom: 40px;
+      position: sticky;
+      top: 20px;
+      z-index: 100;
+    }
+
+    .filter-title {
+      color: #333;
+      font-weight: 600;
+      margin-bottom: 20px;
+      padding-bottom: 10px;
+      border-bottom: 2px solid #4caf50;
+    }
+
+    .filter-group {
+      margin-bottom: 25px;
+    }
+
+    .filter-buttons {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+    }
+
+    .filter-btn {
+      background: #f8f9fa;
+      border: 2px solid #e0e0e0;
+      color: #555;
+      padding: 8px 20px;
+      border-radius: 25px;
+      font-weight: 500;
+      cursor: pointer;
+      transition: all 0.3s;
+    }
+
+    .filter-btn:hover {
+      border-color: #4caf50;
+      color: #4caf50;
+    }
+
+    .filter-btn.active {
+      background: #4caf50;
+      border-color: #4caf50;
+      color: white;
+    }
+
+    .search-box {
+      position: relative;
+      margin-bottom: 20px;
+    }
+
+    .search-input {
+      width: 100%;
+      padding: 12px 45px 12px 20px;
+      border: 2px solid #e0e0e0;
+      border-radius: 25px;
+      font-size: 1rem;
+      transition: all 0.3s;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: #4caf50;
+      box-shadow: 0 0 0 3px rgba(76, 175, 80, 0.1);
+    }
+
+    .search-icon {
+      position: absolute;
+      right: 20px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #666;
+    }
+
+    /* Workout Cards */
+    .workout-card {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 5px 20px rgba(0, 0, 0, 0.08);
+      transition: all 0.3s;
+      height: 100%;
+      margin-bottom: 30px;
+      animation: fadeIn 0.6s ease-out;
+    }
+
+    .workout-card:hover {
+      transform: translateY(-10px);
+      box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+    }
+
+    .workout-image {
+      height: 200px;
+      width: 100%;
+      object-fit: cover;
+    }
+
+    .workout-content {
+      padding: 25px;
+    }
+
+    .workout-category {
+      display: inline-block;
+      background: rgba(76, 175, 80, 0.1);
+      color: #4caf50;
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 600;
+      margin-bottom: 15px;
+    }
+
+    .workout-title {
+      font-size: 1.4rem;
+      font-weight: 700;
+      color: #333;
+      margin-bottom: 15px;
+      line-height: 1.3;
+    }
+
+    .workout-description {
+      color: #666;
+      margin-bottom: 20px;
+      line-height: 1.6;
+    }
+
+    .workout-meta {
+      display: flex;
+      justify-content: space-between;
+      margin-bottom: 20px;
+      flex-wrap: wrap;
+      gap: 10px;
+      align-items: center;
+    }
+
+    .workout-meta-item {
+      display: flex;
+      align-items: center;
+      color: #777;
+    }
+
+    .workout-meta-item i {
+      margin-right: 8px;
+      color: #4caf50;
+    }
+
+    .difficulty-badge {
+      padding: 5px 15px;
+      border-radius: 20px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+    }
+
+    .difficulty-beginner {
+      background: rgba(76, 175, 80, 0.1);
+      color: #4caf50;
+    }
+
+    .difficulty-intermediate {
+      background: rgba(255, 193, 7, 0.1);
+      color: #ffc107;
+    }
+
+    .difficulty-advanced {
+      background: rgba(220, 53, 69, 0.1);
+      color: #dc3545;
+    }
+
+    .btn-workout {
+      background: linear-gradient(135deg, #4caf50, #2e8b57);
+      color: white;
+      border: none;
+      padding: 12px 30px;
+      border-radius: 25px;
+      font-weight: 600;
+      width: 100%;
+      transition: all 0.3s;
+    }
+
+    .btn-workout:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+    }
+
+    /* Featured Programs */
+    .featured-section {
+      background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+      padding: 80px 0;
+      margin: 60px 0;
+    }
+
+    .featured-program {
+      background: white;
+      border-radius: 15px;
+      overflow: hidden;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .featured-content {
+      padding: 40px;
+    }
+
+    .featured-badge {
+      background: #ff6b35;
+      color: white;
+      padding: 8px 20px;
+      border-radius: 20px;
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 20px;
+    }
+
+    .featured-title {
+      font-size: 2rem;
+      font-weight: 800;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    .btn-featured {
+      background: #ff6b35;
+      color: white;
+      border: none;
+      padding: 15px 40px;
+      border-radius: 25px;
+      font-weight: 600;
+      margin-top: 20px;
+      transition: all 0.3s;
+    }
+
+    .btn-featured:hover {
+      background: #e55a2b;
+      transform: translateY(-3px);
+      box-shadow: 0 10px 20px rgba(255, 107, 53, 0.3);
+    }
+
+    /* Progress Section */
+    .progress-section {
+      padding: 60px 0;
+      background: white;
+    }
+
+    .progress-card {
+      background: linear-gradient(135deg, #4caf50, #2e8b57);
+      color: white;
+      border-radius: 15px;
+      padding: 40px;
+      text-align: center;
+    }
+
+    /* Empty State */
+    .empty-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .empty-icon {
+      font-size: 4rem;
+      color: #ddd;
+      margin-bottom: 20px;
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+      .workouts-hero {
+        padding: 60px 0;
+      }
+
+      .filter-section {
+        position: static;
+      }
+    }
+
+    /* Animation */
+    @keyframes fadeIn {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <!-- Navigation -->
+  <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+    <div class="container">
+      <a class="navbar-brand" href="index.html">
+        <i class="fas fa-dumbbell"></i> <strong>SMART FIT</strong>
+      </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+          <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+          <li class="nav-item"><a class="nav-link" href="pricing.html">Pricing</a></li>
+          <li class="nav-item"><a class="nav-link active" href="workouts.html">Workouts</a></li>
+          <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+          <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+          <li class="nav-item"><a class="btn btn-success ms-2" href="register.html">Sign Up</a></li>
+        </ul>
+      </div>
+    </div>
+  </nav>
+
+  <!-- Hero Section -->
+  <section class="workouts-hero">
+    <div class="container">
+      <h1 class="display-4">Workouts & Fitness Programs</h1>
+      <p class="lead">Discover hundreds of expert-designed workouts for every fitness level and goal</p>
+    </div>
+  </section>
+
+  <!-- Main Content -->
+  <section class="workouts-section">
+    <div class="container">
+      <div class="row">
+        <!-- Filters Sidebar -->
+        <div class="col-lg-3">
+          <div class="filter-section">
+            <h4 class="filter-title">Filter Workouts</h4>
+
+            <!-- Search -->
+            <div class="search-box">
+              <input type="text" class="search-input" placeholder="Search workouts..." id="searchInput" />
+              <i class="fas fa-search search-icon"></i>
+            </div>
+
+            <!-- Goal Filter -->
+            <div class="filter-group">
+              <h6>Fitness Goal</h6>
+              <div class="filter-buttons">
+                <button class="filter-btn active" data-filter="all">All</button>
+                <button class="filter-btn" data-filter="weight-loss">Weight Loss</button>
+                <button class="filter-btn" data-filter="muscle-gain">Muscle Gain</button>
+                <button class="filter-btn" data-filter="endurance">Endurance</button>
+                <button class="filter-btn" data-filter="flexibility">Flexibility</button>
+              </div>
+            </div>
+
+            <!-- Difficulty Filter -->
+            <div class="filter-group">
+              <h6>Difficulty Level</h6>
+              <div class="filter-buttons">
+                <button class="filter-btn active" data-difficulty="all">All Levels</button>
+                <button class="filter-btn" data-difficulty="beginner">Beginner</button>
+                <button class="filter-btn" data-difficulty="intermediate">Intermediate</button>
+                <button class="filter-btn" data-difficulty="advanced">Advanced</button>
+              </div>
+            </div>
+
+            <!-- Duration Filter -->
+            <div class="filter-group">
+              <h6>Duration</h6>
+              <div class="filter-buttons">
+                <button class="filter-btn active" data-duration="all">Any</button>
+                <button class="filter-btn" data-duration="short">Under 20min</button>
+                <button class="filter-btn" data-duration="medium">20-45min</button>
+                <button class="filter-btn" data-duration="long">45+ min</button>
+              </div>
+            </div>
+
+            <!-- Equipment Filter -->
+            <div class="filter-group">
+              <h6>Equipment</h6>
+              <div class="filter-buttons">
+                <button class="filter-btn active" data-equipment="all">Any</button>
+                <button class="filter-btn" data-equipment="none">No Equipment</button>
+                <button class="filter-btn" data-equipment="dumbbells">Dumbbells</button>
+                <button class="filter-btn" data-equipment="resistance">Resistance Bands</button>
+              </div>
+            </div>
+
+            <button class="btn-workout" id="resetFilters">Reset All Filters</button>
+          </div>
+        </div>
+
+        <!-- Workouts Grid -->
+        <div class="col-lg-9">
+          <div class="row" id="workoutsGrid">
+
+            <!-- Card 1 -->
+            <div class="col-md-6 col-lg-4" data-goal="weight-loss" data-difficulty="beginner" data-duration="medium" data-equipment="none">
+              <div class="workout-card">
+                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                  alt="Cardio Blast" class="workout-image" />
+                <div class="workout-content">
+                  <span class="workout-category">Cardio</span>
+                  <h3 class="workout-title">Cardio Blast for Beginners</h3>
+                  <p class="workout-description">Low-impact cardio workout perfect for beginners. Burn calories and improve cardiovascular health.</p>
+
+                  <div class="workout-meta">
+                    <div class="workout-meta-item"><i class="fas fa-clock"></i><span>30 mins</span></div>
+                    <div class="workout-meta-item"><i class="fas fa-fire"></i><span>280 cal</span></div>
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                  </div>
+
+                  <button class="btn-workout" onclick="startWorkout(1)">Start Workout</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 2 -->
+            <div class="col-md-6 col-lg-4" data-goal="muscle-gain" data-difficulty="intermediate" data-duration="long" data-equipment="dumbbells">
+              <div class="workout-card">
+                <img src="https://images.unsplash.com/photo-1534367507877-0edd93bd013b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                  alt="Full Body Strength" class="workout-image" />
+                <div class="workout-content">
+                  <span class="workout-category">Strength</span>
+                  <h3 class="workout-title">Full Body Strength</h3>
+                  <p class="workout-description">Build muscle and strength with this comprehensive full-body workout using dumbbells.</p>
+
+                  <div class="workout-meta">
+                    <div class="workout-meta-item"><i class="fas fa-clock"></i><span>50 mins</span></div>
+                    <div class="workout-meta-item"><i class="fas fa-dumbbell"></i><span>Strength</span></div>
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                  </div>
+
+                  <button class="btn-workout" onclick="startWorkout(2)">Start Workout</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 3 -->
+            <div class="col-md-6 col-lg-4" data-goal="flexibility" data-difficulty="beginner" data-duration="short" data-equipment="none">
+              <div class="workout-card">
+                <img src="https://images.unsplash.com/photo-1544367567-0f2fcb009e0b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                  alt="Morning Yoga" class="workout-image" />
+                <div class="workout-content">
+                  <span class="workout-category">Yoga</span>
+                  <h3 class="workout-title">Morning Yoga Flow</h3>
+                  <p class="workout-description">Gentle yoga sequence to start your day with energy and improve flexibility.</p>
+
+                  <div class="workout-meta">
+                    <div class="workout-meta-item"><i class="fas fa-clock"></i><span>15 mins</span></div>
+                    <div class="workout-meta-item"><i class="fas fa-heart"></i><span>Mindfulness</span></div>
+                    <span class="difficulty-badge difficulty-beginner">Beginner</span>
+                  </div>
+
+                  <button class="btn-workout" onclick="startWorkout(3)">Start Workout</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 4 -->
+            <div class="col-md-6 col-lg-4" data-goal="weight-loss" data-difficulty="intermediate" data-duration="medium" data-equipment="none">
+              <div class="workout-card">
+                <img src="https://images.unsplash.com/photo-1596357395217-80de13130e92?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                  alt="HIIT Workout" class="workout-image" />
+                <div class="workout-content">
+                  <span class="workout-category">HIIT</span>
+                  <h3 class="workout-title">Fat Burning HIIT</h3>
+                  <p class="workout-description">High-intensity interval training to maximize fat burn and boost metabolism.</p>
+
+                  <div class="workout-meta">
+                    <div class="workout-meta-item"><i class="fas fa-clock"></i><span>25 mins</span></div>
+                    <div class="workout-meta-item"><i class="fas fa-fire"></i><span>350 cal</span></div>
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                  </div>
+
+                  <button class="btn-workout" onclick="startWorkout(4)">Start Workout</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 5 -->
+            <div class="col-md-6 col-lg-4" data-goal="muscle-gain" data-difficulty="advanced" data-duration="long" data-equipment="dumbbells">
+              <div class="workout-card">
+                <img src="https://images.unsplash.com/photo-1534367507877-0edd93bd013b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                  alt="Advanced Strength" class="workout-image" />
+                <div class="workout-content">
+                  <span class="workout-category">Strength</span>
+                  <h3 class="workout-title">Advanced Power Lifting</h3>
+                  <p class="workout-description">Build maximum strength with compound movements and progressive overload.</p>
+
+                  <div class="workout-meta">
+                    <div class="workout-meta-item"><i class="fas fa-clock"></i><span>60 mins</span></div>
+                    <div class="workout-meta-item"><i class="fas fa-dumbbell"></i><span>Power</span></div>
+                    <span class="difficulty-badge difficulty-advanced">Advanced</span>
+                  </div>
+
+                  <button class="btn-workout" onclick="startWorkout(5)">Start Workout</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Card 6 -->
+            <div class="col-md-6 col-lg-4" data-goal="endurance" data-difficulty="intermediate" data-duration="long" data-equipment="resistance">
+              <div class="workout-card">
+                <img src="https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?ixlib=rb-4.0.3&auto=format&fit=crop&w=600&q=80"
+                  alt="Endurance Training" class="workout-image" />
+                <div class="workout-content">
+                  <span class="workout-category">Endurance</span>
+                  <h3 class="workout-title">Circuit Endurance</h3>
+                  <p class="workout-description">Build stamina and endurance with this challenging circuit training program.</p>
+
+                  <div class="workout-meta">
+                    <div class="workout-meta-item"><i class="fas fa-clock"></i><span>45 mins</span></div>
+                    <div class="workout-meta-item"><i class="fas fa-running"></i><span>Endurance</span></div>
+                    <span class="difficulty-badge difficulty-intermediate">Intermediate</span>
+                  </div>
+
+                  <button class="btn-workout" onclick="startWorkout(6)">Start Workout</button>
+                </div>
+              </div>
+            </div>
+
+          </div><!-- row -->
+        </div><!-- col -->
+      </div><!-- main row -->
+    </div><!-- container -->
+  </section>
+
+  <!-- Featured Program -->
+  <section class="featured-section">
+    <div class="container">
+      <div class="featured-program">
+        <div class="row align-items-center">
+          <div class="col-md-6">
+            <img src="https://images.unsplash.com/photo-1549060279-7e168fce7090?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80"
+              alt="30-Day Challenge" class="img-fluid" />
+          </div>
+          <div class="col-md-6">
+            <div class="featured-content">
+              <span class="featured-badge">FEATURED PROGRAM</span>
+              <h2 class="featured-title">30-Day Transformation Challenge</h2>
+              <p>Join thousands of members in our most popular program. Complete transformation with workouts, nutrition plans, and daily coaching.</p>
+
+              <div class="row mt-4">
+                <div class="col-4 text-center">
+                  <h3 class="text-success">30</h3>
+                  <p>Days</p>
+                </div>
+                <div class="col-4 text-center">
+                  <h3 class="text-success">60+</h3>
+                  <p>Workouts</p>
+                </div>
+                <div class="col-4 text-center">
+                  <h3 class="text-success">24/7</h3>
+                  <p>Support</p>
+                </div>
+              </div>
+
+              <button class="btn-featured" onclick="joinChallenge()">
+                <i class="fas fa-trophy me-2"></i> Join Challenge
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Progress Tracking -->
+  <section class="progress-section">
+    <div class="container">
+      <div class="progress-card">
+        <div class="row align-items-center">
+          <div class="col-md-8">
+            <h3 class="mb-3">Track Your Workout Progress</h3>
+            <p>Log your workouts, track calories burned, and monitor your fitness journey with our advanced tracking tools.</p>
+            <button class="btn btn-light btn-lg mt-3" onclick="window.location.href='login.html'">
+              <i class="fas fa-chart-line me-2"></i> View My Progress
+            </button>
+          </div>
+          <div class="col-md-4 text-center">
+            <i class="fas fa-chart-bar fa-5x opacity-75"></i>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Footer -->
+  <footer class="bg-dark text-white py-4">
+    <div class="container">
+      <div class="row">
+        <div class="col-md-6">
+          <h5>Smart Fit</h5>
+          <p>Your online fitness learning platform</p>
+        </div>
+        <div class="col-md-6 text-md-end">
+          <p class="mb-0">&copy; 2024 Smart Fit. All rights reserved.</p>
+          <p class="mb-0">B.Sc Software Engineering Project | ICBT Campus</p>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <!-- Bootstrap JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+  <script>
+    // Filtering Logic (NOW includes search too ✅)
+    let activeFilters = {
+      goal: "all",
+      difficulty: "all",
+      duration: "all",
+      equipment: "all",
+      search: ""
+    };
+
+    function setActive(buttons, clicked) {
+      buttons.forEach(b => b.classList.remove("active"));
+      clicked.classList.add("active");
+    }
+
+    // Goal filter
+    document.querySelectorAll('.filter-btn[data-filter]').forEach(btn => {
+      btn.addEventListener("click", function () {
+        setActive(document.querySelectorAll('.filter-btn[data-filter]'), this);
+        activeFilters.goal = this.dataset.filter;
+        filterWorkouts();
+      });
+    });
+
+    // Difficulty filter
+    document.querySelectorAll('.filter-btn[data-difficulty]').forEach(btn => {
+      btn.addEventListener("click", function () {
+        setActive(document.querySelectorAll('.filter-btn[data-difficulty]'), this);
+        activeFilters.difficulty = this.dataset.difficulty;
+        filterWorkouts();
+      });
+    });
+
+    // Duration filter
+    document.querySelectorAll('.filter-btn[data-duration]').forEach(btn => {
+      btn.addEventListener("click", function () {
+        setActive(document.querySelectorAll('.filter-btn[data-duration]'), this);
+        activeFilters.duration = this.dataset.duration;
+        filterWorkouts();
+      });
+    });
+
+    // Equipment filter
+    document.querySelectorAll('.filter-btn[data-equipment]').forEach(btn => {
+      btn.addEventListener("click", function () {
+        setActive(document.querySelectorAll('.filter-btn[data-equipment]'), this);
+        activeFilters.equipment = this.dataset.equipment;
+        filterWorkouts();
+      });
+    });
+
+    // Search
+    document.getElementById("searchInput").addEventListener("input", function () {
+      activeFilters.search = this.value.toLowerCase().trim();
+      filterWorkouts();
+    });
+
+    // Reset
+    document.getElementById("resetFilters").addEventListener("click", function () {
+      activeFilters = { goal: "all", difficulty: "all", duration: "all", equipment: "all", search: "" };
+      document.getElementById("searchInput").value = "";
+
+      document.querySelectorAll(".filter-btn").forEach(btn => btn.classList.remove("active"));
+
+      document.querySelector('.filter-btn[data-filter="all"]').classList.add("active");
+      document.querySelector('.filter-btn[data-difficulty="all"]').classList.add("active");
+      document.querySelector('.filter-btn[data-duration="all"]').classList.add("active");
+      document.querySelector('.filter-btn[data-equipment="all"]').classList.add("active");
+
+      filterWorkouts();
+    });
+
+    function filterWorkouts() {
+      const workoutItems = document.querySelectorAll("#workoutsGrid > div");
+
+      workoutItems.forEach(item => {
+        const goal = item.dataset.goal;
+        const difficulty = item.dataset.difficulty;
+        const duration = item.dataset.duration;
+        const equipment = item.dataset.equipment;
+
+        const card = item.querySelector(".workout-card");
+        const title = card.querySelector(".workout-title").textContent.toLowerCase();
+        const desc = card.querySelector(".workout-description").textContent.toLowerCase();
+        const cat = card.querySelector(".workout-category").textContent.toLowerCase();
+
+        let show = true;
+
+        if (activeFilters.goal !== "all" && goal !== activeFilters.goal) show = false;
+        if (activeFilters.difficulty !== "all" && difficulty !== activeFilters.difficulty) show = false;
+        if (activeFilters.duration !== "all" && duration !== activeFilters.duration) show = false;
+        if (activeFilters.equipment !== "all" && equipment !== activeFilters.equipment) show = false;
+
+        if (activeFilters.search) {
+          const ok = title.includes(activeFilters.search) || desc.includes(activeFilters.search) || cat.includes(activeFilters.search);
+          if (!ok) show = false;
+        }
+
+        item.style.display = show ? "block" : "none";
+      });
+
+      const visibleCount = Array.from(workoutItems).filter(i => i.style.display !== "none").length;
+
+      let emptyState = document.getElementById("emptyState");
+      if (visibleCount === 0) {
+        if (!emptyState) {
+          emptyState = document.createElement("div");
+          emptyState.id = "emptyState";
+          emptyState.className = "empty-state col-12";
+          emptyState.innerHTML = `
+            <div class="empty-icon"><i class="fas fa-dumbbell"></i></div>
+            <h4>No workouts found</h4>
+            <p>Try adjusting your filters or search text.</p>
+            <button class="btn-workout" onclick="document.getElementById('resetFilters').click()">Reset Filters</button>
+          `;
+          document.getElementById("workoutsGrid").appendChild(emptyState);
+        }
+      } else if (emptyState) {
+        emptyState.remove();
+      }
+    }
+
+    function startWorkout(id) {
+      const ok = confirm(
+        "Start workout?\n\nIn a real system, this would:\n1. Check user subscription\n2. Start workout timer\n3. Show exercise instructions\n4. Track completion"
+      );
+
+      if (ok) {
+        window.location.href = `workout-player.html?id=${id}`;
+      } else {
+        if (confirm("You need to be logged in to track workouts. Login now?")) {
+          window.location.href = "login.html";
+        }
+      }
+    }
+
+    function joinChallenge() {
+      alert(
+        "Join 30-Day Transformation Challenge!\n\nFeatures included:\n• Daily workout plans\n• Nutrition guidance\n• Progress tracking\n• Community support\n• Certificate of completion"
+      );
+
+      if (confirm("Join this challenge? (Requires Premium or Pro membership)")) {
+        window.location.href = "register.html";
+      }
+    }
+
+    // Init
+    filterWorkouts();
+  </script>
+</body>
+</html>

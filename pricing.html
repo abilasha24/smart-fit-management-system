@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pricing - Smart Fit</title>
+
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Font Awesome (IMPORTANT for icons) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+
+    <!-- Your CSS -->
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        /* Pricing Page Specific Styles */
+        .pricing-hero {
+            background: linear-gradient(135deg, #2E8B57, #4CAF50);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+        }
+
+        .pricing-hero h1 {
+            font-weight: 700;
+            margin-bottom: 20px;
+        }
+
+        .pricing-section {
+            padding: 60px 0;
+        }
+
+        .pricing-tabs {
+            display: flex;
+            justify-content: center;
+            margin-bottom: 40px;
+            border-radius: 50px;
+            background: #f8f9fa;
+            padding: 5px;
+            max-width: 400px;
+            margin: 0 auto 40px;
+        }
+
+        .pricing-tab {
+            flex: 1;
+            text-align: center;
+            padding: 12px 20px;
+            border-radius: 50px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .pricing-tab.active {
+            background: #4CAF50;
+            color: white;
+        }
+
+        .pricing-card {
+            background: white;
+            border-radius: 15px;
+            padding: 40px 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+            transition: all 0.3s;
+            margin-bottom: 30px;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .pricing-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.15);
+        }
+
+        .pricing-card.popular {
+            border: 3px solid #4CAF50;
+        }
+
+        .popular-badge {
+            position: absolute;
+            top: 20px;
+            right: -30px;
+            background: #FF6B35;
+            color: white;
+            padding: 8px 40px;
+            transform: rotate(45deg);
+            font-weight: 600;
+            font-size: 0.8rem;
+        }
+
+        .pricing-header { margin-bottom: 30px; }
+
+        .pricing-icon {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: rgba(76, 175, 80, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 20px;
+            font-size: 2rem;
+            color: #4CAF50;
+        }
+
+        .pricing-title {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        .pricing-price {
+            font-size: 3.5rem;
+            font-weight: 800;
+            color: #4CAF50;
+            margin-bottom: 10px;
+        }
+
+        .pricing-period { color: #666; font-size: 1rem; }
+
+        .pricing-features {
+            list-style: none;
+            padding: 0;
+            margin: 30px 0;
+        }
+
+        .pricing-features li {
+            padding: 12px 0;
+            border-bottom: 1px solid #f0f0f0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #555;
+        }
+
+        .pricing-features li:last-child { border-bottom: none; }
+
+        .pricing-features li i {
+            color: #4CAF50;
+            margin-right: 10px;
+            font-size: 1.2rem;
+        }
+
+        .pricing-features li.disabled { color: #ccc; }
+        .pricing-features li.disabled i { color: #ccc; }
+
+        .btn-pricing {
+            background: linear-gradient(135deg, #4CAF50, #2E8B57);
+            color: white;
+            border: none;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .btn-pricing:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-pricing-outline {
+            background: transparent;
+            color: #4CAF50;
+            border: 2px solid #4CAF50;
+            padding: 15px 40px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.1rem;
+            width: 100%;
+            transition: all 0.3s;
+        }
+
+        .btn-pricing-outline:hover {
+            background: #4CAF50;
+            color: white;
+        }
+
+        /* FAQ Section */
+        .faq-section {
+            padding: 60px 0;
+            background: #f8f9fa;
+        }
+
+        .faq-section h2 {
+            text-align: center;
+            margin-bottom: 40px;
+            color: #333;
+        }
+
+        .accordion-button:not(.collapsed) {
+            background-color: rgba(76, 175, 80, 0.1);
+            color: #2E8B57;
+            font-weight: 600;
+        }
+
+        .accordion-button:focus {
+            border-color: #4CAF50;
+            box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+        }
+
+        /* Comparison Table */
+        .comparison-section { padding: 60px 0; }
+
+        .comparison-table {
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.08);
+        }
+
+        .comparison-table th {
+            background: #4CAF50;
+            color: white;
+            padding: 20px;
+            font-weight: 600;
+        }
+
+        .comparison-table td {
+            padding: 15px 20px;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .comparison-table tr:last-child td { border-bottom: none; }
+
+        .feature-icon { color: #4CAF50; margin-right: 8px; }
+
+        /* Call to Action */
+        .cta-section {
+            background: linear-gradient(135deg, #2E8B57, #4CAF50);
+            color: white;
+            padding: 80px 0;
+            text-align: center;
+            border-radius: 15px;
+            margin: 60px 0;
+        }
+
+        .cta-section h2 {
+            margin-bottom: 20px;
+            font-weight: 700;
+        }
+
+        .btn-cta {
+            background: white;
+            color: #4CAF50;
+            border: none;
+            padding: 15px 50px;
+            border-radius: 50px;
+            font-weight: 600;
+            font-size: 1.2rem;
+            margin-top: 20px;
+            transition: all 0.3s;
+        }
+
+        .btn-cta:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
+        <div class="container">
+            <a class="navbar-brand" href="index.html">
+                <i class="fas fa-dumbbell"></i> <strong>SMART FIT</strong>
+            </a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item"><a class="nav-link" href="index.html">Home</a></li>
+                    <li class="nav-item"><a class="nav-link" href="about.html">About</a></li>
+                    <li class="nav-item"><a class="nav-link active" href="pricing.html">Pricing</a></li>
+                    <li class="nav-item"><a class="nav-link" href="workouts.html">Workouts</a></li>
+                    <li class="nav-item"><a class="nav-link" href="contact.html">Contact</a></li>
+                    <li class="nav-item"><a class="nav-link" href="login.html">Login</a></li>
+                    <li class="nav-item"><a class="btn btn-success ms-2" href="register.html">Sign Up</a></li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Hero Section -->
+    <section class="pricing-hero">
+        <div class="container">
+            <h1 class="display-4">Simple, Transparent Pricing</h1>
+            <p class="lead">Choose the perfect plan for your fitness journey. No hidden fees, cancel anytime.</p>
+        </div>
+    </section>
+
+    <!-- Pricing Tabs -->
+    <div class="container">
+        <div class="pricing-tabs">
+            <div class="pricing-tab active" data-target="member">For Members</div>
+            <div class="pricing-tab" data-target="trainer">For Trainers</div>
+        </div>
+    </div>
+
+    <!-- Member Pricing -->
+    <section class="pricing-section" id="member-pricing">
+        <div class="container">
+            <h2 class="text-center mb-5">Member Membership Plans</h2>
+            <div class="row">
+
+                <div class="col-md-4">
+                    <div class="pricing-card">
+                        <div class="pricing-header">
+                            <div class="pricing-icon">🏃‍♂️</div>
+                            <h3 class="pricing-title">Basic</h3>
+                            <div class="pricing-price">Free</div>
+                            <div class="pricing-period">Start your fitness journey</div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check"></i> Access to 50+ basic workouts</li>
+                            <li><i class="fas fa-check"></i> Progress tracking</li>
+                            <li><i class="fas fa-check"></i> Community support</li>
+                            <li><i class="fas fa-check"></i> Basic nutrition tips</li>
+                            <li class="disabled"><i class="fas fa-times"></i> Personal trainer</li>
+                            <li class="disabled"><i class="fas fa-times"></i> Custom workout plans</li>
+                            <li class="disabled"><i class="fas fa-times"></i> Advanced analytics</li>
+                        </ul>
+                        <button class="btn-pricing-outline" onclick="window.location.href='register.html'">Get Started</button>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="pricing-card popular">
+                        <div class="popular-badge">MOST POPULAR</div>
+                        <div class="pricing-header">
+                            <div class="pricing-icon">💪</div>
+                            <h3 class="pricing-title">Premium</h3>
+                            <div class="pricing-price">LKR 2,500</div>
+                            <div class="pricing-period">per month</div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check"></i> Unlimited workout access</li>
+                            <li><i class="fas fa-check"></i> Advanced progress tracking</li>
+                            <li><i class="fas fa-check"></i> Personal trainer matching</li>
+                            <li><i class="fas fa-check"></i> Custom nutrition plans</li>
+                            <li><i class="fas fa-check"></i> Video call consultations</li>
+                            <li><i class="fas fa-check"></i> Priority support</li>
+                            <li><i class="fas fa-check"></i> Weekly progress reports</li>
+                        </ul>
+                        <button class="btn-pricing" onclick="window.location.href='register.html'">Choose Premium</button>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="pricing-card">
+                        <div class="pricing-header">
+                            <div class="pricing-icon">👑</div>
+                            <h3 class="pricing-title">Pro</h3>
+                            <div class="pricing-price">LKR 5,000</div>
+                            <div class="pricing-period">per month</div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check"></i> Everything in Premium</li>
+                            <li><i class="fas fa-check"></i> Dedicated personal trainer</li>
+                            <li><i class="fas fa-check"></i> Live group classes</li>
+                            <li><i class="fas fa-check"></i> Meal planning & recipes</li>
+                            <li><i class="fas fa-check"></i> Injury prevention guidance</li>
+                            <li><i class="fas fa-check"></i> 24/7 chat support</li>
+                            <li><i class="fas fa-check"></i> Family sharing (3 accounts)</li>
+                        </ul>
+                        <button class="btn-pricing-outline" onclick="window.location.href='register.html'">Go Pro</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Trainer Pricing (Hidden by Default) -->
+    <section class="pricing-section" id="trainer-pricing" style="display: none;">
+        <div class="container">
+            <h2 class="text-center mb-5">Trainer Membership Plans</h2>
+            <div class="row">
+
+                <div class="col-md-4">
+                    <div class="pricing-card">
+                        <div class="pricing-header">
+                            <div class="pricing-icon">👨‍🏫</div>
+                            <h3 class="pricing-title">Starter</h3>
+                            <div class="pricing-price">Free</div>
+                            <div class="pricing-period">per month</div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check"></i> Create basic profile</li>
+                            <li><i class="fas fa-check"></i> Upload 5 workouts</li>
+                            <li><i class="fas fa-check"></i> Connect with 10 members</li>
+                            <li><i class="fas fa-check"></i> Basic analytics</li>
+                            <li class="disabled"><i class="fas fa-times"></i> Premium badge</li>
+                            <li class="disabled"><i class="fas fa-times"></i> Featured listing</li>
+                            <li class="disabled"><i class="fas fa-times"></i> Advanced analytics</li>
+                        </ul>
+                        <button class="btn-pricing-outline" onclick="window.location.href='register.html'">Start Free</button>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="pricing-card popular">
+                        <div class="popular-badge">RECOMMENDED</div>
+                        <div class="pricing-header">
+                            <div class="pricing-icon">⭐</div>
+                            <h3 class="pricing-title">Professional</h3>
+                            <div class="pricing-price">LKR 3,500</div>
+                            <div class="pricing-period">per month</div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check"></i> Unlimited workout uploads</li>
+                            <li><i class="fas fa-check"></i> Connect with unlimited members</li>
+                            <li><i class="fas fa-check"></i> Premium profile badge</li>
+                            <li><i class="fas fa-check"></i> Featured in search results</li>
+                            <li><i class="fas fa-check"></i> Advanced analytics dashboard</li>
+                            <li><i class="fas fa-check"></i> Payment processing</li>
+                            <li><i class="fas fa-check"></i> Priority support</li>
+                        </ul>
+                        <button class="btn-pricing" onclick="window.location.href='register.html'">Upgrade to Pro</button>
+                    </div>
+                </div>
+
+                <div class="col-md-4">
+                    <div class="pricing-card">
+                        <div class="pricing-header">
+                            <div class="pricing-icon">🏆</div>
+                            <h3 class="pricing-title">Elite</h3>
+                            <div class="pricing-price">LKR 7,500</div>
+                            <div class="pricing-period">per month</div>
+                        </div>
+                        <ul class="pricing-features">
+                            <li><i class="fas fa-check"></i> Everything in Professional</li>
+                            <li><i class="fas fa-check"></i> Top placement in search</li>
+                            <li><i class="fas fa-check"></i> Dedicated account manager</li>
+                            <li><i class="fas fa-check"></i> Custom promotional tools</li>
+                            <li><i class="fas fa-check"></i> Bulk member management</li>
+                            <li><i class="fas fa-check"></i> API access</li>
+                            <li><i class="fas fa-check"></i> White-label solutions</li>
+                        </ul>
+                        <button class="btn-pricing-outline" onclick="window.location.href='register.html'">Become Elite</button>
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </section>
+
+    <!-- Comparison Table -->
+    <section class="comparison-section">
+        <div class="container">
+            <h2 class="text-center mb-5">Plan Comparison</h2>
+            <div class="comparison-table">
+                <table class="table mb-0">
+                    <thead>
+                        <tr>
+                            <th>Features</th>
+                            <th>Basic</th>
+                            <th>Premium</th>
+                            <th>Pro</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td><i class="fas fa-dumbbell feature-icon"></i> Workout Access</td>
+                            <td>50+ basic</td>
+                            <td>Unlimited</td>
+                            <td>Unlimited + Premium</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-chart-line feature-icon"></i> Progress Tracking</td>
+                            <td>Basic</td>
+                            <td>Advanced</td>
+                            <td>Premium Analytics</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-user-tie feature-icon"></i> Trainer Support</td>
+                            <td>-</td>
+                            <td>Weekly check-ins</td>
+                            <td>Dedicated trainer</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-apple-alt feature-icon"></i> Nutrition Plans</td>
+                            <td>Basic tips</td>
+                            <td>Custom plans</td>
+                            <td>Meal planning + recipes</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-headset feature-icon"></i> Support</td>
+                            <td>Community</td>
+                            <td>Priority email</td>
+                            <td>24/7 chat + phone</td>
+                        </tr>
+                        <tr>
+                            <td><i class="fas fa-users feature-icon"></i> Family Sharing</td>
+                            <td>-</td>
+                            <td>-</td>
+                            <td>Up to 3 accounts</td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </section>
+
+    <!-- Call to Action -->
+    <section class="cta-section">
+        <div class="container">
+            <h2>Ready to Transform Your Fitness Journey?</h2>
+            <p class="lead mb-4">Join thousands of members who have achieved their fitness goals with Smart Fit</p>
+            <button class="btn-cta" onclick="window.location.href='register.html'">Start Free Trial - 14 Days</button>
+            <p class="mt-3">No credit card required. Cancel anytime.</p>
+        </div>
+    </section>
+
+    <!-- FAQ Section -->
+    <section class="faq-section">
+        <div class="container">
+            <h2>Frequently Asked Questions</h2>
+            <div class="accordion" id="pricingFaq">
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#faq1">
+                            Can I switch plans anytime?
+                        </button>
+                    </h2>
+                    <div id="faq1" class="accordion-collapse collapse show" data-bs-parent="#pricingFaq">
+                        <div class="accordion-body">
+                            Yes! You can upgrade or downgrade your plan at any time. Changes will take effect immediately, and we'll prorate your bill.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq2">
+                            Is there a contract or commitment?
+                        </button>
+                    </h2>
+                    <div id="faq2" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
+                        <div class="accordion-body">
+                            No contracts! All plans are month-to-month. You can cancel anytime from your account settings.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq3">
+                            What payment methods do you accept?
+                        </button>
+                    </h2>
+                    <div id="faq3" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
+                        <div class="accordion-body">
+                            We accept all major credit/debit cards (Visa, MasterCard, American Express), PayPal, and bank transfers for Sri Lankan customers.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq4">
+                            Do you offer discounts for students or seniors?
+                        </button>
+                    </h2>
+                    <div id="faq4" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
+                        <div class="accordion-body">
+                            Yes! We offer a 20% discount for students and seniors. Please contact our support team with proof of eligibility.
+                        </div>
+                    </div>
+                </div>
+
+                <div class="accordion-item">
+                    <h2 class="accordion-header">
+                        <button class="accordion-button collapsed" type="button" data-bs-toggle="collapse" data-bs-target="#faq5">
+                            Can I try before I buy?
+                        </button>
+                    </h2>
+                    <div id="faq5" class="accordion-collapse collapse" data-bs-parent="#pricingFaq">
+                        <div class="accordion-body">
+                            Absolutely! We offer a 14-day free trial for our Premium and Pro plans. No credit card required for the trial.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="bg-dark text-white py-4">
+        <div class="container">
+            <div class="row">
+                <div class="col-md-6">
+                    <h5>Smart Fit</h5>
+                    <p>Your online fitness learning platform</p>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <p class="mb-0">&copy; 2024 Smart Fit. All rights reserved.</p>
+                    <p class="mb-0">B.Sc Software Engineering Project | ICBT Campus</p>
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <!-- Bootstrap JS (ONLY needed) -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        // Pricing Tabs Functionality
+        document.querySelectorAll('.pricing-tab').forEach(tab => {
+            tab.addEventListener('click', function() {
+                document.querySelectorAll('.pricing-tab').forEach(t => t.classList.remove('active'));
+                this.classList.add('active');
+
+                const target = this.getAttribute('data-target');
+                if (target === 'member') {
+                    document.getElementById('member-pricing').style.display = 'block';
+                    document.getElementById('trainer-pricing').style.display = 'none';
+                } else {
+                    document.getElementById('member-pricing').style.display = 'none';
+                    document.getElementById('trainer-pricing').style.display = 'block';
+                }
+            });
+        });
+
+        // Free Trial Button Animation
+        const ctaBtn = document.querySelector('.btn-cta');
+        if (ctaBtn) {
+            ctaBtn.addEventListener('mouseenter', function() {
+                this.style.transform = 'translateY(-3px) scale(1.05)';
+            });
+
+            ctaBtn.addEventListener('mouseleave', function() {
+                this.style.transform = 'translateY(0) scale(1)';
+            });
+        }
+    </script>
+</body>
+</html>

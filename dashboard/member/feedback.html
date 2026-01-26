@@ -1,0 +1,2117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Feedback & Support - Smart Fit</title>
+    
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        :root {
+            --sidebar-width: 250px;
+            --primary-color: #3A86FF;
+            --primary-dark: #2667CC;
+            --secondary-color: #8338EC;
+            --success-color: #38B000;
+            --warning-color: #FF9E00;
+            --danger-color: #FF006E;
+            --info-color: #00BBF9;
+            --dark-color: #2B2D42;
+            --light-color: #f8f9fa;
+            --fitness-orange: #FF9E00;
+            --fitness-teal: #009688;
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: #333;
+            overflow-x: hidden;
+        }
+        
+        /* Dashboard Layout */
+        .dashboard-container {
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            background: linear-gradient(180deg, var(--dark-color), #1a1a1a);
+            color: white;
+            position: fixed;
+            height: 100vh;
+            overflow-y: auto;
+            z-index: 1000;
+            transition: all 0.3s;
+        }
+        
+        .sidebar-header {
+            padding: 25px 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+            background: rgba(0,0,0,0.2);
+        }
+        
+        .sidebar-header h3 {
+            color: var(--primary-color);
+            font-weight: 700;
+            margin: 0;
+            font-size: 1.5rem;
+        }
+        
+        .sidebar-header h3 i {
+            margin-right: 10px;
+        }
+        
+        .user-profile-sidebar {
+            padding: 20px;
+            text-align: center;
+            border-bottom: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .user-avatar-sidebar {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 2rem;
+            font-weight: bold;
+            margin: 0 auto 15px;
+            border: 4px solid rgba(255,255,255,0.2);
+        }
+        
+        .user-profile-sidebar h5 {
+            color: white;
+            margin-bottom: 5px;
+        }
+        
+        .user-profile-sidebar p {
+            color: rgba(255,255,255,0.7);
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .membership-badge {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.8rem;
+            font-weight: 600;
+            display: inline-block;
+        }
+        
+        .sidebar-menu {
+            padding: 20px 0;
+            height: calc(100vh - 300px);
+            overflow-y: auto;
+        }
+        
+        .sidebar-menu ul {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+        
+        .sidebar-menu li {
+            margin-bottom: 5px;
+        }
+        
+        .sidebar-menu a {
+            display: flex;
+            align-items: center;
+            padding: 15px 20px;
+            color: rgba(255,255,255,0.9);
+            text-decoration: none;
+            transition: all 0.3s;
+            border-left: 3px solid transparent;
+        }
+        
+        .sidebar-menu a:hover {
+            background: rgba(255,255,255,0.1);
+            color: white;
+            padding-left: 25px;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .sidebar-menu a.active {
+            background: rgba(58, 134, 255, 0.15);
+            color: white;
+            font-weight: 600;
+            border-left: 3px solid var(--primary-color);
+        }
+        
+        .sidebar-menu i {
+            width: 25px;
+            margin-right: 12px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+        
+        .sidebar-footer {
+            padding: 20px;
+            position: absolute;
+            bottom: 0;
+            width: 100%;
+            background: rgba(0,0,0,0.2);
+            border-top: 1px solid rgba(255,255,255,0.1);
+        }
+        
+        .sidebar-footer .btn {
+            width: 100%;
+            padding: 12px;
+            font-size: 0.9rem;
+            font-weight: 600;
+        }
+        
+        /* Main Content */
+        .main-content {
+            flex: 1;
+            margin-left: var(--sidebar-width);
+            padding: 25px;
+            transition: all 0.3s;
+            min-width: 0;
+        }
+        
+        /* Header */
+        .dashboard-header {
+            background-color: white;
+            padding: 20px 30px;
+            border-radius: 12px;
+            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
+            margin-bottom: 25px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .header-left h4 {
+            color: var(--dark-color);
+            margin-bottom: 5px;
+            font-weight: 600;
+        }
+        
+        .header-left p {
+            color: #6c757d;
+            margin: 0;
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+        
+        .user-avatar {
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            font-size: 1.2rem;
+            box-shadow: 0 3px 10px rgba(58, 134, 255, 0.3);
+        }
+        
+        .user-details h6 {
+            margin: 0;
+            font-weight: 600;
+            color: #333;
+        }
+        
+        .user-details small {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        /* Page Header */
+        .page-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border-radius: 12px;
+            padding: 30px;
+            margin-bottom: 30px;
+            box-shadow: 0 5px 20px rgba(58, 134, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .page-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            right: -10%;
+            width: 200px;
+            height: 200px;
+            background: rgba(255,255,255,0.1);
+            border-radius: 50%;
+        }
+        
+        .page-header-content {
+            position: relative;
+            z-index: 1;
+        }
+        
+        .page-header h2 {
+            margin-bottom: 10px;
+            font-weight: 600;
+        }
+        
+        .page-header p {
+            margin-bottom: 20px;
+            opacity: 0.9;
+            font-size: 1.1rem;
+            max-width: 600px;
+        }
+        
+        /* Feedback Container */
+        .feedback-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 30px;
+            margin-bottom: 30px;
+        }
+        
+        @media (max-width: 992px) {
+            .feedback-container {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        /* Submit Feedback Card */
+        .submit-feedback-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .card-header h5 {
+            margin: 0;
+            color: var(--dark-color);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .card-header h5 i {
+            color: var(--primary-color);
+        }
+        
+        /* Form Styles */
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 1rem;
+            transition: all 0.3s;
+        }
+        
+        .form-control:focus {
+            border-color: var(--primary-color);
+            box-shadow: 0 0 0 3px rgba(58, 134, 255, 0.1);
+            outline: none;
+        }
+        
+        textarea.form-control {
+            min-height: 120px;
+            resize: vertical;
+        }
+        
+        /* Feedback Type Selector */
+        .feedback-types {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .feedback-type {
+            flex: 1;
+            min-width: 120px;
+        }
+        
+        .feedback-type input[type="radio"] {
+            display: none;
+        }
+        
+        .feedback-type label {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 15px 10px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            height: 100%;
+        }
+        
+        .feedback-type label i {
+            font-size: 1.5rem;
+            margin-bottom: 8px;
+            color: #6c757d;
+        }
+        
+        .feedback-type label span {
+            font-weight: 500;
+            font-size: 0.9rem;
+        }
+        
+        .feedback-type input[type="radio"]:checked + label {
+            background: rgba(58, 134, 255, 0.1);
+            border-color: var(--primary-color);
+            color: var(--primary-color);
+        }
+        
+        .feedback-type input[type="radio"]:checked + label i {
+            color: var(--primary-color);
+        }
+        
+        /* Rating Stars */
+        .rating-container {
+            margin-bottom: 20px;
+        }
+        
+        .rating-label {
+            display: block;
+            margin-bottom: 10px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+        
+        .rating-stars {
+            display: flex;
+            gap: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .rating-star {
+            font-size: 2rem;
+            color: #ddd;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        
+        .rating-star:hover,
+        .rating-star.active {
+            color: #FFD700;
+        }
+        
+        .rating-text {
+            color: #666;
+            font-size: 0.9rem;
+            text-align: center;
+        }
+        
+        /* Priority Selector */
+        .priority-selector {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .priority-option {
+            flex: 1;
+            min-width: 100px;
+        }
+        
+        .priority-option input[type="radio"] {
+            display: none;
+        }
+        
+        .priority-option label {
+            display: block;
+            padding: 10px 15px;
+            background: #f8f9fa;
+            border: 2px solid #e0e0e0;
+            border-radius: 20px;
+            text-align: center;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .priority-option.priority-low input[type="radio"]:checked + label {
+            background: rgba(0, 187, 249, 0.1);
+            border-color: var(--info-color);
+            color: var(--info-color);
+        }
+        
+        .priority-option.priority-medium input[type="radio"]:checked + label {
+            background: rgba(255, 158, 0, 0.1);
+            border-color: var(--warning-color);
+            color: var(--warning-color);
+        }
+        
+        .priority-option.priority-high input[type="radio"]:checked + label {
+            background: rgba(255, 0, 110, 0.1);
+            border-color: var(--danger-color);
+            color: var(--danger-color);
+        }
+        
+        /* Feedback History Card */
+        .feedback-history-card {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        /* Feedback History */
+        .feedback-history {
+            max-height: 500px;
+            overflow-y: auto;
+        }
+        
+        .feedback-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-left: 4px solid var(--primary-color);
+            transition: all 0.3s;
+        }
+        
+        .feedback-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 3px 10px rgba(0,0,0,0.1);
+        }
+        
+        .feedback-item.closed {
+            border-left-color: var(--success-color);
+        }
+        
+        .feedback-item.in-progress {
+            border-left-color: var(--warning-color);
+        }
+        
+        .feedback-item.pending {
+            border-left-color: var(--info-color);
+        }
+        
+        .feedback-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 10px;
+        }
+        
+        .feedback-title {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 5px;
+        }
+        
+        .feedback-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 15px;
+        }
+        
+        .feedback-type-badge {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .feedback-type-badge.suggestion {
+            background: rgba(58, 134, 255, 0.1);
+            color: var(--primary-color);
+        }
+        
+        .feedback-type-badge.bug {
+            background: rgba(255, 0, 110, 0.1);
+            color: var(--danger-color);
+        }
+        
+        .feedback-type-badge.complaint {
+            background: rgba(255, 158, 0, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .feedback-type-badge.question {
+            background: rgba(0, 187, 249, 0.1);
+            color: var(--info-color);
+        }
+        
+        .feedback-type-badge.praise {
+            background: rgba(56, 176, 0, 0.1);
+            color: var(--success-color);
+        }
+        
+        .feedback-status {
+            padding: 3px 10px;
+            border-radius: 12px;
+            font-size: 0.75rem;
+            font-weight: 500;
+        }
+        
+        .status-closed {
+            background: rgba(56, 176, 0, 0.1);
+            color: var(--success-color);
+        }
+        
+        .status-in-progress {
+            background: rgba(255, 158, 0, 0.1);
+            color: var(--warning-color);
+        }
+        
+        .status-pending {
+            background: rgba(0, 187, 249, 0.1);
+            color: var(--info-color);
+        }
+        
+        .feedback-date {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        .feedback-content {
+            color: #666;
+            margin-bottom: 15px;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .feedback-rating {
+            display: flex;
+            align-items: center;
+            gap: 5px;
+            margin-bottom: 15px;
+        }
+        
+        .rating-display {
+            color: #FFD700;
+            font-size: 1rem;
+        }
+        
+        .rating-value {
+            font-weight: 600;
+            color: #666;
+            margin-left: 5px;
+        }
+        
+        .feedback-response {
+            background: white;
+            border-radius: 8px;
+            padding: 15px;
+            margin-top: 15px;
+            border-left: 3px solid var(--success-color);
+        }
+        
+        .response-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .response-title {
+            font-weight: 600;
+            color: var(--success-color);
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        
+        .response-date {
+            color: #6c757d;
+            font-size: 0.85rem;
+        }
+        
+        .response-content {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+        
+        .feedback-actions {
+            display: flex;
+            gap: 10px;
+            margin-top: 15px;
+        }
+        
+        /* Empty State */
+        .empty-state {
+            text-align: center;
+            padding: 40px 20px;
+        }
+        
+        .empty-state-icon {
+            font-size: 4rem;
+            color: #ddd;
+            margin-bottom: 20px;
+        }
+        
+        .empty-state h4 {
+            color: #666;
+            margin-bottom: 10px;
+        }
+        
+        .empty-state p {
+            color: #999;
+            margin-bottom: 20px;
+        }
+        
+        /* Statistics Card */
+        .statistics-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 20px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        /* FAQ Section */
+        .faq-section {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .faq-item {
+            margin-bottom: 15px;
+            border-bottom: 1px solid #f0f0f0;
+            padding-bottom: 15px;
+        }
+        
+        .faq-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+        
+        .faq-question {
+            font-weight: 600;
+            color: var(--dark-color);
+            margin-bottom: 8px;
+            cursor: pointer;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .faq-question:hover {
+            color: var(--primary-color);
+        }
+        
+        .faq-answer {
+            color: #666;
+            font-size: 0.95rem;
+            line-height: 1.5;
+            display: none;
+        }
+        
+        .faq-answer.show {
+            display: block;
+        }
+        
+        /* Buttons */
+        .btn-member {
+            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 8px;
+            font-weight: 600;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(58, 134, 255, 0.3);
+        }
+        
+        .btn-member:hover {
+            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 15px rgba(58, 134, 255, 0.4);
+        }
+        
+        .btn-member-sm {
+            padding: 8px 15px;
+            font-size: 0.85rem;
+        }
+        
+        .btn-outline-member {
+            background-color: transparent;
+            color: var(--primary-color);
+            border: 1px solid var(--primary-color);
+            padding: 10px 20px;
+            border-radius: 6px;
+            font-weight: 500;
+            transition: all 0.3s;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+        
+        .btn-outline-member:hover {
+            background-color: var(--primary-color);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(58, 134, 255, 0.3);
+        }
+        
+        .btn-outline-member-sm {
+            padding: 5px 15px;
+            font-size: 0.85rem;
+        }
+        
+        /* Mobile Menu Toggle */
+        .menu-toggle {
+            display: none;
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            color: var(--dark-color);
+            cursor: pointer;
+            padding: 5px;
+        }
+        
+        /* Responsive */
+        @media (max-width: 768px) {
+            .sidebar {
+                transform: translateX(-100%);
+                width: 280px;
+            }
+            
+            .sidebar.active {
+                transform: translateX(0);
+            }
+            
+            .main-content {
+                margin-left: 0;
+                width: 100%;
+                padding: 15px;
+            }
+            
+            .menu-toggle {
+                display: block;
+            }
+            
+            .feedback-types,
+            .priority-selector {
+                flex-direction: column;
+            }
+            
+            .feedback-type,
+            .priority-option {
+                width: 100%;
+            }
+            
+            .feedback-header {
+                flex-direction: column;
+                align-items: flex-start;
+                gap: 10px;
+            }
+            
+            .stats-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+        
+        /* Sidebar Overlay for Mobile */
+        .sidebar-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background-color: rgba(0,0,0,0.5);
+            z-index: 999;
+        }
+        
+        .sidebar-overlay.active {
+            display: block;
+        }
+        
+        /* Success Message */
+        .success-message {
+            background: rgba(56, 176, 0, 0.1);
+            border: 1px solid rgba(56, 176, 0, 0.2);
+            color: var(--success-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            display: none;
+        }
+        
+        .success-message.show {
+            display: flex;
+        }
+        
+        /* Error Message */
+        .error-message {
+            background: rgba(255, 0, 110, 0.1);
+            border: 1px solid rgba(255, 0, 110, 0.2);
+            color: var(--danger-color);
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            display: none;
+        }
+        
+        .error-message.show {
+            display: flex;
+        }
+        
+        /* Character Counter */
+        .char-counter {
+            text-align: right;
+            color: #6c757d;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        
+        .char-counter.near-limit {
+            color: var(--warning-color);
+        }
+        
+        .char-counter.over-limit {
+            color: var(--danger-color);
+        }
+        
+        /* Feedback Filters */
+        .feedback-filters {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .filter-btn {
+            background: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 8px 20px;
+            border-radius: 20px;
+            color: #6c757d;
+            font-weight: 500;
+            transition: all 0.3s;
+            cursor: pointer;
+        }
+        
+        .filter-btn:hover, .filter-btn.active {
+            background: var(--primary-color);
+            color: white;
+            border-color: var(--primary-color);
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-dumbbell"></i> Smart Fit</h3>
+                <small class="text-light">Member Dashboard</small>
+            </div>
+            
+            <div class="user-profile-sidebar">
+                <div class="user-avatar-sidebar">JD</div>
+                <h5>John Doe</h5>
+                <p>Fitness Enthusiast</p>
+                <span class="membership-badge">
+                    <i class="fas fa-crown me-2"></i>PREMIUM MEMBER
+                </span>
+            </div>
+            
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="member-dashboard.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="member-workouts.html"><i class="fas fa-dumbbell"></i> <span>My Workouts</span></a></li>
+                    <li><a href="member-progress.html"><i class="fas fa-chart-line"></i> <span>Progress Tracking</span></a></li>
+                    <li><a href="member-nutrition.html"><i class="fas fa-apple-alt"></i> <span>Nutrition Plan</span></a></li>
+                    <li><a href="member-schedule.html"><i class="fas fa-calendar-alt"></i> <span>Schedule</span></a></li>
+                    <li><a href="member-trainers.html"><i class="fas fa-user-tie"></i> <span>Trainers</span></a></li>
+                    <li><a href="member-achievements.html"><i class="fas fa-trophy"></i> <span>Achievements</span></a></li>
+                    <li><a href="member-notifications.html"><i class="fas fa-bell"></i> <span>Notifications</span></a></li>
+                    <li><a href="member-feedbacks.html" class="active"><i class="fas fa-comment-dots"></i> <span>Feedback & Support</span></a></li>
+                    <li><a href="member-settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
+                </ul>
+            </nav>
+            
+            <div class="sidebar-footer">
+                <a href="../../index.html" class="btn btn-member">
+                    <i class="fas fa-home"></i> <span>Back to Site</span>
+                </a>
+            </div>
+        </aside>
+        
+        <!-- Mobile Sidebar Overlay -->
+        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div class="header-left">
+                    <button class="menu-toggle" id="menuToggle">
+                        <i class="fas fa-bars"></i>
+                    </button>
+                    <div>
+                        <h4><i class="fas fa-comment-dots me-2"></i> Feedback & Support</h4>
+                        <p class="text-muted mb-0">Share your thoughts, report issues, and get help from our support team</p>
+                    </div>
+                </div>
+                
+                <div class="user-info">
+                    <div class="user-avatar">JD</div>
+                    <div class="user-details">
+                        <h6 class="mb-0">John Doe</h6>
+                        <small class="text-muted">Day 28 Streak • 2,850 Points</small>
+                    </div>
+                    <a href="member-dashboard.html" class="btn-outline-member">
+                        <i class="fas fa-arrow-left"></i> Back to Dashboard
+                    </a>
+                </div>
+            </header>
+
+            <!-- Page Header -->
+            <div class="page-header">
+                <div class="page-header-content">
+                    <h2><i class="fas fa-comment-dots me-2"></i> We Value Your Feedback</h2>
+                    <p>Your feedback helps us improve Smart Fit. Share your experience, report issues, suggest features, or ask questions. Our team is here to help!</p>
+                    <div class="d-flex gap-3 flex-wrap">
+                        <button class="btn btn-member" onclick="scrollToFeedbackForm()">
+                            <i class="fas fa-plus me-2"></i> Submit Feedback
+                        </button>
+                        <button class="btn-outline-member" style="color: white; border-color: white;" onclick="scrollToFAQ()">
+                            <i class="fas fa-question-circle me-2"></i> View FAQ
+                        </button>
+                        <button class="btn-outline-member" style="color: white; border-color: white;" onclick="contactSupport()">
+                            <i class="fas fa-headset me-2"></i> Contact Support
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Statistics -->
+            <div class="statistics-card">
+                <div class="card-header">
+                    <h5><i class="fas fa-chart-bar"></i> Your Feedback Stats</h5>
+                </div>
+                
+                <div class="stats-grid">
+                    <div class="stat-item">
+                        <div class="stat-value" id="totalFeedbackCount">7</div>
+                        <div class="stat-label">Total Feedback</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="avgResponseTime">12</div>
+                        <div class="stat-label">Avg. Response (hours)</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="satisfactionRate">92%</div>
+                        <div class="stat-label">Satisfaction Rate</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-value" id="resolvedCount">5</div>
+                        <div class="stat-label">Issues Resolved</div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Feedback Container -->
+            <div class="feedback-container">
+                <!-- Submit Feedback Form -->
+                <div class="submit-feedback-card" id="feedbackForm">
+                    <div class="card-header">
+                        <h5><i class="fas fa-pen-alt"></i> Submit New Feedback</h5>
+                    </div>
+                    
+                    <!-- Success Message -->
+                    <div class="success-message" id="successMessage">
+                        <i class="fas fa-check-circle"></i>
+                        <div>Thank you! Your feedback has been submitted successfully.</div>
+                    </div>
+                    
+                    <!-- Error Message -->
+                    <div class="error-message" id="errorMessage">
+                        <i class="fas fa-exclamation-circle"></i>
+                        <div id="errorMessageText">Please fill in all required fields.</div>
+                    </div>
+                    
+                    <form id="feedbackFormElement">
+                        <div class="form-group">
+                            <label for="feedbackType">Feedback Type *</label>
+                            <div class="feedback-types">
+                                <div class="feedback-type">
+                                    <input type="radio" id="type-suggestion" name="feedbackType" value="suggestion" checked>
+                                    <label for="type-suggestion">
+                                        <i class="fas fa-lightbulb"></i>
+                                        <span>Suggestion</span>
+                                    </label>
+                                </div>
+                                <div class="feedback-type">
+                                    <input type="radio" id="type-bug" name="feedbackType" value="bug">
+                                    <label for="type-bug">
+                                        <i class="fas fa-bug"></i>
+                                        <span>Bug Report</span>
+                                    </label>
+                                </div>
+                                <div class="feedback-type">
+                                    <input type="radio" id="type-question" name="feedbackType" value="question">
+                                    <label for="type-question">
+                                        <i class="fas fa-question-circle"></i>
+                                        <span>Question</span>
+                                    </label>
+                                </div>
+                                <div class="feedback-type">
+                                    <input type="radio" id="type-praise" name="feedbackType" value="praise">
+                                    <label for="type-praise">
+                                        <i class="fas fa-heart"></i>
+                                        <span>Praise</span>
+                                    </label>
+                                </div>
+                                <div class="feedback-type">
+                                    <input type="radio" id="type-complaint" name="feedbackType" value="complaint">
+                                    <label for="type-complaint">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>Complaint</span>
+                                    </label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="feedbackSubject">Subject *</label>
+                            <input type="text" class="form-control" id="feedbackSubject" placeholder="Brief description of your feedback">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="feedbackMessage">Detailed Message *</label>
+                            <textarea class="form-control" id="feedbackMessage" placeholder="Please provide as much detail as possible..."></textarea>
+                            <div class="char-counter" id="charCounter">0/2000 characters</div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label class="rating-label">How would you rate your overall experience?</label>
+                            <div class="rating-stars" id="ratingStars">
+                                <span class="rating-star" data-rating="1"><i class="far fa-star"></i></span>
+                                <span class="rating-star" data-rating="2"><i class="far fa-star"></i></span>
+                                <span class="rating-star" data-rating="3"><i class="far fa-star"></i></span>
+                                <span class="rating-star" data-rating="4"><i class="far fa-star"></i></span>
+                                <span class="rating-star" data-rating="5"><i class="far fa-star"></i></span>
+                            </div>
+                            <div class="rating-text" id="ratingText">Select a rating</div>
+                            <input type="hidden" id="feedbackRating" value="0">
+                        </div>
+                        
+                        <div class="form-group">
+                            <label>Priority (For bug reports and complaints)</label>
+                            <div class="priority-selector">
+                                <div class="priority-option priority-low">
+                                    <input type="radio" id="priority-low" name="priority" value="low" checked>
+                                    <label for="priority-low">Low</label>
+                                </div>
+                                <div class="priority-option priority-medium">
+                                    <input type="radio" id="priority-medium" name="priority" value="medium">
+                                    <label for="priority-medium">Medium</label>
+                                </div>
+                                <div class="priority-option priority-high">
+                                    <input type="radio" id="priority-high" name="priority" value="high">
+                                    <label for="priority-high">High</label>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="feedbackCategory">Category</label>
+                            <select class="form-control" id="feedbackCategory">
+                                <option value="">Select category</option>
+                                <option value="workouts">Workouts</option>
+                                <option value="nutrition">Nutrition</option>
+                                <option value="progress">Progress Tracking</option>
+                                <option value="app">App Features</option>
+                                <option value="trainer">Trainer Experience</option>
+                                <option value="billing">Billing & Subscription</option>
+                                <option value="other">Other</option>
+                            </select>
+                        </div>
+                        
+                        <div class="form-group">
+                            <label for="feedbackAttachments">Attachments (Optional)</label>
+                            <input type="file" class="form-control" id="feedbackAttachments" multiple>
+                            <small class="text-muted">You can attach screenshots or documents (Max: 5 files, 10MB total)</small>
+                        </div>
+                        
+                        <div class="d-flex gap-3 mt-4">
+                            <button type="submit" class="btn btn-member flex-grow-1">
+                                <i class="fas fa-paper-plane me-2"></i> Submit Feedback
+                            </button>
+                            <button type="button" class="btn-outline-member" onclick="resetFeedbackForm()">
+                                <i class="fas fa-redo me-2"></i> Reset
+                            </button>
+                        </div>
+                    </form>
+                </div>
+                
+                <!-- Feedback History -->
+                <div class="feedback-history-card">
+                    <div class="card-header">
+                        <h5><i class="fas fa-history"></i> Your Feedback History</h5>
+                        <div class="feedback-filters">
+                            <button class="filter-btn active" data-filter="all">All</button>
+                            <button class="filter-btn" data-filter="pending">Pending</button>
+                            <button class="filter-btn" data-filter="in-progress">In Progress</button>
+                            <button class="filter-btn" data-filter="closed">Closed</button>
+                        </div>
+                    </div>
+                    
+                    <div class="feedback-history" id="feedbackHistory">
+                        <!-- Feedback items will be loaded here -->
+                    </div>
+                    
+                    <!-- Empty State -->
+                    <div class="empty-state" id="emptyFeedbackState">
+                        <div class="empty-state-icon">
+                            <i class="fas fa-comment-slash"></i>
+                        </div>
+                        <h4>No feedback submitted yet</h4>
+                        <p>Your feedback helps us improve. Submit your first feedback above!</p>
+                        <button class="btn btn-member" onclick="scrollToFeedbackForm()">
+                            <i class="fas fa-plus me-2"></i> Submit Feedback
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- FAQ Section -->
+            <div class="faq-section" id="faqSection">
+                <div class="card-header">
+                    <h5><i class="fas fa-question-circle"></i> Frequently Asked Questions</h5>
+                    <button class="btn-outline-member btn-outline-member-sm" onclick="toggleAllFAQ()">
+                        <i class="fas fa-expand-alt me-2"></i> Expand All
+                    </button>
+                </div>
+                
+                <div class="faq-list">
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(1)">
+                            <span>How long does it take to get a response to my feedback?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer" id="faq-answer-1">
+                            We aim to respond to all feedback within 24 hours. Bug reports and high priority issues are typically addressed within 4-6 hours during business hours. Questions and suggestions may take up to 48 hours for a detailed response.
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(2)">
+                            <span>Can I track the status of my feedback or bug report?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer" id="faq-answer-2">
+                            Yes! All your submitted feedback appears in your Feedback History with status updates. You'll see whether it's Pending, In Progress, or Closed. You'll also receive notifications when there are updates to your feedback.
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(3)">
+                            <span>What should I include in a bug report?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer" id="faq-answer-3">
+                            For effective bug reports, please include: 1) Steps to reproduce the issue, 2) Expected behavior, 3) Actual behavior, 4) Device and browser information, 5) Screenshots if possible, 6) The time when the issue occurred.
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(4)">
+                            <span>Do you implement user suggestions?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer" id="faq-answer-4">
+                            Absolutely! We regularly review user suggestions and many features in Smart Fit started as user suggestions. While we can't implement every suggestion, we prioritize based on user demand, feasibility, and alignment with our product vision. Popular suggestions are often added to our roadmap.
+                        </div>
+                    </div>
+                    
+                    <div class="faq-item">
+                        <div class="faq-question" onclick="toggleFAQ(5)">
+                            <span>How can I follow up on my previous feedback?</span>
+                            <i class="fas fa-chevron-down"></i>
+                        </div>
+                        <div class="faq-answer" id="faq-answer-5">
+                            You can reply to any feedback thread in your Feedback History. Our support team will see your follow-up and respond accordingly. You can also reference your feedback ID when contacting support through other channels.
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="text-center mt-4">
+                    <button class="btn-outline-member" onclick="contactSupport()">
+                        <i class="fas fa-headset me-2"></i> Still need help? Contact Support
+                    </button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <!-- Custom JavaScript -->
+    <script>
+        // Mobile Menu Toggle
+        const menuToggle = document.getElementById('menuToggle');
+        const sidebar = document.querySelector('.sidebar');
+        const sidebarOverlay = document.getElementById('sidebarOverlay');
+        
+        menuToggle.addEventListener('click', () => {
+            sidebar.classList.toggle('active');
+            sidebarOverlay.classList.toggle('active');
+        });
+        
+        sidebarOverlay.addEventListener('click', () => {
+            sidebar.classList.remove('active');
+            sidebarOverlay.classList.remove('active');
+        });
+        
+        // Feedback Data
+        let feedbacks = [];
+        let currentFilter = 'all';
+        
+        // Sample Feedback Data
+        const sampleFeedbacks = [
+            {
+                id: 1,
+                type: 'suggestion',
+                subject: 'Add more HIIT workouts for beginners',
+                message: 'I love the HIIT workouts but as a beginner, I find most of them too challenging. Could you add some beginner-friendly HIIT routines with longer rest periods and simpler exercises?',
+                rating: 5,
+                priority: 'low',
+                category: 'workouts',
+                status: 'closed',
+                date: 'Nov 15, 2024',
+                response: {
+                    date: 'Nov 16, 2024',
+                    message: 'Thank you for your suggestion! We\'re currently working on a "HIIT for Beginners" program that will be released next month. It will include modified exercises and longer rest periods as you suggested.'
+                },
+                attachments: []
+            },
+            {
+                id: 2,
+                type: 'bug',
+                subject: 'Progress chart not updating correctly',
+                message: 'The weight progress chart on the dashboard shows incorrect data. My weight from last week is showing as 80kg instead of 75.5kg. This seems to happen after I log multiple measurements on the same day.',
+                rating: 3,
+                priority: 'high',
+                category: 'progress',
+                status: 'in-progress',
+                date: 'Nov 12, 2024',
+                response: {
+                    date: 'Nov 13, 2024',
+                    message: 'We\'ve identified the issue and our development team is working on a fix. The bug occurs when multiple measurements are logged within a short time period. We expect to have this resolved in the next app update (version 2.3.1).'
+                },
+                attachments: []
+            },
+            {
+                id: 3,
+                type: 'question',
+                subject: 'How to customize meal plans?',
+                message: 'I have dietary restrictions (gluten-free) and would like to know if I can customize the meal plans to exclude certain ingredients. Is this possible in the premium plan?',
+                rating: 4,
+                priority: 'low',
+                category: 'nutrition',
+                status: 'closed',
+                date: 'Nov 10, 2024',
+                response: {
+                    date: 'Nov 11, 2024',
+                    message: 'Yes! Premium members can customize meal plans based on dietary restrictions. Go to Nutrition Plan → Settings → Dietary Preferences. You can select gluten-free, dairy-free, vegetarian, and other options. The meal plans will automatically adjust.'
+                },
+                attachments: []
+            },
+            {
+                id: 4,
+                type: 'praise',
+                subject: 'Excellent trainer support',
+                message: 'I wanted to compliment Trainer Alex for the amazing support. His detailed feedback on my form has helped me avoid injury and make better progress. The video analysis feature is fantastic!',
+                rating: 5,
+                priority: 'low',
+                category: 'trainer',
+                status: 'closed',
+                date: 'Nov 8, 2024',
+                response: {
+                    date: 'Nov 9, 2024',
+                    message: 'Thank you for your kind words! We\'ll make sure Trainer Alex sees your feedback. We\'re glad you\'re finding the video analysis helpful. Keep up the great work!'
+                },
+                attachments: []
+            },
+            {
+                id: 5,
+                type: 'complaint',
+                subject: 'App crashes during workout tracking',
+                message: 'The app consistently crashes when I try to track my running workouts using GPS. This happens about 10 minutes into my run. I\'m using iPhone 13 with iOS 17.1.',
+                rating: 2,
+                priority: 'high',
+                category: 'app',
+                status: 'pending',
+                date: 'Nov 5, 2024',
+                response: null,
+                attachments: []
+            },
+            {
+                id: 6,
+                type: 'suggestion',
+                subject: 'Add social features to share progress',
+                message: 'It would be great to have social features where I can share my progress with friends, join challenges, and see how others are doing. This would increase motivation and engagement.',
+                rating: 4,
+                priority: 'low',
+                category: 'app',
+                status: 'in-progress',
+                date: 'Nov 3, 2024',
+                response: {
+                    date: 'Nov 4, 2024',
+                    message: 'Great suggestion! We\'re currently developing social features including progress sharing, friend challenges, and community groups. These features are scheduled for release in Q1 2025.'
+                },
+                attachments: []
+            },
+            {
+                id: 7,
+                type: 'question',
+                subject: 'Can I export my workout data?',
+                message: 'I\'d like to export my workout history and progress data to analyze in Excel. Is there an export feature available?',
+                rating: 4,
+                priority: 'low',
+                category: 'progress',
+                status: 'closed',
+                date: 'Oct 28, 2024',
+                response: {
+                    date: 'Oct 29, 2024',
+                    message: 'Yes, you can export your data. Go to Progress Tracking → Export Data. You can export in CSV or Excel format. Premium members can also schedule automatic weekly exports.'
+                },
+                attachments: []
+            }
+        ];
+        
+        // Initialize when DOM is loaded
+        document.addEventListener('DOMContentLoaded', function() {
+            loadFeedbacks();
+            setupRatingStars();
+            setupFeedbackFilters();
+            setupCharacterCounter();
+            loadFAQ();
+            updateStats();
+        });
+        
+        // Load Feedbacks
+        function loadFeedbacks() {
+            // Load from localStorage or use sample data
+            const savedFeedbacks = localStorage.getItem('smartfit_feedbacks');
+            
+            if (savedFeedbacks) {
+                feedbacks = JSON.parse(savedFeedbacks);
+            } else {
+                feedbacks = [...sampleFeedbacks];
+                saveFeedbacks();
+            }
+            
+            renderFeedbacks();
+        }
+        
+        // Save Feedbacks to localStorage
+        function saveFeedbacks() {
+            localStorage.setItem('smartfit_feedbacks', JSON.stringify(feedbacks));
+        }
+        
+        // Setup Rating Stars
+        function setupRatingStars() {
+            const stars = document.querySelectorAll('.rating-star');
+            const ratingInput = document.getElementById('feedbackRating');
+            const ratingText = document.getElementById('ratingText');
+            
+            const ratingTexts = [
+                'Select a rating',
+                'Poor - Needs significant improvement',
+                'Fair - Has some issues',
+                'Good - Meets expectations',
+                'Very Good - Above expectations',
+                'Excellent - Outstanding experience'
+            ];
+            
+            stars.forEach(star => {
+                star.addEventListener('click', () => {
+                    const rating = parseInt(star.dataset.rating);
+                    
+                    // Update stars
+                    stars.forEach((s, index) => {
+                        if (index < rating) {
+                            s.innerHTML = '<i class="fas fa-star"></i>';
+                            s.classList.add('active');
+                        } else {
+                            s.innerHTML = '<i class="far fa-star"></i>';
+                            s.classList.remove('active');
+                        }
+                    });
+                    
+                    // Update hidden input
+                    ratingInput.value = rating;
+                    
+                    // Update rating text
+                    ratingText.textContent = ratingTexts[rating];
+                });
+                
+                // Add hover effect
+                star.addEventListener('mouseenter', () => {
+                    const rating = parseInt(star.dataset.rating);
+                    
+                    stars.forEach((s, index) => {
+                        if (index < rating) {
+                            s.innerHTML = '<i class="fas fa-star"></i>';
+                        } else {
+                            s.innerHTML = '<i class="far fa-star"></i>';
+                        }
+                    });
+                });
+                
+                star.addEventListener('mouseleave', () => {
+                    const currentRating = parseInt(ratingInput.value);
+                    
+                    stars.forEach((s, index) => {
+                        if (index < currentRating) {
+                            s.innerHTML = '<i class="fas fa-star"></i>';
+                        } else {
+                            s.innerHTML = '<i class="far fa-star"></i>';
+                        }
+                    });
+                });
+            });
+        }
+        
+        // Setup Character Counter
+        function setupCharacterCounter() {
+            const messageInput = document.getElementById('feedbackMessage');
+            const charCounter = document.getElementById('charCounter');
+            const maxChars = 2000;
+            
+            messageInput.addEventListener('input', () => {
+                const length = messageInput.value.length;
+                charCounter.textContent = `${length}/${maxChars} characters`;
+                
+                if (length > maxChars * 0.9) {
+                    charCounter.classList.add('near-limit');
+                    charCounter.classList.remove('over-limit');
+                } else if (length > maxChars) {
+                    charCounter.classList.remove('near-limit');
+                    charCounter.classList.add('over-limit');
+                } else {
+                    charCounter.classList.remove('near-limit');
+                    charCounter.classList.remove('over-limit');
+                }
+            });
+        }
+        
+        // Setup Feedback Filters
+        function setupFeedbackFilters() {
+            const filterBtns = document.querySelectorAll('.filter-btn');
+            
+            filterBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    // Remove active class from all buttons
+                    filterBtns.forEach(b => b.classList.remove('active'));
+                    
+                    // Add active class to clicked button
+                    btn.classList.add('active');
+                    
+                    // Update current filter
+                    currentFilter = btn.dataset.filter;
+                    
+                    // Re-render feedbacks
+                    renderFeedbacks();
+                });
+            });
+        }
+        
+        // Render Feedbacks
+        function renderFeedbacks() {
+            const feedbackHistory = document.getElementById('feedbackHistory');
+            const emptyState = document.getElementById('emptyFeedbackState');
+            
+            // Filter feedbacks based on current filter
+            let filteredFeedbacks = feedbacks;
+            
+            if (currentFilter !== 'all') {
+                filteredFeedbacks = feedbacks.filter(f => f.status === currentFilter);
+            }
+            
+            // Sort by date (newest first)
+            filteredFeedbacks.sort((a, b) => new Date(b.date) - new Date(a.date));
+            
+            // Show empty state if no feedbacks
+            if (filteredFeedbacks.length === 0) {
+                feedbackHistory.style.display = 'none';
+                emptyState.style.display = 'block';
+                return;
+            }
+            
+            // Show feedbacks list
+            feedbackHistory.style.display = 'block';
+            emptyState.style.display = 'none';
+            
+            // Clear current list
+            feedbackHistory.innerHTML = '';
+            
+            // Add feedbacks to list
+            filteredFeedbacks.forEach(feedback => {
+                const feedbackItem = createFeedbackItem(feedback);
+                feedbackHistory.appendChild(feedbackItem);
+            });
+        }
+        
+        // Create Feedback Item
+        function createFeedbackItem(feedback) {
+            const item = document.createElement('div');
+            item.className = `feedback-item ${feedback.status}`;
+            item.dataset.id = feedback.id;
+            
+            // Get type badge class
+            let typeBadgeClass = '';
+            switch(feedback.type) {
+                case 'suggestion': typeBadgeClass = 'suggestion'; break;
+                case 'bug': typeBadgeClass = 'bug'; break;
+                case 'question': typeBadgeClass = 'question'; break;
+                case 'praise': typeBadgeClass = 'praise'; break;
+                case 'complaint': typeBadgeClass = 'complaint'; break;
+            }
+            
+            // Get status badge class
+            let statusBadgeClass = '';
+            switch(feedback.status) {
+                case 'closed': statusBadgeClass = 'status-closed'; break;
+                case 'in-progress': statusBadgeClass = 'status-in-progress'; break;
+                case 'pending': statusBadgeClass = 'status-pending'; break;
+            }
+            
+            // Create rating stars
+            let ratingStars = '';
+            for (let i = 1; i <= 5; i++) {
+                if (i <= feedback.rating) {
+                    ratingStars += '<i class="fas fa-star"></i>';
+                } else {
+                    ratingStars += '<i class="far fa-star"></i>';
+                }
+            }
+            
+            // Build response HTML if exists
+            let responseHTML = '';
+            if (feedback.response) {
+                responseHTML = `
+                    <div class="feedback-response">
+                        <div class="response-header">
+                            <div class="response-title">
+                                <i class="fas fa-reply"></i>
+                                Response from Smart Fit Support
+                            </div>
+                            <div class="response-date">${feedback.response.date}</div>
+                        </div>
+                        <div class="response-content">${feedback.response.message}</div>
+                    </div>
+                `;
+            }
+            
+            item.innerHTML = `
+                <div class="feedback-header">
+                    <div>
+                        <div class="feedback-title">${feedback.subject}</div>
+                        <div class="feedback-meta">
+                            <span class="feedback-type-badge ${typeBadgeClass}">${feedback.type.charAt(0).toUpperCase() + feedback.type.slice(1)}</span>
+                            <span class="feedback-status ${statusBadgeClass}">${feedback.status.charAt(0).toUpperCase() + feedback.status.slice(1)}</span>
+                            <span class="feedback-date"><i class="far fa-calendar me-1"></i> ${feedback.date}</span>
+                        </div>
+                    </div>
+                    <div class="feedback-actions">
+                        <button class="btn-outline-member btn-outline-member-sm" onclick="viewFeedbackDetails(${feedback.id})">
+                            <i class="fas fa-eye me-1"></i> View
+                        </button>
+                    </div>
+                </div>
+                <div class="feedback-content">${feedback.message}</div>
+                <div class="feedback-rating">
+                    <div class="rating-display">${ratingStars}</div>
+                    <div class="rating-value">${feedback.rating}/5</div>
+                </div>
+                ${responseHTML}
+            `;
+            
+            return item;
+        }
+        
+        // Submit Feedback Form
+        document.getElementById('feedbackFormElement').addEventListener('submit', function(e) {
+            e.preventDefault();
+            
+            // Get form values
+            const type = document.querySelector('input[name="feedbackType"]:checked').value;
+            const subject = document.getElementById('feedbackSubject').value.trim();
+            const message = document.getElementById('feedbackMessage').value.trim();
+            const rating = parseInt(document.getElementById('feedbackRating').value);
+            const priority = document.querySelector('input[name="priority"]:checked').value;
+            const category = document.getElementById('feedbackCategory').value;
+            
+            // Validate form
+            if (!subject || !message || rating === 0) {
+                showError('Please fill in all required fields and provide a rating.');
+                return;
+            }
+            
+            if (message.length > 2000) {
+                showError('Message is too long. Maximum 2000 characters.');
+                return;
+            }
+            
+            // Create new feedback object
+            const newFeedback = {
+                id: feedbacks.length + 1,
+                type: type,
+                subject: subject,
+                message: message,
+                rating: rating,
+                priority: priority,
+                category: category || 'other',
+                status: 'pending',
+                date: getCurrentDate(),
+                response: null,
+                attachments: [] // In real app, handle file uploads
+            };
+            
+            // Add to feedbacks array
+            feedbacks.unshift(newFeedback);
+            saveFeedbacks();
+            
+            // Update UI
+            renderFeedbacks();
+            updateStats();
+            
+            // Show success message
+            showSuccess();
+            
+            // Reset form
+            resetFeedbackForm();
+            
+            // Scroll to feedback history
+            setTimeout(() => {
+                document.querySelector('.feedback-history-card').scrollIntoView({ 
+                    behavior: 'smooth',
+                    block: 'start'
+                });
+            }, 500);
+        });
+        
+        // Reset Feedback Form
+        function resetFeedbackForm() {
+            document.getElementById('feedbackFormElement').reset();
+            
+            // Reset rating stars
+            const stars = document.querySelectorAll('.rating-star');
+            stars.forEach(star => {
+                star.innerHTML = '<i class="far fa-star"></i>';
+                star.classList.remove('active');
+            });
+            
+            document.getElementById('feedbackRating').value = '0';
+            document.getElementById('ratingText').textContent = 'Select a rating';
+            document.getElementById('charCounter').textContent = '0/2000 characters';
+            document.getElementById('charCounter').classList.remove('near-limit', 'over-limit');
+            
+            // Hide messages
+            hideMessages();
+        }
+        
+        // Show Success Message
+        function showSuccess() {
+            const successMessage = document.getElementById('successMessage');
+            successMessage.classList.add('show');
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                successMessage.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Show Error Message
+        function showError(message) {
+            const errorMessage = document.getElementById('errorMessage');
+            const errorMessageText = document.getElementById('errorMessageText');
+            
+            errorMessageText.textContent = message;
+            errorMessage.classList.add('show');
+            
+            // Hide after 5 seconds
+            setTimeout(() => {
+                errorMessage.classList.remove('show');
+            }, 5000);
+        }
+        
+        // Hide Messages
+        function hideMessages() {
+            document.getElementById('successMessage').classList.remove('show');
+            document.getElementById('errorMessage').classList.remove('show');
+        }
+        
+        // View Feedback Details
+        function viewFeedbackDetails(id) {
+            const feedback = feedbacks.find(f => f.id === id);
+            
+            if (feedback) {
+                let details = `Feedback Details\n\n`;
+                details += `Subject: ${feedback.subject}\n`;
+                details += `Type: ${feedback.type.charAt(0).toUpperCase() + feedback.type.slice(1)}\n`;
+                details += `Status: ${feedback.status.charAt(0).toUpperCase() + feedback.status.slice(1)}\n`;
+                details += `Date: ${feedback.date}\n`;
+                details += `Rating: ${feedback.rating}/5\n`;
+                details += `Priority: ${feedback.priority.charAt(0).toUpperCase() + feedback.priority.slice(1)}\n`;
+                details += `Category: ${feedback.category.charAt(0).toUpperCase() + feedback.category.slice(1)}\n\n`;
+                details += `Message:\n${feedback.message}\n\n`;
+                
+                if (feedback.response) {
+                    details += `Response (${feedback.response.date}):\n${feedback.response.message}`;
+                } else {
+                    details += `No response yet. Our team will get back to you soon.`;
+                }
+                
+                alert(details);
+            }
+        }
+        
+        // Update Statistics
+        function updateStats() {
+            const totalFeedback = feedbacks.length;
+            const resolvedCount = feedbacks.filter(f => f.status === 'closed').length;
+            const avgRating = feedbacks.length > 0 ? 
+                (feedbacks.reduce((sum, f) => sum + f.rating, 0) / feedbacks.length).toFixed(1) : 0;
+            
+            document.getElementById('totalFeedbackCount').textContent = totalFeedback;
+            document.getElementById('resolvedCount').textContent = resolvedCount;
+            document.getElementById('satisfactionRate').textContent = `${Math.round((avgRating / 5) * 100)}%`;
+            
+            // For demo, we'll calculate average response time based on feedbacks with responses
+            const feedbacksWithResponse = feedbacks.filter(f => f.response);
+            let avgResponseTime = 12; // Default
+            
+            if (feedbacksWithResponse.length > 0) {
+                // Simple calculation for demo
+                avgResponseTime = Math.round(feedbacksWithResponse.length * 6);
+            }
+            
+            document.getElementById('avgResponseTime').textContent = avgResponseTime;
+        }
+        
+        // Load FAQ
+        function loadFAQ() {
+            // FAQ is already in HTML, just need to setup toggle functionality
+        }
+        
+        // Toggle FAQ Item
+        function toggleFAQ(id) {
+            const answer = document.getElementById(`faq-answer-${id}`);
+            const question = answer.previousElementSibling;
+            const icon = question.querySelector('i');
+            
+            answer.classList.toggle('show');
+            
+            if (answer.classList.contains('show')) {
+                icon.className = 'fas fa-chevron-up';
+            } else {
+                icon.className = 'fas fa-chevron-down';
+            }
+        }
+        
+        // Toggle All FAQ
+        function toggleAllFAQ() {
+            const answers = document.querySelectorAll('.faq-answer');
+            const questions = document.querySelectorAll('.faq-question');
+            const btn = document.querySelector('.faq-section .btn-outline-member-sm');
+            
+            const allShowing = Array.from(answers).every(a => a.classList.contains('show'));
+            
+            answers.forEach((answer, index) => {
+                const question = questions[index];
+                const icon = question.querySelector('i');
+                
+                if (allShowing) {
+                    answer.classList.remove('show');
+                    icon.className = 'fas fa-chevron-down';
+                } else {
+                    answer.classList.add('show');
+                    icon.className = 'fas fa-chevron-up';
+                }
+            });
+            
+            // Update button text
+            if (allShowing) {
+                btn.innerHTML = '<i class="fas fa-expand-alt me-2"></i> Expand All';
+            } else {
+                btn.innerHTML = '<i class="fas fa-compress-alt me-2"></i> Collapse All';
+            }
+        }
+        
+        // Get Current Date
+        function getCurrentDate() {
+            const now = new Date();
+            const options = { year: 'numeric', month: 'short', day: 'numeric' };
+            return now.toLocaleDateString('en-US', options);
+        }
+        
+        // Scroll to Feedback Form
+        function scrollToFeedbackForm() {
+            document.getElementById('feedbackForm').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+        
+        // Scroll to FAQ
+        function scrollToFAQ() {
+            document.getElementById('faqSection').scrollIntoView({ 
+                behavior: 'smooth',
+                block: 'start'
+            });
+        }
+        
+        // Contact Support
+        function contactSupport() {
+            const email = 'support@smartfit.com';
+            const phone = '1-800-SMARTFIT';
+            
+            const message = `Contact Smart Fit Support:\n\n`;
+            message += `Email: ${email}\n`;
+            message += `Phone: ${phone}\n\n`;
+            message += `Hours: Mon-Fri 9AM-6PM, Sat 10AM-4PM\n`;
+            message += `For urgent issues, please call the support line.\n\n`;
+            message += `You can also submit feedback through this page for non-urgent matters.`;
+            
+            alert(message);
+        }
+        
+        // Simulate receiving responses to feedback
+        function simulateResponseToFeedback() {
+            setInterval(() => {
+                // 5% chance of receiving a response to pending feedback
+                if (Math.random() < 0.05) {
+                    const pendingFeedbacks = feedbacks.filter(f => f.status === 'pending' && !f.response);
+                    
+                    if (pendingFeedbacks.length > 0) {
+                        const randomFeedback = pendingFeedbacks[Math.floor(Math.random() * pendingFeedbacks.length)];
+                        
+                        // Update feedback status and add response
+                        const feedbackIndex = feedbacks.findIndex(f => f.id === randomFeedback.id);
+                        
+                        if (feedbackIndex !== -1) {
+                            // 70% chance of being resolved, 30% chance of being in progress
+                            const newStatus = Math.random() < 0.7 ? 'closed' : 'in-progress';
+                            
+                            feedbacks[feedbackIndex].status = newStatus;
+                            feedbacks[feedbackIndex].response = {
+                                date: getCurrentDate(),
+                                message: getRandomResponseMessage(randomFeedback.type, newStatus)
+                            };
+                            
+                            saveFeedbacks();
+                            
+                            // Only update UI if on feedbacks page
+                            if (window.location.pathname.includes('feedbacks')) {
+                                renderFeedbacks();
+                                updateStats();
+                                showToast('New response to your feedback!');
+                            }
+                        }
+                    }
+                }
+            }, 30000); // Check every 30 seconds
+        }
+        
+        // Get Random Response Message
+        function getRandomResponseMessage(type, status) {
+            const responses = {
+                suggestion: [
+                    'Thank you for your suggestion! We\'ve added it to our feature request list and our product team will review it.',
+                    'Great suggestion! We\'re considering this for our roadmap. We\'ll keep you updated on any developments.',
+                    'We appreciate you sharing this idea with us. It aligns with our vision and we\'ll explore implementation options.'
+                ],
+                bug: [
+                    'We\'ve identified the issue and our development team is working on a fix. Thank you for the detailed report!',
+                    'This bug has been logged and assigned to our engineering team. We expect to have it resolved in the next update.',
+                    'Thank you for reporting this issue. We\'ve reproduced it and are working on a solution.'
+                ],
+                question: [
+                    'We hope this answers your question. If you need more information, please don\'t hesitate to ask.',
+                    'Thank you for your question. Here\'s the information you requested.',
+                    'We\'re happy to clarify this for you. Please let us know if you have any follow-up questions.'
+                ],
+                praise: [
+                    'Thank you for your kind words! We\'re delighted to hear you\'re enjoying Smart Fit.',
+                    'We appreciate your positive feedback. It motivates our team to keep improving!',
+                    'Thank you for taking the time to share your positive experience. We\'re glad we could help!'
+                ],
+                complaint: [
+                    'We apologize for the inconvenience. We\'re working to resolve this issue as quickly as possible.',
+                    'Thank you for bringing this to our attention. We take all complaints seriously and are addressing this matter.',
+                    'We\'re sorry to hear about your experience. We\'re looking into this and will make it right.'
+                ]
+            };
+            
+            const statusMessages = {
+                'closed': 'This issue has been resolved.',
+                'in-progress': 'We\'re currently working on this.'
+            };
+            
+            const typeResponses = responses[type] || responses.suggestion;
+            const randomResponse = typeResponses[Math.floor(Math.random() * typeResponses.length)];
+            
+            return `${randomResponse} ${statusMessages[status] || ''}`;
+        }
+        
+        // Show Toast Message
+        function showToast(message) {
+            // Remove existing toasts
+            const existingToasts = document.querySelectorAll('.custom-toast');
+            existingToasts.forEach(toast => toast.remove());
+            
+            // Create toast
+            const toast = document.createElement('div');
+            toast.className = 'custom-toast';
+            toast.innerHTML = `
+                <div class="toast-content">
+                    <i class="fas fa-comment-alt me-2"></i>
+                    <span>${message}</span>
+                </div>
+            `;
+            
+            // Style toast
+            toast.style.cssText = `
+                position: fixed;
+                bottom: 20px;
+                right: 20px;
+                background: var(--primary-color);
+                color: white;
+                padding: 12px 20px;
+                border-radius: 8px;
+                box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+                z-index: 10000;
+                display: flex;
+                align-items: center;
+                animation: slideIn 0.3s ease-out;
+            `;
+            
+            // Add animation
+            const style = document.createElement('style');
+            style.textContent = `
+                @keyframes slideIn {
+                    from { transform: translateX(100%); opacity: 0; }
+                    to { transform: translateX(0); opacity: 1; }
+                }
+                @keyframes slideOut {
+                    from { transform: translateX(0); opacity: 1; }
+                    to { transform: translateX(100%); opacity: 0; }
+                }
+            `;
+            document.head.appendChild(style);
+            
+            // Add to body
+            document.body.appendChild(toast);
+            
+            // Remove after 3 seconds
+            setTimeout(() => {
+                toast.style.animation = 'slideOut 0.3s ease-out forwards';
+                setTimeout(() => toast.remove(), 300);
+            }, 3000);
+        }
+        
+        // Start simulating responses
+        setTimeout(() => {
+            simulateResponseToFeedback();
+        }, 10000);
+    </script>
+</body>
+</html>

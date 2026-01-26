@@ -1,0 +1,914 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Profile - Trainer</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../../shared.css">
+    
+    <style>
+        .profile-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .profile-container {
+            display: grid;
+            grid-template-columns: 350px 1fr;
+            gap: 30px;
+        }
+        
+        .profile-sidebar {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            height: fit-content;
+        }
+        
+        .profile-picture {
+            text-align: center;
+            margin-bottom: 25px;
+        }
+        
+        .profile-avatar {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #2196F3, #21CBF3);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 3rem;
+            font-weight: 700;
+            margin: 0 auto 20px;
+            border: 5px solid white;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+        }
+        
+        .profile-upload {
+            position: relative;
+            cursor: pointer;
+        }
+        
+        .profile-upload input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+        
+        .profile-info {
+            text-align: center;
+        }
+        
+        .profile-name {
+            font-size: 1.5rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .profile-title {
+            color: #2196F3;
+            font-weight: 600;
+            margin-bottom: 15px;
+        }
+        
+        .profile-badge {
+            display: inline-block;
+            background: #E8F5E9;
+            color: #2E7D32;
+            padding: 5px 15px;
+            border-radius: 20px;
+            font-size: 0.85rem;
+            font-weight: 600;
+            margin-bottom: 20px;
+        }
+        
+        .profile-stats {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 25px 0;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+        }
+        
+        .stat-number {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #2196F3;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+            color: #666;
+        }
+        
+        .profile-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .btn-profile-action {
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            background: white;
+            color: #333;
+            text-align: left;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s;
+        }
+        
+        .btn-profile-action:hover {
+            background: #f8f9fa;
+            border-color: #2196F3;
+            color: #2196F3;
+        }
+        
+        .profile-content {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        
+        .nav-tabs {
+            border-bottom: 1px solid #eee;
+            margin-bottom: 25px;
+        }
+        
+        .nav-tabs .nav-link {
+            border: none;
+            color: #666;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 8px 8px 0 0;
+        }
+        
+        .nav-tabs .nav-link.active {
+            color: #2196F3;
+            background: #f0f7ff;
+            border-bottom: 3px solid #2196F3;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .form-section h5 {
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .form-row {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .form-group {
+            margin-bottom: 20px;
+        }
+        
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 500;
+        }
+        
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            font-size: 0.95rem;
+        }
+        
+        .form-control:focus {
+            border-color: #2196F3;
+            box-shadow: 0 0 0 3px rgba(33, 150, 243, 0.1);
+        }
+        
+        .textarea {
+            height: 120px;
+            resize: vertical;
+        }
+        
+        .certifications-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .certification-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            position: relative;
+        }
+        
+        .certification-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .certification-title {
+            font-weight: 600;
+            font-size: 1.1rem;
+        }
+        
+        .certification-date {
+            color: #666;
+            font-size: 0.85rem;
+        }
+        
+        .certification-issuer {
+            color: #2196F3;
+            font-size: 0.9rem;
+            margin-bottom: 10px;
+        }
+        
+        .certification-actions {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            display: flex;
+            gap: 5px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        
+        .certification-card:hover .certification-actions {
+            opacity: 1;
+        }
+        
+        .btn-action {
+            width: 30px;
+            height: 30px;
+            border-radius: 5px;
+            border: none;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-edit-cert {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .btn-delete-cert {
+            background: #f44336;
+            color: white;
+        }
+        
+        .availability-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .availability-slot {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .availability-slot:hover {
+            background: #e3f2fd;
+        }
+        
+        .availability-slot.active {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .slot-day {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .slot-hours {
+            font-size: 0.9rem;
+        }
+        
+        .review-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .review-item:last-child {
+            border-bottom: none;
+        }
+        
+        .review-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 10px;
+        }
+        
+        .reviewer {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .reviewer-avatar {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background: #4CAF50;
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+        
+        .review-stars {
+            color: #FFD700;
+            margin-bottom: 10px;
+        }
+        
+        .review-date {
+            color: #666;
+            font-size: 0.85rem;
+        }
+        
+        .btn-save {
+            background: #2196F3;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 992px) {
+            .profile-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .profile-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-user-tie"></i> Trainer Panel</h3>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="exercises.html"><i class="fas fa-dumbbell"></i> <span>My Exercises</span></a></li>
+                    <li><a href="members.html"><i class="fas fa-users"></i> <span>My Members</span></a></li>
+                    <li><a href="earnings.html"><i class="fas fa-money-bill"></i> <span>Earnings</span></a></li>
+                    <li><a href="nutrition.html"><i class="fas fa-apple-alt"></i> <span>Nutrition Plans</span></a></li>
+                    <li><a href="schedule.html"><i class="fas fa-calendar"></i> <span>Schedule</span></a></li>
+                    <li><a href="messages.html"><i class="fas fa-comments"></i> <span>Messages</span></a></li>
+                    <li><a href="profile.html" class="active"><i class="fas fa-user"></i> <span>Profile</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="../../index.html" class="btn btn-outline-dashboard btn-sm w-100">
+                    <i class="fas fa-home"></i> <span>Back to Site</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div>
+                    <h4>Profile</h4>
+                    <p class="text-muted">Manage your trainer profile and settings</p>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">AJ</div>
+                    <div>
+                        <h6 class="mb-0">Alex Johnson</h6>
+                        <small class="text-muted">Certified Trainer</small>
+                    </div>
+                    <a href="../../login.html" class="btn btn-outline-dashboard ms-3"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </header>
+
+            <!-- Header Actions -->
+            <div class="profile-header">
+                <div>
+                    <h5>Trainer Profile</h5>
+                    <p class="text-muted mb-0">Update your information and preferences</p>
+                </div>
+                <button class="btn btn-primary" onclick="saveProfile()">
+                    <i class="fas fa-save me-2"></i> Save Changes
+                </button>
+            </div>
+
+            <div class="profile-container">
+                <!-- Sidebar -->
+                <div class="profile-sidebar">
+                    <div class="profile-picture">
+                        <div class="profile-avatar">AJ</div>
+                        <div class="profile-upload">
+                            <button class="btn btn-outline-primary btn-sm">
+                                <i class="fas fa-camera me-2"></i> Change Photo
+                            </button>
+                            <input type="file" accept="image/*" onchange="uploadPhoto(event)">
+                        </div>
+                    </div>
+                    
+                    <div class="profile-info">
+                        <h3 class="profile-name">Alex Johnson</h3>
+                        <div class="profile-title">Certified Personal Trainer</div>
+                        <span class="profile-badge">
+                            <i class="fas fa-check-circle me-1"></i> Verified Trainer
+                        </span>
+                        
+                        <div class="profile-stats">
+                            <div class="stat-item">
+                                <div class="stat-number">4.8</div>
+                                <div class="stat-label">Rating</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">42</div>
+                                <div class="stat-label">Members</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">5</div>
+                                <div class="stat-label">Years Exp</div>
+                            </div>
+                            <div class="stat-item">
+                                <div class="stat-number">98%</div>
+                                <div class="stat-label">Satisfaction</div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="profile-actions">
+                        <button class="btn-profile-action" onclick="editProfile()">
+                            <i class="fas fa-edit"></i> Edit Profile
+                        </button>
+                        <button class="btn-profile-action" onclick="changePassword()">
+                            <i class="fas fa-lock"></i> Change Password
+                        </button>
+                        <button class="btn-profile-action" onclick="privacySettings()">
+                            <i class="fas fa-shield-alt"></i> Privacy Settings
+                        </button>
+                        <button class="btn-profile-action" onclick="notificationSettings()">
+                            <i class="fas fa-bell"></i> Notifications
+                        </button>
+                    </div>
+                </div>
+                
+                <!-- Content -->
+                <div class="profile-content">
+                    <!-- Tabs -->
+                    <ul class="nav nav-tabs" id="profileTab" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link active" id="basic-tab" data-bs-toggle="tab" data-bs-target="#basic" type="button">
+                                Basic Info
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="certifications-tab" data-bs-toggle="tab" data-bs-target="#certifications" type="button">
+                                Certifications
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="availability-tab" data-bs-toggle="tab" data-bs-target="#availability" type="button">
+                                Availability
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button class="nav-link" id="reviews-tab" data-bs-toggle="tab" data-bs-target="#reviews" type="button">
+                                Reviews
+                            </button>
+                        </li>
+                    </ul>
+                    
+                    <div class="tab-content" id="profileTabContent">
+                        <!-- Basic Info Tab -->
+                        <div class="tab-pane fade show active" id="basic">
+                            <form id="profileForm">
+                                <div class="form-section">
+                                    <h5>Personal Information</h5>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>First Name</label>
+                                            <input type="text" class="form-control" value="Alex">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Last Name</label>
+                                            <input type="text" class="form-control" value="Johnson">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label>Email Address</label>
+                                            <input type="email" class="form-control" value="alex@trainer.com">
+                                        </div>
+                                        <div class="form-group">
+                                            <label>Phone Number</label>
+                                            <input type="tel" class="form-control" value="(555) 123-4567">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Location</label>
+                                        <input type="text" class="form-control" value="New York, NY">
+                                    </div>
+                                </div>
+                                
+                                <div class="form-section">
+                                    <h5>Professional Details</h5>
+                                    <div class="form-group">
+                                        <label>Professional Title</label>
+                                        <input type="text" class="form-control" value="Certified Personal Trainer">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Specializations</label>
+                                        <input type="text" class="form-control" value="Weight Loss, Strength Training, HIIT, Nutrition">
+                                        <small class="text-muted">Separate with commas</small>
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>Experience (Years)</label>
+                                        <input type="number" class="form-control" value="5" min="0">
+                                    </div>
+                                    
+                                    <div class="form-group">
+                                        <label>About Me</label>
+                                        <textarea class="form-control textarea">
+Certified personal trainer with 5+ years of experience helping clients achieve their fitness goals. Specialized in weight loss, strength training, and nutrition coaching. Passionate about creating sustainable fitness habits and empowering individuals to live healthier lives.
+                                        </textarea>
+                                    </div>
+                                </div>
+                                
+                                <div class="form-section">
+                                    <h5>Social Links</h5>
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label><i class="fab fa-instagram text-danger"></i> Instagram</label>
+                                            <input type="text" class="form-control" placeholder="@username">
+                                        </div>
+                                        <div class="form-group">
+                                            <label><i class="fab fa-facebook text-primary"></i> Facebook</label>
+                                            <input type="text" class="form-control" placeholder="Profile URL">
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-row">
+                                        <div class="form-group">
+                                            <label><i class="fab fa-youtube text-danger"></i> YouTube</label>
+                                            <input type="text" class="form-control" placeholder="Channel URL">
+                                        </div>
+                                        <div class="form-group">
+                                            <label><i class="fab fa-linkedin text-primary"></i> LinkedIn</label>
+                                            <input type="text" class="form-control" placeholder="Profile URL">
+                                        </div>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                        
+                        <!-- Certifications Tab -->
+                        <div class="tab-pane fade" id="certifications">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="mb-0">Certifications</h5>
+                                <button class="btn btn-primary btn-sm" onclick="addCertification()">
+                                    <i class="fas fa-plus me-2"></i> Add Certification
+                                </button>
+                            </div>
+                            
+                            <div class="certifications-grid">
+                                <div class="certification-card">
+                                    <div class="certification-header">
+                                        <div>
+                                            <div class="certification-title">NASM CPT</div>
+                                            <div class="certification-date">Issued: 2021 • Expires: 2024</div>
+                                        </div>
+                                    </div>
+                                    <div class="certification-issuer">National Academy of Sports Medicine</div>
+                                    <div class="certification-actions">
+                                        <button class="btn-action btn-edit-cert" onclick="editCertification(1)">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-action btn-delete-cert" onclick="deleteCertification(1)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="certification-card">
+                                    <div class="certification-header">
+                                        <div>
+                                            <div class="certification-title">ACE Nutrition</div>
+                                            <div class="certification-date">Issued: 2022 • Expires: 2025</div>
+                                        </div>
+                                    </div>
+                                    <div class="certification-issuer">American Council on Exercise</div>
+                                    <div class="certification-actions">
+                                        <button class="btn-action btn-edit-cert" onclick="editCertification(2)">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-action btn-delete-cert" onclick="deleteCertification(2)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                                
+                                <div class="certification-card">
+                                    <div class="certification-header">
+                                        <div>
+                                            <div class="certification-title">CPR/AED</div>
+                                            <div class="certification-date">Issued: 2023 • Expires: 2025</div>
+                                        </div>
+                                    </div>
+                                    <div class="certification-issuer">American Red Cross</div>
+                                    <div class="certification-actions">
+                                        <button class="btn-action btn-edit-cert" onclick="editCertification(3)">
+                                            <i class="fas fa-edit"></i>
+                                        </button>
+                                        <button class="btn-action btn-delete-cert" onclick="deleteCertification(3)">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Availability Tab -->
+                        <div class="tab-pane fade" id="availability">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <h5 class="mb-0">Working Hours</h5>
+                                <button class="btn btn-primary btn-sm" onclick="setCustomHours()">
+                                    <i class="fas fa-edit me-2"></i> Edit Hours
+                                </button>
+                            </div>
+                            
+                            <p class="text-muted mb-4">Set your regular working hours for appointments</p>
+                            
+                            <div class="availability-grid">
+                                <div class="availability-slot active">
+                                    <div class="slot-day">Monday</div>
+                                    <div class="slot-hours">8 AM - 6 PM</div>
+                                </div>
+                                <div class="availability-slot active">
+                                    <div class="slot-day">Tuesday</div>
+                                    <div class="slot-hours">8 AM - 6 PM</div>
+                                </div>
+                                <div class="availability-slot active">
+                                    <div class="slot-day">Wednesday</div>
+                                    <div class="slot-hours">8 AM - 6 PM</div>
+                                </div>
+                                <div class="availability-slot active">
+                                    <div class="slot-day">Thursday</div>
+                                    <div class="slot-hours">8 AM - 6 PM</div>
+                                </div>
+                                <div class="availability-slot active">
+                                    <div class="slot-day">Friday</div>
+                                    <div class="slot-hours">8 AM - 5 PM</div>
+                                </div>
+                                <div class="availability-slot">
+                                    <div class="slot-day">Saturday</div>
+                                    <div class="slot-hours">9 AM - 2 PM</div>
+                                </div>
+                                <div class="availability-slot">
+                                    <div class="slot-day">Sunday</div>
+                                    <div class="slot-hours">Closed</div>
+                                </div>
+                            </div>
+                            
+                            <div class="form-section mt-4">
+                                <h5>Break Time</h5>
+                                <div class="form-row">
+                                    <div class="form-group">
+                                        <label>Lunch Break</label>
+                                        <input type="text" class="form-control" value="12:00 PM - 1:00 PM">
+                                    </div>
+                                    <div class="form-group">
+                                        <label>Other Breaks</label>
+                                        <input type="text" class="form-control" placeholder="e.g., 3:00 PM - 3:15 PM">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Reviews Tab -->
+                        <div class="tab-pane fade" id="reviews">
+                            <div class="d-flex justify-content-between align-items-center mb-4">
+                                <div>
+                                    <h5 class="mb-0">Member Reviews</h5>
+                                    <p class="text-muted mb-0">4.8 average rating (124 reviews)</p>
+                                </div>
+                                <button class="btn btn-outline-primary btn-sm" onclick="viewAllReviews()">
+                                    View All Reviews
+                                </button>
+                            </div>
+                            
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="reviewer">
+                                        <div class="reviewer-avatar">SR</div>
+                                        <div>
+                                            <div class="reviewer-name">Sarah Rodriguez</div>
+                                            <div class="review-stars">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="review-date">April 15, 2024</div>
+                                </div>
+                                <p>Alex is an amazing trainer! He created a personalized plan that helped me lose 15 pounds in 3 months. His nutrition advice was spot on and he's always available to answer questions.</p>
+                            </div>
+                            
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="reviewer">
+                                        <div class="reviewer-avatar">MK</div>
+                                        <div>
+                                            <div class="reviewer-name">Michael Kim</div>
+                                            <div class="review-stars">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="review-date">April 10, 2024</div>
+                                </div>
+                                <p>Best decision I made was hiring Alex as my trainer. His strength training program helped me gain 10 pounds of muscle. Very knowledgeable and professional.</p>
+                            </div>
+                            
+                            <div class="review-item">
+                                <div class="review-header">
+                                    <div class="reviewer">
+                                        <div class="reviewer-avatar">EC</div>
+                                        <div>
+                                            <div class="reviewer-name">Emily Chen</div>
+                                            <div class="review-stars">
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star"></i>
+                                                <i class="fas fa-star-half-alt"></i>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="review-date">March 28, 2024</div>
+                                </div>
+                                <p>Alex's HIIT workouts are challenging but effective. I've seen great improvements in my endurance and overall fitness. He pushes you just enough to see results.</p>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-end mt-4">
+                        <button class="btn btn-save" onclick="saveProfile()">
+                            <i class="fas fa-save me-2"></i> Save All Changes
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Tab functionality
+        const triggerTabList = [].slice.call(document.querySelectorAll('#profileTab button'));
+        triggerTabList.forEach(function (triggerEl) {
+            const tabTrigger = new bootstrap.Tab(triggerEl);
+            
+            triggerEl.addEventListener('click', function (event) {
+                event.preventDefault();
+                tabTrigger.show();
+            });
+        });
+        
+        // Availability slot selection
+        document.querySelectorAll('.availability-slot').forEach(slot => {
+            slot.addEventListener('click', function() {
+                const day = this.querySelector('.slot-day').textContent;
+                if (day === 'Sunday' && this.querySelector('.slot-hours').textContent === 'Closed') {
+                    return; // Don't toggle Sunday if closed
+                }
+                this.classList.toggle('active');
+            });
+        });
+        
+        function uploadPhoto(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    const avatar = document.querySelector('.profile-avatar');
+                    avatar.style.backgroundImage = `url(${e.target.result})`;
+                    avatar.style.backgroundSize = 'cover';
+                    avatar.style.backgroundPosition = 'center';
+                    avatar.textContent = '';
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+        
+        function saveProfile() {
+            alert('Profile changes saved successfully!');
+        }
+        
+        function editProfile() {
+            // Activate basic info tab
+            new bootstrap.Tab(document.querySelector('#basic-tab')).show();
+        }
+        
+        function changePassword() {
+            alert('Opening password change form...');
+        }
+        
+        function privacySettings() {
+            alert('Opening privacy settings...');
+        }
+        
+        function notificationSettings() {
+            alert('Opening notification settings...');
+        }
+        
+        function addCertification() {
+            alert('Adding new certification...');
+        }
+        
+        function editCertification(id) {
+            alert(`Editing certification #${id}`);
+        }
+        
+        function deleteCertification(id) {
+            if (confirm('Are you sure you want to delete this certification?')) {
+                alert(`Certification #${id} deleted`);
+            }
+        }
+        
+        function setCustomHours() {
+            alert('Opening hours customization...');
+        }
+        
+        function viewAllReviews() {
+            alert('Viewing all reviews...');
+        }
+    </script>
+</body>
+</html>

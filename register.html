@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Register - Smart Fit</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+  <link rel="stylesheet" href="css/shared.css">
+  <link rel="stylesheet" href="css/style.css">
+
+  <style>
+    .register-container { min-height: 100vh; background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%); }
+    .register-card { border-radius: 15px; border: none; box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1); overflow: hidden; }
+    .register-header { background: linear-gradient(135deg, #2E8B57, #4CAF50); color: white; padding: 40px; text-align: center; }
+    .register-body { padding: 40px; background: white; }
+
+    .step-indicator { display: flex; justify-content: space-between; margin-bottom: 30px; position: relative; }
+    .step-indicator::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 2px; background: #dee2e6; z-index: 1; }
+    .step { width: 40px; height: 40px; border-radius: 50%; background: white; border: 2px solid #dee2e6; display: flex; align-items: center; justify-content: center; font-weight: bold; position: relative; z-index: 2; transition: all 0.3s; }
+    .step.active { background: #2E8B57; border-color: #2E8B57; color: white; }
+    .step.completed { background: #4CAF50; border-color: #4CAF50; color: white; }
+    .step-label { position: absolute; top: 45px; left: 50%; transform: translateX(-50%); white-space: nowrap; font-size: 0.8rem; }
+
+    .form-step { display: none; }
+    .form-step.active { display: block; animation: fadeIn 0.35s; }
+    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+    .plan-card.selected-plan { border: 2px solid #2E8B57 !important; box-shadow: 0 10px 25px rgba(46, 139, 87, 0.15); transform: translateY(-2px); }
+
+    /* Safety: avoid overlays blocking button clicks */
+    .btn { position: relative; z-index: 10; }
+  </style>
+</head>
+
+<body>
+<div class="register-container d-flex align-items-center justify-content-center py-4">
+  <div class="container">
+    <div class="row justify-content-center">
+      <div class="col-lg-8">
+        <div class="register-card">
+          <div class="register-header">
+            <h2>Join Smart Fit Today</h2>
+            <p class="mb-0">Create your account and start your fitness journey</p>
+          </div>
+
+          <div class="register-body">
+
+            <!-- Step Indicator -->
+            <div class="step-indicator">
+              <div class="step active" data-step="1">1 <span class="step-label">Account</span></div>
+              <div class="step" data-step="2">2 <span class="step-label">Profile</span></div>
+              <div class="step" data-step="3">3 <span class="step-label">Plan</span></div>
+              <div class="step" data-step="4">4 <span class="step-label">Payment</span></div>
+              <div class="step" data-step="5">5 <span class="step-label">Confirm</span></div>
+            </div>
+
+            <!-- ✅ ONE FORM ONLY -->
+            <form id="registerForm" novalidate>
+
+              <!-- STEP 1 -->
+              <div class="form-step active" id="step1">
+                <h4 class="mb-4">Account Information</h4>
+
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="firstName" class="form-label">First Name *</label>
+                    <input type="text" class="form-control" id="firstName" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="lastName" class="form-label">Last Name *</label>
+                    <input type="text" class="form-control" id="lastName" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="email" class="form-label">Email Address *</label>
+                    <input type="email" class="form-control" id="email" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="phone" class="form-label">Phone Number *</label>
+                    <input type="tel" class="form-control" id="phone" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="password" class="form-label">Password *</label>
+                    <input type="password" class="form-control" id="password" required>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="confirmPassword" class="form-label">Confirm Password *</label>
+                    <input type="password" class="form-control" id="confirmPassword" required>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                  <button type="button" class="btn btn-outline-secondary" disabled>Previous</button>
+                  <button type="button" class="btn btn-success btn-next">
+                    Continue <i class="fas fa-arrow-right ms-2"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- STEP 2 -->
+              <div class="form-step" id="step2">
+                <h4 class="mb-4">Profile Information</h4>
+
+                <div class="row g-3">
+                  <div class="col-md-6">
+                    <label for="dob" class="form-label">Date of Birth</label>
+                    <input type="date" class="form-control" id="dob">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="gender" class="form-label">Gender</label>
+                    <select class="form-select" id="gender">
+                      <option value="">Select Gender</option>
+                      <option value="male">Male</option>
+                      <option value="female">Female</option>
+                      <option value="other">Other</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="height" class="form-label">Height (cm)</label>
+                    <input type="number" class="form-control" id="height" min="100" max="250">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="weight" class="form-label">Weight (kg)</label>
+                    <input type="number" class="form-control" id="weight" min="30" max="200">
+                  </div>
+                  <div class="col-md-6">
+                    <label for="fitnessLevel" class="form-label">Fitness Level</label>
+                    <select class="form-select" id="fitnessLevel">
+                      <option value="">Select Level</option>
+                      <option value="beginner">Beginner</option>
+                      <option value="intermediate">Intermediate</option>
+                      <option value="advanced">Advanced</option>
+                    </select>
+                  </div>
+                  <div class="col-md-6">
+                    <label for="goal" class="form-label">Primary Goal</label>
+                    <select class="form-select" id="goal">
+                      <option value="">Select Goal</option>
+                      <option value="weight_loss">Weight Loss</option>
+                      <option value="muscle_gain">Muscle Gain</option>
+                      <option value="endurance">Endurance</option>
+                      <option value="flexibility">Flexibility</option>
+                      <option value="general_fitness">General Fitness</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                  <button type="button" class="btn btn-outline-secondary btn-prev">
+                    <i class="fas fa-arrow-left me-2"></i> Previous
+                  </button>
+                  <button type="button" class="btn btn-success btn-next">
+                    Continue <i class="fas fa-arrow-right ms-2"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- STEP 3 -->
+              <div class="form-step" id="step3">
+                <h4 class="mb-4">Choose Your Plan</h4>
+                <p class="text-muted mb-4">Select the plan that best fits your fitness goals</p>
+
+                <div class="row g-4">
+                  <div class="col-md-4">
+                    <div class="card h-100 plan-card" id="plan-basic">
+                      <div class="card-header text-center py-4">
+                        <h5>Basic</h5>
+                        <div class="price mt-3">
+                          <span class="h3">Rs 990</span> <span class="text-muted">/month</span>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <ul class="list-unstyled">
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Basic workouts</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Progress tracking</li>
+                          <li class="mb-2"><i class="fas fa-times text-danger me-2"></i> Live sessions</li>
+                          <li class="mb-2"><i class="fas fa-times text-danger me-2"></i> Personalized plans</li>
+                        </ul>
+                      </div>
+                      <div class="card-footer">
+                        <button type="button" class="btn btn-outline-primary w-100" onclick="selectPlan('basic', 990)">Select Plan</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <div class="card h-100 border-primary plan-card selected-plan" id="plan-premium">
+                      <div class="card-header text-center py-4 bg-primary text-white">
+                        <h5>Premium</h5>
+                        <div class="price mt-3">
+                          <span class="h3">Rs 1,990</span> <span class="text-light">/month</span>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <ul class="list-unstyled">
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> All Basic features</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Live sessions</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Personalized training</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Nutrition plans</li>
+                        </ul>
+                      </div>
+                      <div class="card-footer">
+                        <button type="button" class="btn btn-primary w-100" onclick="selectPlan('premium', 1990)">Select Plan</button>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div class="col-md-4">
+                    <div class="card h-100 plan-card" id="plan-pro">
+                      <div class="card-header text-center py-4">
+                        <h5>Pro</h5>
+                        <div class="price mt-3">
+                          <span class="h3">Rs 2,990</span> <span class="text-muted">/month</span>
+                        </div>
+                      </div>
+                      <div class="card-body">
+                        <ul class="list-unstyled">
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> All Premium features</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> 1-on-1 coaching</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Custom meal plans</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Priority support</li>
+                        </ul>
+                      </div>
+                      <div class="card-footer">
+                        <button type="button" class="btn btn-outline-primary w-100" onclick="selectPlan('pro', 2990)">Select Plan</button>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="form-check mt-4">
+                  <input class="form-check-input" type="checkbox" id="trialCheck">
+                  <label class="form-check-label" for="trialCheck">Start with 7-day free trial</label>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                  <button type="button" class="btn btn-outline-secondary btn-prev">
+                    <i class="fas fa-arrow-left me-2"></i> Previous
+                  </button>
+                  <button type="button" class="btn btn-success btn-next">
+                    Continue <i class="fas fa-arrow-right ms-2"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- STEP 4 -->
+              <div class="form-step" id="step4">
+                <h4 class="mb-4">Payment Details</h4>
+                <p class="text-muted">Demo payment section.</p>
+
+                <div class="d-flex justify-content-between mt-4">
+                  <button type="button" class="btn btn-outline-secondary btn-prev">
+                    <i class="fas fa-arrow-left me-2"></i> Previous
+                  </button>
+                  <button type="button" class="btn btn-success btn-next">
+                    Continue <i class="fas fa-arrow-right ms-2"></i>
+                  </button>
+                </div>
+              </div>
+
+              <!-- STEP 5 -->
+              <div class="form-step" id="step5">
+                <h4 class="mb-4">Review & Confirm</h4>
+
+                <div class="form-check mb-3">
+                  <input class="form-check-input" type="checkbox" id="agreeTerms">
+                  <label class="form-check-label" for="agreeTerms">
+                    I agree to the Terms & Conditions and Privacy Policy
+                  </label>
+                </div>
+
+                <div class="form-check mb-4">
+                  <input class="form-check-input" type="checkbox" id="paymentAuthorization">
+                  <label class="form-check-label" for="paymentAuthorization">
+                    I authorize Smart Fit to charge my payment method for the amount shown above
+                  </label>
+                </div>
+
+                <div class="d-flex justify-content-between mt-4">
+                  <button type="button" class="btn btn-outline-secondary btn-prev">
+                    <i class="fas fa-arrow-left me-2"></i> Previous
+                  </button>
+
+                  <!-- ✅ SUBMIT BUTTON (ONLY HERE) -->
+                  <button type="submit" class="btn btn-success btn-lg">
+                    <i class="fas fa-lock me-2"></i> Complete & Register
+                  </button>
+                </div>
+              </div>
+
+            </form>
+
+            <div class="text-center mt-4">
+              <p class="mb-0">Already have an account?
+                <a href="login.html" class="text-decoration-none fw-bold">Sign in here</a>
+              </p>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  // Plan selection (kept as your style)
+  let selectedPlan = "premium";
+  let selectedPlanPrice = 1990;
+
+  function selectPlan(plan, price) {
+    selectedPlan = plan;
+    selectedPlanPrice = price;
+    document.querySelectorAll(".plan-card").forEach(card => card.classList.remove("selected-plan"));
+    const card = document.getElementById(`plan-${plan}`);
+    if (card) card.classList.add("selected-plan");
+  }
+  window.selectPlan = selectPlan;
+
+  document.addEventListener("DOMContentLoaded", () => {
+    const steps = Array.from(document.querySelectorAll(".form-step"));
+    const stepDots = Array.from(document.querySelectorAll(".step"));
+    let currentIndex = 0;
+
+    function setIndicator(stepNumber) {
+      stepDots.forEach((dot, idx) => {
+        dot.classList.remove("active");
+        dot.classList.remove("completed");
+
+        if (idx < stepNumber - 1) dot.classList.add("completed");
+        if (idx === stepNumber - 1) dot.classList.add("active");
+      });
+    }
+
+    function showStep(index) {
+      steps.forEach(s => s.classList.remove("active"));
+      steps[index].classList.add("active");
+      currentIndex = index;
+      setIndicator(index + 1);
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    }
+
+    function validateStep1() {
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName  = document.getElementById("lastName").value.trim();
+      const email     = document.getElementById("email").value.trim();
+      const phone     = document.getElementById("phone").value.trim();
+      const password  = document.getElementById("password").value;
+      const confirm   = document.getElementById("confirmPassword").value;
+
+      if (!firstName || !lastName || !email || !phone || !password || !confirm) {
+        alert("Please fill all required fields in Step 1");
+        return false;
+      }
+      if (password !== confirm) {
+        alert("Passwords do not match");
+        return false;
+      }
+      if (password.length < 8) {
+        alert("Password must be at least 8 characters");
+        return false;
+      }
+      return true;
+    }
+
+    // Next buttons
+    document.querySelectorAll(".btn-next").forEach(btn => {
+      btn.addEventListener("click", () => {
+        // Step1 validation
+        if (currentIndex === 0 && !validateStep1()) return;
+        if (currentIndex < steps.length - 1) showStep(currentIndex + 1);
+      });
+    });
+
+    // Prev buttons
+    document.querySelectorAll(".btn-prev").forEach(btn => {
+      btn.addEventListener("click", () => {
+        if (currentIndex > 0) showStep(currentIndex - 1);
+      });
+    });
+
+    // Submit -> DB insert
+    document.getElementById("registerForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+
+      // Step5 checkbox validation (JS-only)
+      if (!document.getElementById("agreeTerms").checked || !document.getElementById("paymentAuthorization").checked) {
+        alert("Please tick both confirmation checkboxes");
+        return;
+      }
+
+      const data = new FormData();
+      data.append("firstName", document.getElementById("firstName").value.trim());
+      data.append("lastName",  document.getElementById("lastName").value.trim());
+      data.append("email",     document.getElementById("email").value.trim());
+      data.append("phone",     document.getElementById("phone").value.trim());
+      data.append("password",  document.getElementById("password").value);
+
+      // (optional fields)
+      data.append("dob", document.getElementById("dob").value);
+      data.append("gender", document.getElementById("gender").value);
+      data.append("height", document.getElementById("height").value);
+      data.append("weight", document.getElementById("weight").value);
+      data.append("fitnessLevel", document.getElementById("fitnessLevel").value);
+      data.append("goal", document.getElementById("goal").value);
+
+      data.append("plan", selectedPlan);
+      data.append("role", "member");
+
+      console.log("SENDING:", [...data.entries()]);
+
+      try {
+        const res = await fetch("backend/register.php", { method: "POST", body: data });
+        const json = await res.json();
+        console.log("RESPONSE:", json);
+
+        if (json.status !== "success") {
+          alert(json.message || "Register failed");
+          return;
+        }
+
+        // (optional) localStorage for dashboard greeting
+        const fullName = `${data.get("firstName")} ${data.get("lastName")}`.trim();
+        localStorage.setItem("loggedUserName", fullName);
+        localStorage.setItem("loggedUserRole", "member");
+        localStorage.setItem("loggedUserPlan", selectedPlan);
+
+        window.location.href = "dashboard/member/dashboard.html";
+      } catch (err) {
+        console.error(err);
+        alert("Server error / fetch failed");
+      }
+    });
+
+    // init
+    showStep(0);
+  });
+</script>
+
+</body>
+</html>

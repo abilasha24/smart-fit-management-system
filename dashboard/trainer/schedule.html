@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Schedule - Trainer</title>
+    
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- FullCalendar CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+    
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="../../style.css">
+    <link rel="stylesheet" href="../../shared.css">
+    
+    <style>
+        .schedule-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+        }
+        
+        .schedule-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+        
+        .stat-card {
+            background: white;
+            border-radius: 12px;
+            padding: 25px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+        }
+        
+        .stat-number {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .calendar-container {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+            margin-bottom: 30px;
+        }
+        
+        .calendar-controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+        
+        .view-buttons {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .view-btn {
+            padding: 8px 20px;
+            background: #f8f9fa;
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            cursor: pointer;
+        }
+        
+        .view-btn.active {
+            background: #2196F3;
+            color: white;
+            border-color: #2196F3;
+        }
+        
+        #calendar {
+            margin-top: 20px;
+        }
+        
+        .fc-event {
+            border-radius: 6px;
+            border: none;
+            padding: 5px;
+        }
+        
+        .fc-event.personal-training {
+            background: #2196F3;
+            border-color: #2196F3;
+        }
+        
+        .fc-event.group-session {
+            background: #4CAF50;
+            border-color: #4CAF50;
+        }
+        
+        .fc-event.consultation {
+            background: #FF9800;
+            border-color: #FF9800;
+        }
+        
+        .upcoming-sessions {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        
+        .session-item {
+            padding: 20px;
+            border-bottom: 1px solid #eee;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .session-item:last-child {
+            border-bottom: none;
+        }
+        
+        .session-info {
+            flex: 1;
+        }
+        
+        .session-title {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .session-details {
+            display: flex;
+            gap: 15px;
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .session-time {
+            background: #f8f9fa;
+            padding: 10px 15px;
+            border-radius: 8px;
+            text-align: center;
+            min-width: 100px;
+        }
+        
+        .session-time .time {
+            font-weight: 700;
+            font-size: 1.1rem;
+            color: #333;
+        }
+        
+        .session-time .duration {
+            font-size: 0.8rem;
+            color: #666;
+        }
+        
+        .session-actions {
+            display: flex;
+            gap: 10px;
+        }
+        
+        .btn-start {
+            background: #4CAF50;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        
+        .btn-cancel {
+            background: #f44336;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        
+        .btn-reschedule {
+            background: #FF9800;
+            color: white;
+            border: none;
+            padding: 8px 15px;
+            border-radius: 5px;
+        }
+        
+        .session-badge {
+            padding: 4px 10px;
+            border-radius: 20px;
+            font-size: 0.75rem;
+            font-weight: 600;
+        }
+        
+        .badge-personal {
+            background: rgba(33, 150, 243, 0.1);
+            color: #2196F3;
+        }
+        
+        .badge-group {
+            background: rgba(76, 175, 80, 0.1);
+            color: #4CAF50;
+        }
+        
+        .badge-consult {
+            background: rgba(255, 152, 0, 0.1);
+            color: #FF9800;
+        }
+        
+        .availability-section {
+            background: white;
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+        }
+        
+        .availability-slots {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .slot-item {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .slot-item:hover {
+            background: #e3f2fd;
+        }
+        
+        .slot-item.active {
+            background: #2196F3;
+            color: white;
+        }
+        
+        .slot-time {
+            font-weight: 600;
+            margin-bottom: 5px;
+        }
+        
+        .slot-status {
+            font-size: 0.8rem;
+        }
+        
+        @media (max-width: 768px) {
+            .schedule-header {
+                flex-direction: column;
+                gap: 15px;
+            }
+            
+            .schedule-stats {
+                grid-template-columns: 1fr 1fr;
+            }
+            
+            .session-item {
+                flex-direction: column;
+                gap: 15px;
+                text-align: center;
+            }
+            
+            .session-details {
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard-container">
+        <!-- Sidebar -->
+        <aside class="sidebar">
+            <div class="sidebar-header">
+                <h3><i class="fas fa-user-tie"></i> Trainer Panel</h3>
+            </div>
+            <nav class="sidebar-menu">
+                <ul>
+                    <li><a href="index.html"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
+                    <li><a href="exercises.html"><i class="fas fa-dumbbell"></i> <span>My Exercises</span></a></li>
+                    <li><a href="members.html"><i class="fas fa-users"></i> <span>My Members</span></a></li>
+                    <li><a href="earnings.html"><i class="fas fa-money-bill"></i> <span>Earnings</span></a></li>
+                    <li><a href="nutrition.html"><i class="fas fa-apple-alt"></i> <span>Nutrition Plans</span></a></li>
+                    <li><a href="schedule.html" class="active"><i class="fas fa-calendar"></i> <span>Schedule</span></a></li>
+                    <li><a href="messages.html"><i class="fas fa-comments"></i> <span>Messages</span></a></li>
+                    <li><a href="profile.html"><i class="fas fa-user"></i> <span>Profile</span></a></li>
+                </ul>
+            </nav>
+            <div class="sidebar-footer">
+                <a href="../../index.html" class="btn btn-outline-dashboard btn-sm w-100">
+                    <i class="fas fa-home"></i> <span>Back to Site</span>
+                </a>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Header -->
+            <header class="dashboard-header">
+                <div>
+                    <h4>Schedule</h4>
+                    <p class="text-muted">Manage your appointments and availability</p>
+                </div>
+                <div class="user-info">
+                    <div class="user-avatar">AJ</div>
+                    <div>
+                        <h6 class="mb-0">Alex Johnson</h6>
+                        <small class="text-muted">Certified Trainer</small>
+                    </div>
+                    <a href="../../login.html" class="btn btn-outline-dashboard ms-3"><i class="fas fa-sign-out-alt"></i> Logout</a>
+                </div>
+            </header>
+
+            <!-- Header Actions -->
+            <div class="schedule-header">
+                <div>
+                    <h5>Appointment Calendar</h5>
+                    <p class="text-muted mb-0">Today: <span id="currentDate"></span></p>
+                </div>
+                <div class="d-flex gap-2">
+                    <button class="btn btn-outline-primary" onclick="manageAvailability()">
+                        <i class="fas fa-clock me-2"></i> Set Availability
+                    </button>
+                    <button class="btn btn-primary" onclick="addAppointment()">
+                        <i class="fas fa-plus me-2"></i> Add Appointment
+                    </button>
+                </div>
+            </div>
+
+            <!-- Schedule Stats -->
+            <div class="schedule-stats">
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #2196F3;">8</div>
+                    <div class="stat-label">Today's Appointments</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #4CAF50;">42</div>
+                    <div class="stat-label">This Week Total</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #FF9800;">3</div>
+                    <div class="stat-label">Pending Requests</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number" style="color: #9C27B0;">92%</div>
+                    <div class="stat-label">Attendance Rate</div>
+                </div>
+            </div>
+
+            <!-- Calendar -->
+            <div class="calendar-container">
+                <div class="calendar-controls">
+                    <div class="view-buttons">
+                        <span class="view-btn active" data-view="day">Day</span>
+                        <span class="view-btn" data-view="week">Week</span>
+                        <span class="view-btn" data-view="month">Month</span>
+                    </div>
+                    <div>
+                        <button class="btn btn-sm btn-outline-secondary me-2" id="prevBtn">
+                            <i class="fas fa-chevron-left"></i>
+                        </button>
+                        <button class="btn btn-sm btn-outline-secondary" id="nextBtn">
+                            <i class="fas fa-chevron-right"></i>
+                        </button>
+                    </div>
+                </div>
+                
+                <div id="calendar"></div>
+            </div>
+
+            <div class="row">
+                <div class="col-lg-8">
+                    <!-- Upcoming Sessions -->
+                    <div class="upcoming-sessions">
+                        <h5>Upcoming Sessions</h5>
+                        <p class="text-muted mb-4">Next 7 days</p>
+                        
+                        <div class="session-item">
+                            <div class="session-info">
+                                <div class="session-title">Personal Training - Sarah Rodriguez</div>
+                                <div class="session-details">
+                                    <span><i class="fas fa-user"></i> One-on-One</span>
+                                    <span><i class="fas fa-map-marker-alt"></i> Gym Studio A</span>
+                                    <span class="session-badge badge-personal">Personal</span>
+                                </div>
+                            </div>
+                            <div class="session-time">
+                                <div class="time">10:00 AM</div>
+                                <div class="duration">60 min</div>
+                            </div>
+                            <div class="session-actions">
+                                <button class="btn-start" onclick="startSession(1)">Start</button>
+                                <button class="btn-reschedule" onclick="rescheduleSession(1)">Reschedule</button>
+                            </div>
+                        </div>
+                        
+                        <div class="session-item">
+                            <div class="session-info">
+                                <div class="session-title">Group HIIT Session</div>
+                                <div class="session-details">
+                                    <span><i class="fas fa-users"></i> 8 Participants</span>
+                                    <span><i class="fas fa-map-marker-alt"></i> Main Hall</span>
+                                    <span class="session-badge badge-group">Group</span>
+                                </div>
+                            </div>
+                            <div class="session-time">
+                                <div class="time">12:00 PM</div>
+                                <div class="duration">45 min</div>
+                            </div>
+                            <div class="session-actions">
+                                <button class="btn-start" onclick="startSession(2)">Start</button>
+                                <button class="btn-reschedule" onclick="rescheduleSession(2)">Reschedule</button>
+                            </div>
+                        </div>
+                        
+                        <div class="session-item">
+                            <div class="session-info">
+                                <div class="session-title">Nutrition Consultation - Michael Kim</div>
+                                <div class="session-details">
+                                    <span><i class="fas fa-apple-alt"></i> Online</span>
+                                    <span><i class="fas fa-video"></i> Video Call</span>
+                                    <span class="session-badge badge-consult">Consultation</span>
+                                </div>
+                            </div>
+                            <div class="session-time">
+                                <div class="time">2:30 PM</div>
+                                <div class="duration">30 min</div>
+                            </div>
+                            <div class="session-actions">
+                                <button class="btn-start" onclick="startSession(3)">Join</button>
+                                <button class="btn-cancel" onclick="cancelSession(3)">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4">
+                    <!-- Availability -->
+                    <div class="availability-section">
+                        <h5>Today's Availability</h5>
+                        <p class="text-muted mb-3">Available time slots for new appointments</p>
+                        
+                        <div class="availability-slots">
+                            <div class="slot-item active">
+                                <div class="slot-time">9:00 AM</div>
+                                <div class="slot-status">Available</div>
+                            </div>
+                            <div class="slot-item">
+                                <div class="slot-time">10:00 AM</div>
+                                <div class="slot-status">Booked</div>
+                            </div>
+                            <div class="slot-item">
+                                <div class="slot-time">11:00 AM</div>
+                                <div class="slot-status">Booked</div>
+                            </div>
+                            <div class="slot-item active">
+                                <div class="slot-time">1:00 PM</div>
+                                <div class="slot-status">Available</div>
+                            </div>
+                            <div class="slot-item active">
+                                <div class="slot-time">3:00 PM</div>
+                                <div class="slot-status">Available</div>
+                            </div>
+                            <div class="slot-item active">
+                                <div class="slot-time">4:00 PM</div>
+                                <div class="slot-status">Available</div>
+                            </div>
+                        </div>
+                        
+                        <button class="btn btn-outline-primary w-100 mt-3" onclick="setCustomHours()">
+                            <i class="fas fa-edit me-2"></i> Customize Hours
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- FullCalendar JS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+    
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    
+    <script>
+        // Set current date
+        const currentDate = new Date();
+        const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+        document.getElementById('currentDate').textContent = currentDate.toLocaleDateString('en-US', options);
+        
+        // Calendar initialization
+        document.addEventListener('DOMContentLoaded', function() {
+            const calendarEl = document.getElementById('calendar');
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                headerToolbar: false,
+                height: 'auto',
+                events: [
+                    {
+                        title: 'Personal Training - Sarah',
+                        start: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 10, 0),
+                        end: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 11, 0),
+                        className: 'personal-training'
+                    },
+                    {
+                        title: 'Group HIIT Session',
+                        start: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 12, 0),
+                        end: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 12, 45),
+                        className: 'group-session'
+                    },
+                    {
+                        title: 'Nutrition Consultation',
+                        start: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 14, 30),
+                        end: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate(), 15, 0),
+                        className: 'consultation'
+                    },
+                    {
+                        title: 'Personal Training - Michael',
+                        start: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1, 9, 0),
+                        end: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 1, 10, 0),
+                        className: 'personal-training'
+                    },
+                    {
+                        title: 'Yoga Class',
+                        start: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 2, 16, 0),
+                        end: new Date(currentDate.getFullYear(), currentDate.getMonth(), currentDate.getDate() + 2, 17, 0),
+                        className: 'group-session'
+                    }
+                ],
+                eventClick: function(info) {
+                    alert('Event: ' + info.event.title);
+                }
+            });
+            
+            calendar.render();
+            
+            // View buttons
+            document.querySelectorAll('.view-btn').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.view-btn').forEach(b => {
+                        b.classList.remove('active');
+                    });
+                    this.classList.add('active');
+                    
+                    const view = this.dataset.view;
+                    calendar.changeView(view === 'day' ? 'timeGridDay' : 
+                                      view === 'week' ? 'timeGridWeek' : 
+                                      'dayGridMonth');
+                });
+            });
+            
+            // Navigation buttons
+            document.getElementById('prevBtn').addEventListener('click', function() {
+                calendar.prev();
+            });
+            
+            document.getElementById('nextBtn').addEventListener('click', function() {
+                calendar.next();
+            });
+        });
+        
+        // Time slot selection
+        document.querySelectorAll('.slot-item').forEach(slot => {
+            slot.addEventListener('click', function() {
+                if (!this.classList.contains('active')) return;
+                
+                const time = this.querySelector('.slot-time').textContent;
+                alert(`Selected time slot: ${time}`);
+            });
+        });
+        
+        function addAppointment() {
+            alert('Opening appointment creation form...');
+        }
+        
+        function manageAvailability() {
+            alert('Opening availability settings...');
+        }
+        
+        function setCustomHours() {
+            alert('Opening custom hours editor...');
+        }
+        
+        function startSession(id) {
+            alert(`Starting session #${id}`);
+        }
+        
+        function rescheduleSession(id) {
+            alert(`Rescheduling session #${id}`);
+        }
+        
+        function cancelSession(id) {
+            if (confirm('Are you sure you want to cancel this session?')) {
+                alert(`Session #${id} cancelled`);
+            }
+        }
+    </script>
+</body>
+</html>

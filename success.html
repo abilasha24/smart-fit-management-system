@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Smart Fit</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="css/shared.css">
+    <link rel="stylesheet" href="css/style.css">
+
+    <style>
+        .success-container {
+            min-height: 100vh;
+            background: linear-gradient(135deg, #f5f7fa 0%, #e4edf5 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .success-card {
+            background: white;
+            border-radius: 20px;
+            padding: 50px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            max-width: 600px;
+            width: 100%;
+        }
+
+        .success-icon {
+            width: 100px;
+            height: 100px;
+            background: linear-gradient(135deg, #2E8B57, #4CAF50);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 30px;
+            animation: pulse 2s infinite;
+        }
+
+        .success-icon i {
+            font-size: 3rem;
+            color: white;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+
+        .order-details {
+            background: #f8f9fa;
+            border-radius: 15px;
+            padding: 25px;
+            margin: 30px 0;
+        }
+
+        .order-summary { text-align: left; }
+
+        .summary-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #dee2e6;
+        }
+
+        .summary-item:last-child { border-bottom: none; }
+
+        .next-steps { text-align: left; margin-top: 30px; }
+
+        .step-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 10px;
+            border-left: 4px solid #2E8B57;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+        }
+
+        .step-number {
+            width: 35px;
+            height: 35px;
+            background: #2E8B57;
+            color: white;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 15px;
+            font-weight: bold;
+            flex-shrink: 0;
+        }
+
+        .step-content h6 { margin-bottom: 5px; color: #2E8B57; }
+
+        .download-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            padding: 10px 20px;
+            background: #2E8B57;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .download-btn:hover {
+            background: #1e6b47;
+            color: white;
+            transform: translateY(-2px);
+        }
+    </style>
+</head>
+
+<body>
+<div class="success-container">
+    <div class="success-card">
+        <div class="success-icon">
+            <i class="fas fa-check"></i>
+        </div>
+
+        <h1 class="mb-3"><i class="fas fa-check-circle text-success"></i> Payment Successful!</h1>
+        <p class="lead mb-4">Welcome to Smart Fit! Your fitness journey begins now.</p>
+
+        <div class="order-details">
+            <h5 class="mb-4"><i class="fas fa-receipt"></i> Order Details</h5>
+
+            <div class="order-summary">
+                <div class="summary-item">
+                    <span><strong>Order ID:</strong></span>
+                    <span id="orderId">#SMF</span>
+                </div>
+
+                <div class="summary-item">
+                    <span><strong>Date & Time:</strong></span>
+                    <span id="orderDateTime">-</span>
+                </div>
+
+                <div class="summary-item">
+                    <span><strong>Plan:</strong></span>
+                    <span id="orderPlan" class="badge bg-primary">Premium Plan</span>
+                </div>
+
+                <div class="summary-item">
+                    <span><strong>Billing Cycle:</strong></span>
+                    <span id="orderCycle">Monthly</span>
+                </div>
+
+                <div class="summary-item">
+                    <span><strong>Payment Method:</strong></span>
+                    <span id="orderMethod"></span>
+                </div>
+
+                <div class="summary-item">
+                    <span><strong>Subtotal:</strong></span>
+                    <span id="subtotalText">Rs 0.00</span>
+                </div>
+
+                <div class="summary-item">
+                    <span><strong>Tax (8%):</strong></span>
+                    <span id="taxText">Rs 0.00</span>
+                </div>
+
+                <div class="summary-item">
+                    <span><strong>Discount:</strong></span>
+                    <span id="discountText" class="text-success">- Rs 0.00</span>
+                </div>
+
+                <div class="summary-item" style="border-top: 2px solid #2E8B57; padding-top: 15px;">
+                    <span><strong>Total Amount:</strong></span>
+                    <span id="totalText" class="h5 text-success">Rs 0.00</span>
+                </div>
+            </div>
+
+            <div class="mt-4 text-center">
+                <a href="#" class="download-btn" onclick="downloadInvoice(); return false;">
+                    <i class="fas fa-download"></i> Download Invoice
+                </a>
+            </div>
+        </div>
+
+        <div class="alert alert-success">
+            <i class="fas fa-envelope me-2"></i>
+            A confirmation email has been sent to your registered email address with all details.
+        </div>
+
+        <div class="next-steps">
+            <h5 class="mb-4"><i class="fas fa-rocket"></i> What's Next?</h5>
+
+            <div class="step-item">
+                <div class="step-number">1</div>
+                <div class="step-content">
+                    <h6>Check Your Email</h6>
+                    <p class="mb-0 text-muted">Find your login credentials and welcome guide in your inbox</p>
+                </div>
+            </div>
+
+            <div class="step-item">
+                <div class="step-number">2</div>
+                <div class="step-content">
+                    <h6>Complete Your Profile</h6>
+                    <p class="mb-0 text-muted">Set fitness goals and preferences in your dashboard</p>
+                </div>
+            </div>
+
+            <div class="step-item">
+                <div class="step-number">3</div>
+                <div class="step-content">
+                    <h6>Start Your First Workout</h6>
+                    <p class="mb-0 text-muted">Access beginner-friendly workouts tailored for you</p>
+                </div>
+            </div>
+
+            <div class="step-item">
+                <div class="step-number">4</div>
+                <div class="step-content">
+                    <h6>Download Mobile App</h6>
+                    <p class="mb-0 text-muted">Get the app for on-the-go fitness tracking</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-grid gap-3 d-md-flex justify-content-center mt-4">
+            <a href="dashboard/member/index.html" class="btn btn-primary btn-lg px-4" id="dashboardBtn">
+                <i class="fas fa-tachometer-alt me-2"></i> Go to Dashboard
+            </a>
+            <a href="index.html" class="btn btn-outline-primary btn-lg px-4">
+                <i class="fas fa-home me-2"></i> Back to Home
+            </a>
+        </div>
+
+        <div class="mt-5 pt-4 border-top">
+            <div class="row">
+                <div class="col-md-6">
+                    <h6><i class="fas fa-question-circle me-2"></i> Need Help?</h6>
+                    <p class="small text-muted">
+                        Contact our support team for any assistance
+                        <br>
+                        <a href="contact.html" class="text-decoration-none">support@smartfit.lk</a>
+                    </p>
+                </div>
+                <div class="col-md-6">
+                    <h6><i class="fas fa-clock me-2"></i> Support Hours</h6>
+                    <p class="small text-muted">
+                        24/7 Customer Support
+                        <br>
+                        Response time: Under 2 hours
+                    </p>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+    function getUrlParams() {
+        const params = new URLSearchParams(window.location.search);
+        return {
+            plan: (params.get('plan') || 'premium').toLowerCase(),
+            amount: Number(params.get('amount') || 1990),
+            cycle: (params.get('cycle') || 'monthly').toLowerCase(),
+            payment: (params.get('payment') || 'card').toLowerCase()
+        };
+    }
+
+    function formatCurrency(amount) {
+        return 'Rs ' + Number(amount).toLocaleString('en-IN', { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function generateOrderId() {
+        const now = new Date();
+        const y = now.getFullYear();
+        const m = String(now.getMonth() + 1).padStart(2, '0');
+        const d = String(now.getDate()).padStart(2, '0');
+        const rand = Math.floor(100 + Math.random() * 900);
+        return `#SMF${y}${m}${d}${rand}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', function() {
+        const params = getUrlParams();
+        const now = new Date();
+
+        const dateTime =
+            now.toLocaleDateString('en-US', { day: 'numeric', month: 'short', year: 'numeric' }) +
+            ', ' +
+            now.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
+
+        document.getElementById('orderDateTime').textContent = dateTime;
+        document.getElementById('orderId').textContent = generateOrderId();
+
+        const planNames = { basic: 'Basic Plan', premium: 'Premium Plan', pro: 'Pro Plan', free: 'Free Trial' };
+        document.getElementById('orderPlan').textContent = planNames[params.plan] || 'Premium Plan';
+
+        const isYearly = params.cycle === 'yearly';
+        document.getElementById('orderCycle').textContent = isYearly ? 'Yearly (Save 15%)' : 'Monthly';
+
+        const paymentMethods = {
+            card: '<i class="fab fa-cc-visa"></i> Visa ending in 4242',
+            bank: '<i class="fas fa-university"></i> Bank Transfer',
+            paypal: '<i class="fab fa-paypal"></i> PayPal'
+        };
+        document.getElementById('orderMethod').innerHTML = paymentMethods[params.payment] || '<i class="fas fa-credit-card"></i> Card';
+
+        const monthly = params.amount;
+        const base = isYearly ? (monthly * 12) : monthly;
+        const discount = isYearly ? (base * 0.15) : 0;
+        const subtotal = base - discount;
+        const tax = subtotal * 0.08;
+        const total = subtotal + tax;
+
+        document.getElementById('subtotalText').textContent = formatCurrency(subtotal);
+        document.getElementById('taxText').textContent = formatCurrency(tax);
+        document.getElementById('discountText').textContent = '- ' + formatCurrency(discount);
+        document.getElementById('totalText').textContent = formatCurrency(total);
+
+        const dashboardBtn = document.getElementById('dashboardBtn');
+        const countdownEl = document.createElement('div');
+        countdownEl.className = 'mt-2 small text-muted';
+        countdownEl.innerHTML = 'Auto-redirecting in <span id="countdown">10</span> seconds...';
+        dashboardBtn.parentElement.appendChild(countdownEl);
+
+        let countdown = 10;
+        const interval = setInterval(() => {
+            countdown--;
+            document.getElementById('countdown').textContent = countdown;
+            if (countdown <= 0) {
+                clearInterval(interval);
+                window.location.href = dashboardBtn.href;
+            }
+        }, 1000);
+    });
+
+    function downloadInvoice() {
+        alert('Invoice download started! (Demo feature)');
+    }
+</script>
+</body>
+</html>

@@ -1,0 +1,14 @@
+# DB config (do not upload)
+backend/db.php
+config/db.php
+.env
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+*.log
+
+# Node (if any)
+node_modules/
