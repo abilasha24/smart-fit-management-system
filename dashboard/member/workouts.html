@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Member Workouts | Smart Fit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+  <style>
+    body { background:#f6f7fb; }
+    .sidebar { min-height:100vh; background:#111827; color:#fff; }
+    .sidebar a{
+      color:#c7c7c7; text-decoration:none; display:block;
+      padding:12px 18px; border-radius:8px; margin-bottom:6px;
+    }
+    .sidebar a.active, .sidebar a:hover{ background:#1f2937; color:#fff; }
+    .content { padding:30px; }
+    .card { border-radius:16px; }
+    .pill { background:#e9f7ee; color:#0b7a33; padding:4px 10px; border-radius:999px; font-size:.85rem; }
+  </style>
+</head>
+
+<body>
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- SIDEBAR -->
+    <div class="col-md-3 col-lg-2 sidebar p-3">
+      <h4 class="fw-bold mb-2">SMART FIT</h4>
+      <div class="small text-white-50 mb-4">
+        Hi, <span id="navUsername" class="text-white fw-semibold">Member</span>
+      </div>
+
+      <a href="dashboard.html">🏠 Dashboard</a>
+      <a href="workouts.html" class="active">💪 Workouts</a>
+      <a href="myworkout.html">🏋️ My Workouts</a>
+      <a href="progress.html">📈 Progress</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="subscription.html">💳 Subscription</a>
+      <a href="notifications.html">🔔 Notifications</a>
+      <a href="feedback.html">📝 Feedback</a>
+      
+      <a href="../../index.html">🌐 Back to Website</a>
+      <a href="../../backend/logout.php" class="text-danger mt-3">🚪 Logout</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="col-md-9 col-lg-10 content">
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <h2 class="fw-bold mb-0">💪 Workouts</h2>
+          <div class="text-muted">Start and complete workouts (Member panel)</div>
+        </div>
+        <div id="statusText" class="text-muted"></div>
+      </div>
+
+      <div id="msg" class="text-danger mb-3"></div>
+
+      <div class="row g-3" id="grid">
+        <div class="col-12 text-center text-muted">Loading...</div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+/* ✅ IMPORTANT: member folder -> backend path must be ../../backend/... */
+const API = {
+  whoami: "../../backend/whoami.php",
+  list: "../../backend/get_workouts.php",
+  start: "../../backend/start_workout.php",
+  complete: "../../backend/complete_workout.php"
+};
+
+function setStatus(t){ document.getElementById("statusText").textContent = t || ""; }
+function showMsg(t){ document.getElementById("msg").textContent = t || ""; }
+
+async function authGuard(){
+  try{
+    const res = await fetch(API.whoami, { credentials:"same-origin" });
+    const me = await res.json();
+
+    if(!me.logged_in || (me.role||"").toLowerCase() !== "member"){
+      window.location.href = "../../login.html";
+      return null;
+    }
+
+    document.getElementById("navUsername").textContent = me.username || "Member";
+    return me;
+  }catch(e){
+    window.location.href = "../../login.html";
+    return null;
+  }
+}
+
+async function loadWorkouts(){
+  showMsg(""); setStatus("Loading...");
+
+  try{
+    const res = await fetch(API.list, { credentials:"same-origin" });
+    const data = await res.json();
+
+    if(!data.ok){
+      showMsg(data.message || "Failed to load workouts");
+      setStatus("");
+      return;
+    }
+
+    const grid = document.getElementById("grid");
+    grid.innerHTML = "";
+
+    if(!data.workouts || data.workouts.length === 0){
+      grid.innerHTML = `<div class="col-12"><div class="alert alert-warning">No workouts found.</div></div>`;
+      setStatus("");
+      return;
+    }
+
+    data.workouts.forEach(w=>{
+      const col = document.createElement("div");
+      col.className = "col-md-4";
+
+      col.innerHTML = `
+        <div class="card shadow-sm h-100">
+          <div class="card-body">
+            <div class="d-flex justify-content-between mb-2">
+              <span class="pill">${(w.level||"").toLowerCase()}</span>
+            </div>
+            <h5 class="fw-bold">${escapeHtml(w.title)}</h5>
+            <div class="text-muted mb-2">
+              ⏱ ${escapeHtml(w.duration_min)} mins · 🔥 ${escapeHtml(w.calories)} cal
+            </div>
+            <div class="d-grid gap-2">
+              <button class="btn btn-success" data-start="${w.id}">Start</button>
+              <button class="btn btn-outline-success" data-complete="${w.id}">Complete</button>
+            </div>
+          </div>
+        </div>
+      `;
+
+      grid.appendChild(col);
+    });
+
+    grid.querySelectorAll("[data-start]").forEach(b=>{
+      b.addEventListener("click", ()=>startWorkout(parseInt(b.dataset.start, 10)));
+    });
+
+    grid.querySelectorAll("[data-complete]").forEach(b=>{
+      b.addEventListener("click", ()=>completeWorkout(parseInt(b.dataset.complete, 10)));
+    });
+
+    setStatus(`Loaded ${data.workouts.length} workouts ✅`);
+  }catch(e){
+    console.error(e);
+    showMsg("Network / JSON error while loading workouts.");
+    setStatus("");
+  }
+}
+
+async function startWorkout(id){
+  if(!id) return alert("Invalid workout id");
+  if(!confirm("Start this workout?")) return;
+
+  try{
+    const res = await fetch(API.start, {
+      method:"POST",
+      credentials:"same-origin",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ workout_id: id })
+    });
+    const d = await res.json();
+    alert(d.message || "Done");
+  }catch(e){
+    console.error(e);
+    alert("Network error while starting workout.");
+  }
+}
+
+async function completeWorkout(id){
+  if(!id) return alert("Invalid workout id");
+  if(!confirm("Complete this workout?")) return;
+
+  try{
+    const res = await fetch(API.complete, {
+      method:"POST",
+      credentials:"same-origin",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ workout_id: id })
+    });
+    const d = await res.json();
+    alert(d.message || "Done");
+  }catch(e){
+    console.error(e);
+    alert("Network error while completing workout.");
+  }
+}
+
+function escapeHtml(str){
+  return String(str ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+(async function init(){
+  const me = await authGuard();
+  if(me) await loadWorkouts();
+})();
+</script>
+
+</body>
+</html>

@@ -1,85 +1,222 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Member Dashboard - Smart Fit</title>
+  <meta charset="UTF-8">
+  <title>Member Dashboard | Smart Fit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
 
   <style>
     body { background:#f6f7fb; }
-    .topbar { background:#1f2328; color:#fff; padding: 14px 0; }
-    .brand { font-weight:700; letter-spacing:1px; }
-    .dashboard-wrap { padding: 28px 0; }
-    .welcome-card { background:#fff; border-radius: 12px; box-shadow: 0 8px 24px rgba(0,0,0,0.06); padding: 26px; }
-    .mini-card { background:#fff; border-radius: 10px; border: 1px solid #e9ecef; padding: 18px; height: 100%; }
-    .muted { color:#6c757d; }
+    .sidebar { min-height:100vh; background:#111827; color:#fff; }
+    .sidebar a{
+      color:#c7c7c7; text-decoration:none; display:block;
+      padding:12px 18px; border-radius:8px; margin-bottom:6px;
+    }
+    .sidebar a.active, .sidebar a:hover{ background:#1f2937; color:#fff; }
+    .content { padding:30px; }
+    .card { border-radius:16px; }
+    .stat-card { border-radius:18px; box-shadow:0 10px 25px rgba(0,0,0,.06); }
+    .big { font-size:1.7rem; font-weight:800; }
+    .quick a { text-decoration:none; }
   </style>
 </head>
 
 <body>
-  <div class="topbar">
-    <div class="container d-flex align-items-center justify-content-between">
-      <div class="brand fs-5">SMART FIT</div>
+<div class="container-fluid">
+  <div class="row">
 
-      <div class="d-flex align-items-center gap-3">
-        <small class="text-white-50" id="roleText"></small>
-        <button class="btn btn-outline-light btn-sm" id="logoutBtn">Logout</button>
+    <!-- SIDEBAR -->
+    <div class="col-md-3 col-lg-2 sidebar p-3">
+      <h4 class="fw-bold mb-2">SMART FIT</h4>
+      <div class="small text-white-50 mb-4">
+        Hi, <span id="navUsername" class="text-white fw-semibold">Member</span>
       </div>
+
+      <a href="dashboard.html" class="active">🏠 Dashboard</a>
+      <a href="workouts.html">💪 Workouts</a>
+      <a href="myworkout.html">🏋️ My Workouts</a>
+      <a href="progress.html">📈 Progress</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="subscription.html">💳 Subscription</a>
+      <a href="notifications.html">🔔 Notifications</a>
+      <a href="feedback.html">📝 Feedback</a>
+    
+      <a href="../../index.html">🌐 Back to Website</a>
+      <a href="../../backend/logout.php" class="text-danger mt-3">🚪 Logout</a>
     </div>
-  </div>
 
-  <div class="container dashboard-wrap">
-    <div class="welcome-card">
-      <h3 class="mb-1">
-        Welcome, <span id="memberName" class="text-success">Member</span> 👋
-      </h3>
-      <p class="muted mb-4">This is your Member Dashboard.</p>
+    <!-- MAIN -->
+    <div class="col-md-9 col-lg-10 content">
 
-      <div class="row g-3">
-        <div class="col-md-4">
-          <div class="mini-card">
-            <h6 class="fw-bold mb-1">Your Plan</h6>
-            <div class="muted" id="planText">Loading...</div>
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <h2 class="fw-bold mb-0">🏠 Member Dashboard</h2>
+          <div class="text-muted">Overview of your fitness activity</div>
+        </div>
+        <div id="statusText" class="text-muted"></div>
+      </div>
+
+      <div id="msg" class="mb-3 text-danger"></div>
+
+      <!-- STATS -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="text-muted">Completed</div>
+              <div class="big" id="completed">0</div>
+            </div>
           </div>
         </div>
-
-        <div class="col-md-4">
-          <div class="mini-card">
-            <h6 class="fw-bold mb-1">Next Workout</h6>
-            <div class="muted" id="workoutText">Not set</div>
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="text-muted">Started</div>
+              <div class="big" id="started">0</div>
+            </div>
           </div>
         </div>
-
-        <div class="col-md-4">
-          <div class="mini-card">
-            <h6 class="fw-bold mb-1">Progress</h6>
-            <div class="muted" id="progressText">0%</div>
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="text-muted">Total Minutes</div>
+              <div class="big" id="minutes">0</div>
+            </div>
+          </div>
+        </div>
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="text-muted">Total Calories</div>
+              <div class="big" id="calories">0</div>
+            </div>
           </div>
         </div>
       </div>
-    </div>
+
+      <!-- SUBSCRIPTION SUMMARY + NOTIFICATIONS -->
+      <div class="row g-3 mb-3">
+        <div class="col-lg-7">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="fw-bold mb-2">💳 Subscription</h5>
+              <div id="subBox" class="text-muted">Loading...</div>
+              <div class="mt-3">
+                <a class="btn btn-outline-dark btn-sm" href="subscription.html">View Subscription</a>
+                <a class="btn btn-success btn-sm" href="../../pricing.html">Upgrade Plan</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="fw-bold mb-2">🔔 Notifications</h5>
+              <div class="text-muted">Unread: <span class="fw-bold" id="unread">0</span></div>
+              <div class="mt-3">
+                <a class="btn btn-dark btn-sm" href="notifications.html">Open Notifications</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- QUICK SHORTCUTS -->
+      <div class="card shadow-sm quick">
+        <div class="card-body">
+          <h5 class="fw-bold mb-3">⚡ Quick Actions</h5>
+          <div class="row g-2">
+            <div class="col-md-3"><a class="btn btn-outline-success w-100" href="workouts.html">Start Workout</a></div>
+            <div class="col-md-3"><a class="btn btn-outline-dark w-100" href="myworkout.html">My Workouts</a></div>
+            <div class="col-md-3"><a class="btn btn-outline-dark w-100" href="progress.html">View Progress</a></div>
+            <div class="col-md-3"><a class="btn btn-outline-dark w-100" href="profile.html">Edit Profile</a></div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
   </div>
+</div>
 
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
-  <script>
-    const name = localStorage.getItem("loggedUserName") || "Member";
-    const role = localStorage.getItem("loggedUserRole") || "member";
+<script>
+const API = {
+  whoami: "../../backend/whoami.php",
+  stats: "../../backend/get_member_stats.php"
+};
 
-    document.getElementById("memberName").textContent = name;
-    document.getElementById("roleText").textContent = role.toUpperCase();
+function setStatus(t){ document.getElementById("statusText").textContent = t || ""; }
+function showMsg(t){ document.getElementById("msg").textContent = t || ""; }
 
-    const plan = localStorage.getItem("loggedUserPlan") || "Basic";
-    document.getElementById("planText").textContent = plan;
+async function authGuard(){
+  try{
+    const res = await fetch(API.whoami, { credentials:"same-origin" });
+    const me = await res.json();
+    if(!me.logged_in || (me.role||"").toLowerCase() !== "member"){
+      window.location.href = "../../login.html";
+      return null;
+    }
+    document.getElementById("navUsername").textContent = me.username || "Member";
+    return me;
+  }catch(e){
+    window.location.href = "../../login.html";
+    return null;
+  }
+}
 
-    document.getElementById("logoutBtn").addEventListener("click", function () {
-      localStorage.removeItem("loggedUserName");
-      localStorage.removeItem("loggedUserRole");
-      localStorage.removeItem("loggedUserPlan");
-      window.location.href = "/smart_fit/login.html";
-    });
-  </script>
+function renderSubscription(sub){
+  const box = document.getElementById("subBox");
+  if(!sub){
+    box.innerHTML = `<div>No subscription found. <a href="../../pricing.html">Buy a plan</a></div>`;
+    return;
+  }
+  box.innerHTML = `
+    <div class="fw-semibold">${sub.plan} <span class="text-muted">(${sub.billing_cycle})</span></div>
+    <div class="text-muted">Paid: Rs. ${sub.amount} via ${sub.payment_method}</div>
+    <div class="small text-muted">Date: ${sub.created_at}</div>
+  `;
+}
+
+async function loadStats(){
+  showMsg(""); setStatus("Loading...");
+
+  try{
+    const res = await fetch(API.stats, { credentials:"same-origin" });
+    const data = await res.json();
+
+    if(!data.ok){
+      showMsg(data.message || "Failed to load stats");
+      setStatus("");
+      return;
+    }
+
+    const s = data.stats;
+
+    document.getElementById("completed").textContent = s.completed ?? 0;
+    document.getElementById("started").textContent = s.started ?? 0;
+    document.getElementById("minutes").textContent = s.total_minutes ?? 0;
+    document.getElementById("calories").textContent = s.total_calories ?? 0;
+    document.getElementById("unread").textContent = s.unread_notifications ?? 0;
+
+    renderSubscription(data.subscription);
+
+    setStatus("Ready ✅");
+  }catch(e){
+    console.error(e);
+    showMsg("Network / JSON error while loading stats");
+    setStatus("");
+  }
+}
+
+(async function(){
+  const me = await authGuard();
+  if(me) await loadStats();
+})();
+</script>
+
 </body>
 </html>

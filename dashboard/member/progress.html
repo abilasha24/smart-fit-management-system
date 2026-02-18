@@ -1,1029 +1,225 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Member Dashboard - Smart Fit</title>
-    
-    <!-- Bootstrap CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Chart.js for Charts -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    
-    <style>
-        :root {
-            --sidebar-width: 250px;
-            --primary-color: #3A86FF;
-            --primary-dark: #2667CC;
-            --secondary-color: #8338EC;
-            --success-color: #38B000;
-            --warning-color: #FF9E00;
-            --danger-color: #FF006E;
-            --info-color: #00BBF9;
-            --dark-color: #2B2D42;
-            --light-color: #f8f9fa;
-            --fitness-orange: #FF9E00;
-            --fitness-teal: #009688;
-        }
-        
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-        }
-        
-        body {
-            background-color: #f5f7fa;
-            color: #333;
-            overflow-x: hidden;
-        }
-        
-        /* Dashboard Layout */
-        .dashboard-container {
-            display: flex;
-            min-height: 100vh;
-        }
-        
-        /* Sidebar */
-        .sidebar {
-            width: var(--sidebar-width);
-            background: linear-gradient(180deg, var(--dark-color), #1a1a1a);
-            color: white;
-            position: fixed;
-            height: 100vh;
-            overflow-y: auto;
-            z-index: 1000;
-            transition: all 0.3s;
-        }
-        
-        .sidebar-header {
-            padding: 25px 20px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-            background: rgba(0,0,0,0.2);
-        }
-        
-        .sidebar-header h3 {
-            color: var(--primary-color);
-            font-weight: 700;
-            margin: 0;
-            font-size: 1.5rem;
-        }
-        
-        .sidebar-header h3 i {
-            margin-right: 10px;
-        }
-        
-        .user-profile-sidebar {
-            padding: 20px;
-            text-align: center;
-            border-bottom: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .user-avatar-sidebar {
-            width: 80px;
-            height: 80px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 2rem;
-            font-weight: bold;
-            margin: 0 auto 15px;
-            border: 4px solid rgba(255,255,255,0.2);
-        }
-        
-        .user-profile-sidebar h5 {
-            color: white;
-            margin-bottom: 5px;
-        }
-        
-        .user-profile-sidebar p {
-            color: rgba(255,255,255,0.7);
-            font-size: 0.9rem;
-            margin-bottom: 10px;
-        }
-        
-        .membership-badge {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            padding: 5px 15px;
-            border-radius: 20px;
-            font-size: 0.8rem;
-            font-weight: 600;
-            display: inline-block;
-        }
-        
-        .sidebar-menu {
-            padding: 20px 0;
-            height: calc(100vh - 300px);
-            overflow-y: auto;
-        }
-        
-        .sidebar-menu ul {
-            list-style: none;
-            padding: 0;
-            margin: 0;
-        }
-        
-        .sidebar-menu li {
-            margin-bottom: 5px;
-        }
-        
-        .sidebar-menu a {
-            display: flex;
-            align-items: center;
-            padding: 15px 20px;
-            color: rgba(255,255,255,0.9);
-            text-decoration: none;
-            transition: all 0.3s;
-            border-left: 3px solid transparent;
-        }
-        
-        .sidebar-menu a:hover {
-            background: rgba(255,255,255,0.1);
-            color: white;
-            padding-left: 25px;
-            border-left: 3px solid var(--primary-color);
-        }
-        
-        .sidebar-menu a.active {
-            background: rgba(58, 134, 255, 0.15);
-            color: white;
-            font-weight: 600;
-            border-left: 3px solid var(--primary-color);
-        }
-        
-        .sidebar-menu i {
-            width: 25px;
-            margin-right: 12px;
-            text-align: center;
-            font-size: 1.1rem;
-        }
-        
-        .sidebar-menu .badge {
-            margin-left: auto;
-            font-size: 0.7rem;
-            padding: 3px 8px;
-        }
-        
-        .sidebar-footer {
-            padding: 20px;
-            position: absolute;
-            bottom: 0;
-            width: 100%;
-            background: rgba(0,0,0,0.2);
-            border-top: 1px solid rgba(255,255,255,0.1);
-        }
-        
-        .sidebar-footer .btn {
-            width: 100%;
-            padding: 12px;
-            font-size: 0.9rem;
-            font-weight: 600;
-        }
-        
-        /* Main Content */
-        .main-content {
-            flex: 1;
-            margin-left: var(--sidebar-width);
-            padding: 25px;
-            transition: all 0.3s;
-            min-width: 0;
-        }
-        
-        /* Header */
-        .dashboard-header {
-            background-color: white;
-            padding: 20px 30px;
-            border-radius: 12px;
-            box-shadow: 0 3px 15px rgba(0,0,0,0.08);
-            margin-bottom: 25px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            flex-wrap: wrap;
-            gap: 15px;
-        }
-        
-        .header-left h4 {
-            color: var(--dark-color);
-            margin-bottom: 5px;
-            font-weight: 600;
-        }
-        
-        .header-left p {
-            color: #6c757d;
-            margin: 0;
-        }
-        
-        .user-info {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-        }
-        
-        .user-avatar {
-            width: 50px;
-            height: 50px;
-            border-radius: 50%;
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-weight: bold;
-            font-size: 1.2rem;
-            box-shadow: 0 3px 10px rgba(58, 134, 255, 0.3);
-        }
-        
-        .user-details h6 {
-            margin: 0;
-            font-weight: 600;
-            color: #333;
-        }
-        
-        .user-details small {
-            color: #6c757d;
-            font-size: 0.85rem;
-        }
-        
-        /* Welcome Banner */
-        .welcome-banner {
-            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
-            color: white;
-            border-radius: 12px;
-            padding: 30px;
-            margin-bottom: 30px;
-            box-shadow: 0 5px 20px rgba(58, 134, 255, 0.3);
-            position: relative;
-            overflow: hidden;
-        }
-        
-        .welcome-banner::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            right: -10%;
-            width: 200px;
-            height: 200px;
-            background: rgba(255,255,255,0.1);
-            border-radius: 50%;
-        }
-        
-        .welcome-banner-content {
-            position: relative;
-            z-index: 1;
-        }
-        
-        .welcome-banner h3 {
-            margin-bottom: 15px;
-            font-weight: 600;
-        }
-        
-        .welcome-banner p {
-            margin-bottom: 20px;
-            opacity: 0.9;
-            font-size: 1.1rem;
-        }
-        
-        /* Stats Cards */
-        .stats-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-        
-        .stats-card {
-            background-color: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            transition: all 0.3s;
-            position: relative;
-            overflow: hidden;
-            border-top: 4px solid var(--primary-color);
-        }
-        
-        .stats-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
-        }
-        
-        .stats-card:nth-child(1) { border-top-color: var(--primary-color); }
-        .stats-card:nth-child(2) { border-top-color: var(--fitness-orange); }
-        .stats-card:nth-child(3) { border-top-color: var(--success-color); }
-        .stats-card:nth-child(4) { border-top-color: var(--info-color); }
-        .stats-card:nth-child(5) { border-top-color: var(--fitness-teal); }
-        
-        .stats-icon {
-            width: 60px;
-            height: 60px;
-            border-radius: 12px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 24px;
-            color: white;
-            margin-bottom: 15px;
-        }
-        
-        .stats-card:nth-child(1) .stats-icon { background: var(--primary-color); }
-        .stats-card:nth-child(2) .stats-icon { background: var(--fitness-orange); }
-        .stats-card:nth-child(3) .stats-icon { background: var(--success-color); }
-        .stats-card:nth-child(4) .stats-icon { background: var(--info-color); }
-        .stats-card:nth-child(5) .stats-icon { background: var(--fitness-teal); }
-        
-        .stats-number {
-            font-size: 2.5rem;
-            font-weight: 700;
-            color: #333;
-            margin: 10px 0;
-        }
-        
-        .stats-label {
-            color: #666;
-            font-size: 0.9rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-            margin-bottom: 10px;
-            display: block;
-        }
-        
-        .stats-trend {
-            font-size: 0.85rem;
-            display: flex;
-            align-items: center;
-            gap: 5px;
-            font-weight: 600;
-        }
-        
-        .stats-trend.up {
-            color: var(--success-color);
-        }
-        
-        .stats-trend.down {
-            color: var(--danger-color);
-        }
-        
-        /* Quick Actions */
-        .quick-actions {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-            gap: 15px;
-            margin-bottom: 30px;
-        }
-        
-        .action-btn {
-            background: white;
-            border: 2px solid var(--primary-color);
-            color: var(--primary-color);
-            padding: 20px 15px;
-            border-radius: 10px;
-            font-weight: 600;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            transition: all 0.3s;
-            text-align: center;
-            text-decoration: none;
-            min-height: 100px;
-            cursor: pointer;
-        }
-        
-        .action-btn:hover {
-            background: var(--primary-color);
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 5px 15px rgba(58, 134, 255, 0.3);
-        }
-        
-        .action-btn i {
-            font-size: 2rem;
-        }
-        
-        /* Tables */
-        .dashboard-card {
-            background-color: white;
-            border-radius: 12px;
-            padding: 25px;
-            box-shadow: 0 5px 15px rgba(0,0,0,0.08);
-            margin-bottom: 30px;
-        }
-        
-        .card-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 20px;
-            padding-bottom: 15px;
-            border-bottom: 1px solid #eee;
-        }
-        
-        .card-header h5 {
-            margin: 0;
-            color: var(--dark-color);
-            font-weight: 600;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        
-        .card-header h5 i {
-            color: var(--primary-color);
-        }
-        
-        .dashboard-table {
-            width: 100%;
-            border-collapse: collapse;
-            margin: 0;
-        }
-        
-        .dashboard-table th {
-            background-color: #f8f9fa;
-            padding: 15px;
-            text-align: left;
-            font-weight: 600;
-            color: var(--dark-color);
-            border-bottom: 2px solid #e0e0e0;
-            white-space: nowrap;
-        }
-        
-        .dashboard-table td {
-            padding: 15px;
-            border-bottom: 1px solid #e0e0e0;
-            vertical-align: middle;
-        }
-        
-        .dashboard-table tr:hover {
-            background-color: #f8f9fa;
-        }
-        
-        .dashboard-table tr:last-child td {
-            border-bottom: none;
-        }
-        
-        /* Progress Bars */
-        .progress-item {
-            margin-bottom: 25px;
-        }
-        
-        .progress-label {
-            display: flex;
-            justify-content: space-between;
-            margin-bottom: 10px;
-        }
-        
-        .progress-label span {
-            font-weight: 600;
-            color: var(--dark-color);
-        }
-        
-        .progress-label .value {
-            color: var(--primary-color);
-            font-weight: 700;
-        }
-        
-        .progress-bar-container {
-            height: 10px;
-            background: #e9ecef;
-            border-radius: 5px;
-            overflow: hidden;
-        }
-        
-        .progress-bar {
-            height: 100%;
-            background: linear-gradient(90deg, var(--primary-color), var(--primary-dark));
-            border-radius: 5px;
-            transition: width 1s ease-in-out;
-        }
-        
-        /* Mobile Menu Toggle */
-        .menu-toggle {
-            display: none;
-            background: none;
-            border: none;
-            font-size: 1.5rem;
-            color: var(--dark-color);
-            cursor: pointer;
-            padding: 5px;
-        }
-        
-        /* Responsive */
-        @media (max-width: 1200px) {
-            .stats-grid {
-                grid-template-columns: repeat(2, 1fr);
-            }
-        }
-        
-        @media (max-width: 768px) {
-            .sidebar {
-                transform: translateX(-100%);
-                width: 280px;
-            }
-            
-            .sidebar.active {
-                transform: translateX(0);
-            }
-            
-            .main-content {
-                margin-left: 0;
-                width: 100%;
-            }
-            
-            .menu-toggle {
-                display: block;
-            }
-            
-            .stats-grid {
-                grid-template-columns: 1fr;
-            }
-        }
-        
-        /* Buttons */
-        .btn-member {
-            background: linear-gradient(135deg, var(--primary-color), var(--primary-dark));
-            color: white;
-            border: none;
-            padding: 10px 25px;
-            border-radius: 8px;
-            font-weight: 600;
-            transition: all 0.3s;
-            text-decoration: none;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(58, 134, 255, 0.3);
-        }
-        
-        .btn-member:hover {
-            background: linear-gradient(135deg, var(--primary-dark), var(--primary-color));
-            color: white;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 15px rgba(58, 134, 255, 0.4);
-        }
-    </style>
+  <meta charset="UTF-8">
+  <title>Progress | Smart Fit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    body { background:#f6f7fb; }
+    .sidebar { min-height:100vh; background:#111827; color:#fff; }
+    .sidebar a{
+      color:#c7c7c7; text-decoration:none; display:block;
+      padding:12px 18px; border-radius:8px; margin-bottom:6px;
+    }
+    .sidebar a.active, .sidebar a:hover{ background:#1f2937; color:#fff; }
+    .content { padding:30px; }
+    .card { border-radius:16px; }
+    .stat { border-radius:16px; background:#fff; box-shadow:0 10px 25px rgba(0,0,0,.06); padding:16px; }
+    .stat .big { font-size:1.6rem; font-weight:800; }
+  </style>
 </head>
+
 <body>
-    <div class="dashboard-container">
-        <!-- Sidebar -->
-        <aside class="sidebar">
-            <div class="sidebar-header">
-                <h3><i class="fas fa-dumbbell"></i> Smart Fit</h3>
-                <small class="text-light">Member Dashboard</small>
-            </div>
-            
-            <div class="user-profile-sidebar">
-                <div class="user-avatar-sidebar">JD</div>
-                <h5>John Doe</h5>
-                <p>Fitness Enthusiast</p>
-                <span class="membership-badge">
-                    <i class="fas fa-crown me-2"></i>PREMIUM MEMBER
-                </span>
-            </div>
-            
-            <nav class="sidebar-menu">
-                <ul>
-                    <li><a href="member-dashboard.html" class="active"><i class="fas fa-tachometer-alt"></i> <span>Dashboard</span></a></li>
-                    <li><a href="member-workouts.html"><i class="fas fa-dumbbell"></i> <span>My Workouts</span></a></li>
-                    <li><a href="member-progress.html"><i class="fas fa-chart-line"></i> <span>Progress Tracking</span></a></li>
-                    <li><a href="member-nutrition.html"><i class="fas fa-apple-alt"></i> <span>Nutrition Plan</span></a></li>
-                    <li><a href="member-schedule.html"><i class="fas fa-calendar-alt"></i> <span>Schedule</span></a></li>
-                    <li><a href="member-trainers.html"><i class="fas fa-user-tie"></i> <span>Trainers</span></a></li>
-                    <li><a href="member-achievements.html"><i class="fas fa-trophy"></i> <span>Achievements</span></a></li>
-                    <li><a href="member-settings.html"><i class="fas fa-cog"></i> <span>Settings</span></a></li>
-                </ul>
-            </nav>
-            
-            <div class="sidebar-footer">
-                <a href="../../index.html" class="btn btn-member">
-                    <i class="fas fa-home"></i> <span>Back to Site</span>
-                </a>
-            </div>
-        </aside>
-        
-        <!-- Mobile Sidebar Overlay -->
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+    
 
-        <!-- Main Content -->
-        <main class="main-content">
-            <!-- Header -->
-            <header class="dashboard-header">
-                <div class="header-left">
-                    <button class="menu-toggle" id="menuToggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <div>
-                        <h4><i class="fas fa-tachometer-alt me-2"></i> Member Dashboard</h4>
-                        <p class="text-muted mb-0">Welcome back, John! Ready to crush your fitness goals?</p>
-                    </div>
-                </div>
-                
-                <div class="user-info">
-                    <div class="user-avatar">JD</div>
-                    <div class="user-details">
-                        <h6 class="mb-0">John Doe</h6>
-                        <small class="text-muted">Day 28 Streak • 2,850 Points</small>
-                    </div>
-                    <a href="../../login.html" class="btn-outline-member">
-                        <i class="fas fa-sign-out-alt"></i> Logout
-                    </a>
-                </div>
-            </header>
+<div class="container-fluid">
+  <div class="row">
 
-            <!-- Welcome Banner -->
-            <div class="welcome-banner">
-                <div class="welcome-banner-content">
-                    <h3><i class="fas fa-dumbbell me-2"></i> Today's Recommended Workout</h3>
-                    <p>Full Body Strength Training - 45 mins • 450 calories • Advanced Level</p>
-                    <div class="d-flex gap-3">
-                        <button class="btn btn-member" onclick="startWorkout()">
-                            <i class="fas fa-play me-2"></i> Start Workout Now
-                        </button>
-                        <button class="btn-outline-member" style="color: white; border-color: white;" onclick="viewWorkoutDetails()">
-                            <i class="fas fa-info-circle me-2"></i> View Details
-                        </button>
-                    </div>
-                </div>
-            </div>
+    <!-- SIDEBAR -->
+    <div class="col-md-3 col-lg-2 sidebar p-3">
+      <h4 class="fw-bold mb-2">SMART FIT</h4>
+      <div class="small text-white-50 mb-4">
+        Hi, <span id="navUsername" class="text-white fw-semibold">Member</span>
+      </div>
 
-            <!-- Stats Cards -->
-            <div class="stats-grid">
-                <div class="stats-card">
-                    <div class="stats-icon"><i class="fas fa-fire"></i></div>
-                    <h2 class="stats-number">1,250</h2>
-                    <span class="stats-label">Calories Burned Today</span>
-                    <div class="stats-trend up">
-                        <i class="fas fa-arrow-up"></i> 15% from yesterday
-                    </div>
-                </div>
-                
-                <div class="stats-card">
-                    <div class="stats-icon"><i class="fas fa-dumbbell"></i></div>
-                    <h2 class="stats-number">24</h2>
-                    <span class="stats-label">Workouts This Month</span>
-                    <div class="stats-trend up">
-                        <i class="fas fa-arrow-up"></i> 18% from last month
-                    </div>
-                </div>
-                
-                <div class="stats-card">
-                    <div class="stats-icon"><i class="fas fa-weight-scale"></i></div>
-                    <h2 class="stats-number">75.5</h2>
-                    <span class="stats-label">Current Weight (kg)</span>
-                    <div class="stats-trend down">
-                        <i class="fas fa-arrow-down"></i> 2.3 kg lost
-                    </div>
-                </div>
-                
-                <div class="stats-card">
-                    <div class="stats-icon"><i class="fas fa-heartbeat"></i></div>
-                    <h2 class="stats-number">86%</h2>
-                    <span class="stats-label">Goal Progress</span>
-                    <div class="stats-trend up">
-                        <i class="fas fa-arrow-up"></i> 12% this week
-                    </div>
-                </div>
-                
-                <div class="stats-card">
-                    <div class="stats-icon"><i class="fas fa-running"></i></div>
-                    <h2 class="stats-number">28</h2>
-                    <span class="stats-label">Day Streak</span>
-                    <div class="stats-trend up">
-                        <i class="fas fa-arrow-up"></i> Personal best!
-                    </div>
-                </div>
-            </div>
+      <a href="dashboard.html">🏠 Dashboard</a>
+      <a href="workouts.html">💪 Workouts</a>
+      <a href="myworkout.html">🏋️ My Workouts</a>
+      <a href="progress.html" class="active">📈 Progress</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="subscription.html">💳 Subscription</a>
+      <a href="notifications.html">🔔 Notifications</a>
+      <a href="feedback.html">📝 Feedback</a>
 
-            <!-- Quick Actions -->
-            <div class="quick-actions">
-                <a href="member-workouts.html" class="action-btn">
-                    <i class="fas fa-dumbbell"></i>
-                    <span>Start Workout</span>
-                </a>
-                <a href="member-nutrition.html" class="action-btn">
-                    <i class="fas fa-utensils"></i>
-                    <span>Log Meal</span>
-                </a>
-                <a href="member-progress.html" class="action-btn">
-                    <i class="fas fa-chart-line"></i>
-                    <span>Track Progress</span>
-                </a>
-                <a href="member-schedule.html" class="action-btn">
-                    <i class="fas fa-calendar-plus"></i>
-                    <span>Book Session</span>
-                </a>
-            </div>
-
-            <!-- Progress & Recent Activity -->
-            <div class="row">
-                <!-- Progress Tracking -->
-                <div class="col-lg-6 mb-4">
-                    <div class="dashboard-card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-chart-line"></i> Goal Progress</h5>
-                            <a href="member-progress.html" class="btn-outline-member btn-outline-member-sm">
-                                View Details
-                            </a>
-                        </div>
-                        
-                        <div class="progress-item">
-                            <div class="progress-label">
-                                <span>Weight Loss Goal</span>
-                                <span class="value">75%</span>
-                            </div>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar" style="width: 75%;"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="progress-item">
-                            <div class="progress-label">
-                                <span>Muscle Gain Goal</span>
-                                <span class="value">60%</span>
-                            </div>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar" style="width: 60%;"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="progress-item">
-                            <div class="progress-label">
-                                <span>Cardio Endurance</span>
-                                <span class="value">85%</span>
-                            </div>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar" style="width: 85%;"></div>
-                            </div>
-                        </div>
-                        
-                        <div class="progress-item">
-                            <div class="progress-label">
-                                <span>Flexibility Goal</span>
-                                <span class="value">45%</span>
-                            </div>
-                            <div class="progress-bar-container">
-                                <div class="progress-bar" style="width: 45%;"></div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Recent Activity -->
-                <div class="col-lg-6 mb-4">
-                    <div class="dashboard-card">
-                        <div class="card-header">
-                            <h5><i class="fas fa-history"></i> Recent Activity</h5>
-                            <button class="btn-outline-member btn-outline-member-sm">
-                                View All
-                            </button>
-                        </div>
-                        
-                        <div class="table-responsive">
-                            <table class="dashboard-table">
-                                <thead>
-                                    <tr>
-                                        <th>Activity</th>
-                                        <th>Time</th>
-                                        <th>Calories</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="activity-icon me-2" style="width: 35px; height: 35px; background: rgba(58, 134, 255, 0.1); color: var(--primary-color); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                                    <i class="fas fa-dumbbell"></i>
-                                                </div>
-                                                <div>
-                                                    <strong>Full Body Strength</strong>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>Today, 10:30 AM</td>
-                                        <td>450 cal</td>
-                                    </tr>
-                                    
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="activity-icon me-2" style="width: 35px; height: 35px; background: rgba(56, 176, 0, 0.1); color: var(--success-color); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                                    <i class="fas fa-apple-alt"></i>
-                                                </div>
-                                                <div>
-                                                    <strong>Meal Logged</strong>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>Today, 8:15 AM</td>
-                                        <td>635 cal</td>
-                                    </tr>
-                                    
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <div class="activity-icon me-2" style="width: 35px; height: 35px; background: rgba(255, 158, 0, 0.1); color: var(--warning-color); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                                    <i class="fas fa-running"></i>
-                                                </div>
-                                                <div>
-                                                    <strong>Morning Run</strong>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>Yesterday, 7:00 AM</td>
-                                        <td>350 cal</td>
-                                    </tr>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Upcoming Workouts -->
-            <div class="dashboard-card">
-                <div class="card-header">
-                    <h5><i class="fas fa-dumbbell"></i> Upcoming Workouts</h5>
-                    <a href="member-workouts.html" class="btn-outline-member btn-outline-member-sm">
-                        View All
-                    </a>
-                </div>
-                
-                <div class="row">
-                    <div class="col-md-6 mb-3">
-                        <div class="workout-card" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
-                            <div class="workout-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                <h5 style="margin: 0;">HIIT Cardio Blast</h5>
-                                <span style="background: var(--danger-color); color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem;">Cardio</span>
-                            </div>
-                            <div class="workout-body">
-                                <div class="workout-info" style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                                    <div class="text-center">
-                                        <i class="fas fa-clock text-primary"></i>
-                                        <div style="font-weight: 700; font-size: 1.2rem;">30 min</div>
-                                        <small style="color: #6c757d;">Duration</small>
-                                    </div>
-                                    <div class="text-center">
-                                        <i class="fas fa-fire text-primary"></i>
-                                        <div style="font-weight: 700; font-size: 1.2rem;">600 cal</div>
-                                        <small style="color: #6c757d;">Calories</small>
-                                    </div>
-                                    <div class="text-center">
-                                        <i class="fas fa-bolt text-primary"></i>
-                                        <div style="font-weight: 700; font-size: 1.2rem;">Advanced</div>
-                                        <small style="color: #6c757d;">Level</small>
-                                    </div>
-                                </div>
-                                <p style="margin-bottom: 15px;">High intensity interval training to boost metabolism.</p>
-                                <button class="btn btn-member" style="width: 100%;">
-                                    <i class="fas fa-play me-2"></i> Start Workout
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                    
-                    <div class="col-md-6 mb-3">
-                        <div class="workout-card" style="background: white; border-radius: 12px; padding: 20px; box-shadow: 0 3px 10px rgba(0,0,0,0.08);">
-                            <div class="workout-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 15px;">
-                                <h5 style="margin: 0;">Morning Yoga Flow</h5>
-                                <span style="background: var(--success-color); color: white; padding: 3px 10px; border-radius: 20px; font-size: 0.8rem;">Yoga</span>
-                            </div>
-                            <div class="workout-body">
-                                <div class="workout-info" style="display: flex; justify-content: space-between; margin-bottom: 15px;">
-                                    <div class="text-center">
-                                        <i class="fas fa-clock text-primary"></i>
-                                        <div style="font-weight: 700; font-size: 1.2rem;">60 min</div>
-                                        <small style="color: #6c757d;">Duration</small>
-                                    </div>
-                                    <div class="text-center">
-                                        <i class="fas fa-fire text-primary"></i>
-                                        <div style="font-weight: 700; font-size: 1.2rem;">250 cal</div>
-                                        <small style="color: #6c757d;">Calories</small>
-                                    </div>
-                                    <div class="text-center">
-                                        <i class="fas fa-bolt text-primary"></i>
-                                        <div style="font-weight: 700; font-size: 1.2rem;">Beginner</div>
-                                        <small style="color: #6c757d;">Level</small>
-                                    </div>
-                                </div>
-                                <p style="margin-bottom: 15px;">Gentle yoga flow to improve flexibility and reduce stress.</p>
-                                <button class="btn btn-member" style="width: 100%;">
-                                    <i class="fas fa-play me-2"></i> Start Workout
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </main>
+      <a href="../../index.html">🌐 Back to Website</a>
+      <a href="../../backend/logout.php" class="text-danger mt-3">🚪 Logout</a>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- Custom JavaScript -->
-    <script>
-        // Mobile Menu Toggle
-        const menuToggle = document.getElementById('menuToggle');
-        const sidebar = document.querySelector('.sidebar');
-        const sidebarOverlay = document.getElementById('sidebarOverlay');
-        
-        menuToggle.addEventListener('click', () => {
-            sidebar.classList.toggle('active');
-            sidebarOverlay.classList.toggle('active');
-        });
-        
-        sidebarOverlay.addEventListener('click', () => {
-            sidebar.classList.remove('active');
-            sidebarOverlay.classList.remove('active');
-        });
-        
-        // Stats Animation
-        function animateStats() {
-            const statsNumbers = document.querySelectorAll('.stats-number');
-            statsNumbers.forEach(stat => {
-                const text = stat.textContent;
-                let finalValue;
-                
-                if (text.includes('.')) {
-                    finalValue = parseFloat(text);
-                } else {
-                    finalValue = parseInt(text.replace(/[^0-9]/g, ''));
-                }
-                
-                let currentValue = 0;
-                const increment = finalValue / 50;
-                const timer = setInterval(() => {
-                    currentValue += increment;
-                    if (currentValue >= finalValue) {
-                        if (text.includes('.')) {
-                            stat.textContent = finalValue.toFixed(1);
-                        } else {
-                            stat.textContent = finalValue;
-                        }
-                        clearInterval(timer);
-                    } else {
-                        if (text.includes('.')) {
-                            stat.textContent = currentValue.toFixed(1);
-                        } else {
-                            stat.textContent = Math.floor(currentValue);
-                        }
-                    }
-                }, 20);
-            });
-        }
-        
-        // Initialize when DOM is loaded
-        document.addEventListener('DOMContentLoaded', function() {
-            animateStats();
-            loadUserData();
-        });
-        
-        // Load User Data
-        function loadUserData() {
-            const userData = {
-                name: "John Doe",
-                streak: 28,
-                points: 2850,
-                weight: 75.5,
-                goalProgress: 86,
-                workoutsThisMonth: 24,
-                caloriesToday: 1250
-            };
-            
-            // Update user info
-            document.querySelector('.user-details h6').textContent = userData.name;
-            document.querySelector('.user-details small').textContent = `Day ${userData.streak} Streak • ${userData.points.toLocaleString()} Points`;
-            
-            // Update welcome message with user's name
-            const welcomeMsg = document.querySelector('.header-left p');
-            if (welcomeMsg) {
-                welcomeMsg.textContent = `Welcome back, ${userData.name.split(' ')[0]}! Ready to crush your fitness goals?`;
-            }
-        }
-        
-        // Button Actions
-        function startWorkout() {
-            alert('Starting workout session...');
-            // In real app, redirect to workout page
-        }
-        
-        function viewWorkoutDetails() {
-            alert('Showing workout details...');
-            // In real app, show modal with details
-        }
-    </script>
+    <!-- MAIN -->
+    <div class="col-md-9 col-lg-10 content">
+
+      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div>
+          <h2 class="fw-bold mb-0">📈 Progress</h2>
+          <div class="text-muted">Your workout activity summary</div>
+        </div>
+        <div id="statusText" class="text-muted"></div>
+      </div>
+
+      <div id="msg" class="text-danger mb-3"></div>
+
+      <!-- STATS -->
+      <div class="row g-3 mb-3">
+        <div class="col-md-4">
+          <div class="stat">
+            <div class="text-muted">Completed Workouts</div>
+            <div class="big" id="statCompleted">0</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat">
+            <div class="text-muted">Started (Not Completed)</div>
+            <div class="big" id="statStarted">0</div>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="stat">
+            <div class="text-muted">Total Calories (Completed)</div>
+            <div class="big" id="statCalories">0</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- CHARTS -->
+      <div class="row g-3">
+        <div class="col-lg-4">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h6 class="fw-bold mb-3">Status Breakdown</h6>
+              <canvas id="chartStatus" height="220"></canvas>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-8">
+          <div class="card shadow-sm mb-3">
+            <div class="card-body">
+              <h6 class="fw-bold mb-3">Calories Burned (Completed) — by Date</h6>
+              <canvas id="chartCalories" height="120"></canvas>
+            </div>
+          </div>
+
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h6 class="fw-bold mb-3">Workout Minutes (Completed) — by Date</h6>
+              <canvas id="chartMinutes" height="120"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /content -->
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+const API = {
+  whoami: "../../backend/whoami.php",
+  progress: "../../backend/get_progress.php"
+};
+
+let statusChart, caloriesChart, minutesChart;
+
+function setStatus(t){ document.getElementById("statusText").textContent = t || ""; }
+function showMsg(t){ document.getElementById("msg").textContent = t || ""; }
+
+async function fetchJSON(url, opts={}){
+  const res = await fetch(url, { credentials:"same-origin", ...opts });
+  return await res.json();
+}
+
+async function authGuard(){
+  try{
+    const me = await fetchJSON(API.whoami);
+    if(!me.logged_in || (me.role||"").toLowerCase() !== "member"){
+      window.location.href = "../../login.html";
+      return null;
+    }
+    document.getElementById("navUsername").textContent = me.username || "Member";
+    return me;
+  }catch(e){
+    window.location.href = "../../login.html";
+    return null;
+  }
+}
+
+function sum(arr){ return (arr||[]).reduce((a,b)=>a + (Number(b)||0), 0); }
+
+async function loadProgress(){
+  showMsg(""); setStatus("Loading...");
+
+  try{
+    const data = await fetchJSON(API.progress);
+
+    if(!data.ok){
+      showMsg(data.message || "Failed to load progress");
+      setStatus("");
+      return;
+    }
+
+    const started = Number(data.statusCounts?.started ?? 0);
+    const completed = Number(data.statusCounts?.completed ?? 0);
+
+    const daily = data.daily || [];
+    const labels = daily.map(x => x.date);
+    const calories = daily.map(x => Number(x.calories||0));
+    const minutes  = daily.map(x => Number(x.minutes||0));
+
+    document.getElementById("statStarted").textContent = started;
+    document.getElementById("statCompleted").textContent = completed;
+    document.getElementById("statCalories").textContent = sum(calories);
+
+    renderStatusChart(started, completed);
+    renderChart("chartCalories", "Calories", labels, calories, "line");
+    renderChart("chartMinutes", "Minutes", labels, minutes, "bar");
+
+    setStatus("Ready ✅");
+  }catch(e){
+    console.error(e);
+    showMsg("Network / JSON error. Check backend/get_progress.php");
+    setStatus("");
+  }
+}
+
+function renderStatusChart(started, completed){
+  const ctx = document.getElementById("chartStatus");
+  if(statusChart) statusChart.destroy();
+  statusChart = new Chart(ctx, {
+    type: "doughnut",
+    data: {
+      labels: ["Started", "Completed"],
+      datasets: [{ data: [started, completed] }]
+    },
+    options: { responsive:true, plugins:{ legend:{ position:"bottom" } } }
+  });
+}
+
+function renderChart(id, label, labels, values, type){
+  const ctx = document.getElementById(id);
+  if(id === "chartCalories" && caloriesChart) caloriesChart.destroy();
+  if(id === "chartMinutes" && minutesChart) minutesChart.destroy();
+
+  const ch = new Chart(ctx, {
+    type,
+    data: { labels, datasets: [{ label, data: values, tension:0.3 }] },
+    options: { responsive:true, scales:{ y:{ beginAtZero:true } } }
+  });
+
+  if(id === "chartCalories") caloriesChart = ch;
+  else minutesChart = ch;
+}
+
+(async function(){
+  const me = await authGuard();
+  if(me) await loadProgress();
+})();
+</script>
+
 </body>
 </html>

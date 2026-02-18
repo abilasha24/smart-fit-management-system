@@ -28,9 +28,31 @@
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 
     .plan-card.selected-plan { border: 2px solid #2E8B57 !important; box-shadow: 0 10px 25px rgba(46, 139, 87, 0.15); transform: translateY(-2px); }
-
-    /* Safety: avoid overlays blocking button clicks */
     .btn { position: relative; z-index: 10; }
+
+    .summary-box{
+      background:#f8f9fa;
+      border:1px solid #e9ecef;
+      border-radius:12px;
+      padding:16px;
+    }
+    .summary-line{
+      display:flex;
+      justify-content:space-between;
+      padding:8px 0;
+      border-bottom:1px dashed #dee2e6;
+    }
+    .summary-line:last-child{ border-bottom:none; }
+    .badge-soft{
+      background: rgba(76,175,80,0.12);
+      color:#2E8B57;
+      border:1px solid rgba(46,139,87,0.25);
+      border-radius:999px;
+      padding:6px 10px;
+      font-weight:600;
+      font-size:12px;
+      display:inline-block;
+    }
   </style>
 </head>
 
@@ -56,7 +78,6 @@
               <div class="step" data-step="5">5 <span class="step-label">Confirm</span></div>
             </div>
 
-            <!-- ✅ ONE FORM ONLY -->
             <form id="registerForm" novalidate>
 
               <!-- STEP 1 -->
@@ -68,22 +89,46 @@
                     <label for="firstName" class="form-label">First Name *</label>
                     <input type="text" class="form-control" id="firstName" required>
                   </div>
+
                   <div class="col-md-6">
                     <label for="lastName" class="form-label">Last Name *</label>
                     <input type="text" class="form-control" id="lastName" required>
                   </div>
+
+                  <!-- ✅ Gmail only -->
                   <div class="col-md-6">
-                    <label for="email" class="form-label">Email Address *</label>
-                    <input type="email" class="form-control" id="email" required>
+                    <label for="email" class="form-label">Email Address (Gmail only) *</label>
+                    <input
+                      type="email"
+                      class="form-control"
+                      id="email"
+                      required
+                      placeholder="example@gmail.com"
+                      pattern="^[a-zA-Z0-9._%+-]+@gmail\.com$"
+                      title="Only Gmail addresses are allowed (example@gmail.com)">
+                    <div class="form-text">Must end with <strong>@gmail.com</strong></div>
                   </div>
+
+                  <!-- ✅ Sri Lanka only -->
                   <div class="col-md-6">
-                    <label for="phone" class="form-label">Phone Number *</label>
-                    <input type="tel" class="form-control" id="phone" required>
+                    <label for="phone" class="form-label">Phone Number (Sri Lanka) *</label>
+                    <input
+                      type="tel"
+                      class="form-control"
+                      id="phone"
+                      required
+                      inputmode="numeric"
+                      placeholder="07XXXXXXXX or +947XXXXXXXX"
+                      pattern="^(07\d{8}|\+947\d{8})$"
+                      title="Enter Sri Lanka mobile: 07XXXXXXXX or +947XXXXXXXX">
+                    <div class="form-text">Allowed: <strong>07XXXXXXXX</strong> or <strong>+947XXXXXXXX</strong></div>
                   </div>
+
                   <div class="col-md-6">
                     <label for="password" class="form-label">Password *</label>
                     <input type="password" class="form-control" id="password" required>
                   </div>
+
                   <div class="col-md-6">
                     <label for="confirmPassword" class="form-label">Confirm Password *</label>
                     <input type="password" class="form-control" id="confirmPassword" required>
@@ -159,71 +204,77 @@
               <!-- STEP 3 -->
               <div class="form-step" id="step3">
                 <h4 class="mb-4">Choose Your Plan</h4>
-                <p class="text-muted mb-4">Select the plan that best fits your fitness goals</p>
+                <p class="text-muted mb-4">Plans are aligned with the Home / Pricing page</p>
 
                 <div class="row g-4">
+                  <!-- Basic -->
                   <div class="col-md-4">
                     <div class="card h-100 plan-card" id="plan-basic">
                       <div class="card-header text-center py-4">
                         <h5>Basic</h5>
                         <div class="price mt-3">
-                          <span class="h3">Rs 990</span> <span class="text-muted">/month</span>
+                          <span class="h3">Free</span> <span class="text-muted">/month</span>
                         </div>
+                        <div class="mt-2"><span class="badge-soft">Starter</span></div>
                       </div>
                       <div class="card-body">
                         <ul class="list-unstyled">
                           <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Basic workouts</li>
                           <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Progress tracking</li>
-                          <li class="mb-2"><i class="fas fa-times text-danger me-2"></i> Live sessions</li>
-                          <li class="mb-2"><i class="fas fa-times text-danger me-2"></i> Personalized plans</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Community support</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Basic nutrition tips</li>
                         </ul>
                       </div>
                       <div class="card-footer">
-                        <button type="button" class="btn btn-outline-primary w-100" onclick="selectPlan('basic', 990)">Select Plan</button>
+                        <button type="button" class="btn btn-outline-primary w-100" onclick="selectPlan('basic', 0)">Select Plan</button>
                       </div>
                     </div>
                   </div>
 
+                  <!-- Premium (default) -->
                   <div class="col-md-4">
-                    <div class="card h-100 border-primary plan-card selected-plan" id="plan-premium">
-                      <div class="card-header text-center py-4 bg-primary text-white">
+                    <div class="card h-100 border-success plan-card selected-plan" id="plan-premium">
+                      <div class="card-header text-center py-4 bg-success text-white">
                         <h5>Premium</h5>
                         <div class="price mt-3">
-                          <span class="h3">Rs 1,990</span> <span class="text-light">/month</span>
+                          <span class="h3">LKR 2,500</span> <span class="text-light">/month</span>
                         </div>
+                        <div class="mt-2"><span class="badge-soft" style="background:rgba(255,255,255,0.18);border-color:rgba(255,255,255,0.3);color:#fff;">Most Popular</span></div>
                       </div>
                       <div class="card-body">
                         <ul class="list-unstyled">
-                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> All Basic features</li>
-                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Live sessions</li>
-                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Personalized training</li>
-                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Nutrition plans</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Unlimited workout access</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Advanced progress tracking</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Personal trainer matching</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Custom nutrition plans</li>
                         </ul>
                       </div>
                       <div class="card-footer">
-                        <button type="button" class="btn btn-primary w-100" onclick="selectPlan('premium', 1990)">Select Plan</button>
+                        <button type="button" class="btn btn-success w-100" onclick="selectPlan('premium', 2500)">Select Plan</button>
                       </div>
                     </div>
                   </div>
 
+                  <!-- Pro -->
                   <div class="col-md-4">
                     <div class="card h-100 plan-card" id="plan-pro">
                       <div class="card-header text-center py-4">
                         <h5>Pro</h5>
                         <div class="price mt-3">
-                          <span class="h3">Rs 2,990</span> <span class="text-muted">/month</span>
+                          <span class="h3">LKR 5,000</span> <span class="text-muted">/month</span>
                         </div>
+                        <div class="mt-2"><span class="badge-soft">Best Value</span></div>
                       </div>
                       <div class="card-body">
                         <ul class="list-unstyled">
-                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> All Premium features</li>
-                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> 1-on-1 coaching</li>
-                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Custom meal plans</li>
-                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Priority support</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Everything in Premium</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Dedicated personal trainer</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> Meal planning & recipes</li>
+                          <li class="mb-2"><i class="fas fa-check text-success me-2"></i> 24/7 chat support</li>
                         </ul>
                       </div>
                       <div class="card-footer">
-                        <button type="button" class="btn btn-outline-primary w-100" onclick="selectPlan('pro', 2990)">Select Plan</button>
+                        <button type="button" class="btn btn-outline-primary w-100" onclick="selectPlan('pro', 5000)">Select Plan</button>
                       </div>
                     </div>
                   </div>
@@ -231,7 +282,7 @@
 
                 <div class="form-check mt-4">
                   <input class="form-check-input" type="checkbox" id="trialCheck">
-                  <label class="form-check-label" for="trialCheck">Start with 7-day free trial</label>
+                  <label class="form-check-label" for="trialCheck">Start with 7-day free trial (demo)</label>
                 </div>
 
                 <div class="d-flex justify-content-between mt-4">
@@ -246,8 +297,49 @@
 
               <!-- STEP 4 -->
               <div class="form-step" id="step4">
-                <h4 class="mb-4">Payment Details</h4>
-                <p class="text-muted">Demo payment section.</p>
+                <h4 class="mb-3">Payment Details</h4>
+                <p class="text-muted mb-4">Demo payment section (for project). Summary updates automatically.</p>
+
+                <div class="row g-4">
+                  <div class="col-md-6">
+                    <label class="form-label">Billing Cycle</label>
+                    <select id="billingCycle" class="form-select">
+                      <option value="monthly" selected>Monthly</option>
+                      <option value="yearly">Yearly</option>
+                    </select>
+                    <div class="form-text">Yearly = 12 months (demo calculation)</div>
+                  </div>
+
+                  <div class="col-md-6">
+                    <label class="form-label">Payment Method</label>
+                    <select id="paymentMethod" class="form-select">
+                      <option value="card" selected>Card</option>
+                      <option value="bank">Bank Transfer</option>
+                      <option value="mobile">Mobile Payment</option>
+                    </select>
+                  </div>
+
+                  <div class="col-12">
+                    <div class="summary-box">
+                      <div class="summary-line">
+                        <span>Selected Plan</span>
+                        <strong id="sumPlan">Premium</strong>
+                      </div>
+                      <div class="summary-line">
+                        <span>Billing</span>
+                        <strong id="sumCycle">Monthly</strong>
+                      </div>
+                      <div class="summary-line">
+                        <span>Payment Method</span>
+                        <strong id="sumMethod">Card</strong>
+                      </div>
+                      <div class="summary-line">
+                        <span>Amount</span>
+                        <strong id="sumAmount">LKR 2,500</strong>
+                      </div>
+                    </div>
+                  </div>
+                </div>
 
                 <div class="d-flex justify-content-between mt-4">
                   <button type="button" class="btn btn-outline-secondary btn-prev">
@@ -263,6 +355,25 @@
               <div class="form-step" id="step5">
                 <h4 class="mb-4">Review & Confirm</h4>
 
+                <div class="summary-box mb-4">
+                  <div class="summary-line">
+                    <span>Plan</span>
+                    <strong id="finalPlan">Premium</strong>
+                  </div>
+                  <div class="summary-line">
+                    <span>Billing</span>
+                    <strong id="finalCycle">Monthly</strong>
+                  </div>
+                  <div class="summary-line">
+                    <span>Method</span>
+                    <strong id="finalMethod">Card</strong>
+                  </div>
+                  <div class="summary-line">
+                    <span>Total</span>
+                    <strong id="finalAmount">LKR 2,500</strong>
+                  </div>
+                </div>
+
                 <div class="form-check mb-3">
                   <input class="form-check-input" type="checkbox" id="agreeTerms">
                   <label class="form-check-label" for="agreeTerms">
@@ -273,7 +384,7 @@
                 <div class="form-check mb-4">
                   <input class="form-check-input" type="checkbox" id="paymentAuthorization">
                   <label class="form-check-label" for="paymentAuthorization">
-                    I authorize Smart Fit to charge my payment method for the amount shown above
+                    I authorize Smart Fit to charge my payment method for the amount shown above (demo)
                   </label>
                 </div>
 
@@ -282,7 +393,6 @@
                     <i class="fas fa-arrow-left me-2"></i> Previous
                   </button>
 
-                  <!-- ✅ SUBMIT BUTTON (ONLY HERE) -->
                   <button type="submit" class="btn btn-success btn-lg">
                     <i class="fas fa-lock me-2"></i> Complete & Register
                   </button>
@@ -307,18 +417,96 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  // Plan selection (kept as your style)
+  // ✅ default selected plan
   let selectedPlan = "premium";
-  let selectedPlanPrice = 1990;
+  let selectedPlanPrice = 2500;
 
+  function planLabel(p){
+    if(p === "basic") return "Basic";
+    if(p === "premium") return "Premium";
+    if(p === "pro") return "Pro";
+    return p;
+  }
+
+  function formatLKR(n){
+    try { return "LKR " + Number(n).toLocaleString("en-LK"); }
+    catch(e){ return "LKR " + n; }
+  }
+
+  // ✅ Normalize phone to +94 format
+  function normalizeSriLankaPhone(raw){
+    const v = (raw || "").trim();
+    // 07XXXXXXXX => +947XXXXXXXX
+    if(/^07\d{8}$/.test(v)) return "+94" + v.substring(1);
+    // +947XXXXXXXX stays
+    if(/^\+947\d{8}$/.test(v)) return v;
+    return null;
+  }
+
+  // ✅ Plan selection (updates UI + price)
   function selectPlan(plan, price) {
     selectedPlan = plan;
     selectedPlanPrice = price;
+
     document.querySelectorAll(".plan-card").forEach(card => card.classList.remove("selected-plan"));
     const card = document.getElementById(`plan-${plan}`);
     if (card) card.classList.add("selected-plan");
+
+    updatePaymentSummary();
   }
   window.selectPlan = selectPlan;
+
+  function getBillingCycle(){
+    const el = document.getElementById("billingCycle");
+    return el ? el.value : "monthly";
+  }
+
+  function getPaymentMethod(){
+    const el = document.getElementById("paymentMethod");
+    return el ? el.value : "card";
+  }
+
+  function billingLabel(cycle){
+    return cycle === "yearly" ? "Yearly" : "Monthly";
+  }
+
+  function paymentLabel(method){
+    if(method === "bank") return "Bank Transfer";
+    if(method === "mobile") return "Mobile Payment";
+    return "Card";
+  }
+
+  function calcAmount(){
+    const cycle = getBillingCycle();
+    if(cycle === "yearly") return selectedPlanPrice * 12; // demo
+    return selectedPlanPrice;
+  }
+
+  function updatePaymentSummary(){
+    const cycle = getBillingCycle();
+    const method = getPaymentMethod();
+    const amount = calcAmount();
+
+    const sumPlan = document.getElementById("sumPlan");
+    const sumCycle = document.getElementById("sumCycle");
+    const sumMethod = document.getElementById("sumMethod");
+    const sumAmount = document.getElementById("sumAmount");
+
+    if(sumPlan) sumPlan.textContent = planLabel(selectedPlan);
+    if(sumCycle) sumCycle.textContent = billingLabel(cycle);
+    if(sumMethod) sumMethod.textContent = paymentLabel(method);
+    if(sumAmount) sumAmount.textContent = formatLKR(amount);
+
+    const finalPlan = document.getElementById("finalPlan");
+    const finalCycle = document.getElementById("finalCycle");
+    const finalMethod = document.getElementById("finalMethod");
+    const finalAmount = document.getElementById("finalAmount");
+
+    if(finalPlan) finalPlan.textContent = planLabel(selectedPlan);
+    if(finalCycle) finalCycle.textContent = billingLabel(cycle);
+    if(finalMethod) finalMethod.textContent = paymentLabel(method);
+    if(finalAmount) finalAmount.textContent = formatLKR(amount);
+  }
 
   document.addEventListener("DOMContentLoaded", () => {
     const steps = Array.from(document.querySelectorAll(".form-step"));
@@ -327,9 +515,7 @@
 
     function setIndicator(stepNumber) {
       stepDots.forEach((dot, idx) => {
-        dot.classList.remove("active");
-        dot.classList.remove("completed");
-
+        dot.classList.remove("active", "completed");
         if (idx < stepNumber - 1) dot.classList.add("completed");
         if (idx === stepNumber - 1) dot.classList.add("active");
       });
@@ -340,6 +526,10 @@
       steps[index].classList.add("active");
       currentIndex = index;
       setIndicator(index + 1);
+
+      // Always update summary when entering Step 4 or 5
+      if(index === 3 || index === 4) updatePaymentSummary();
+
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
 
@@ -347,14 +537,29 @@
       const firstName = document.getElementById("firstName").value.trim();
       const lastName  = document.getElementById("lastName").value.trim();
       const email     = document.getElementById("email").value.trim();
-      const phone     = document.getElementById("phone").value.trim();
+      const phoneRaw  = document.getElementById("phone").value.trim();
       const password  = document.getElementById("password").value;
       const confirm   = document.getElementById("confirmPassword").value;
 
-      if (!firstName || !lastName || !email || !phone || !password || !confirm) {
+      if (!firstName || !lastName || !email || !phoneRaw || !password || !confirm) {
         alert("Please fill all required fields in Step 1");
         return false;
       }
+
+      // ✅ Gmail only
+      const gmailOk = /^[a-zA-Z0-9._%+-]+@gmail\.com$/.test(email);
+      if(!gmailOk){
+        alert("Please enter a valid Gmail address (example@gmail.com)");
+        return false;
+      }
+
+      // ✅ Sri Lanka phone only
+      const normalized = normalizeSriLankaPhone(phoneRaw);
+      if(!normalized){
+        alert("Phone must be Sri Lanka mobile: 07XXXXXXXX or +947XXXXXXXX");
+        return false;
+      }
+
       if (password !== confirm) {
         alert("Passwords do not match");
         return false;
@@ -363,13 +568,13 @@
         alert("Password must be at least 8 characters");
         return false;
       }
+
       return true;
     }
 
     // Next buttons
     document.querySelectorAll(".btn-next").forEach(btn => {
       btn.addEventListener("click", () => {
-        // Step1 validation
         if (currentIndex === 0 && !validateStep1()) return;
         if (currentIndex < steps.length - 1) showStep(currentIndex + 1);
       });
@@ -382,24 +587,48 @@
       });
     });
 
-    // Submit -> DB insert
+    // Payment selectors update summary live
+    const billingCycle = document.getElementById("billingCycle");
+    const paymentMethod = document.getElementById("paymentMethod");
+    if(billingCycle) billingCycle.addEventListener("change", updatePaymentSummary);
+    if(paymentMethod) paymentMethod.addEventListener("change", updatePaymentSummary);
+
+    // ✅ Submit -> DB insert
     document.getElementById("registerForm").addEventListener("submit", async (e) => {
       e.preventDefault();
 
-      // Step5 checkbox validation (JS-only)
       if (!document.getElementById("agreeTerms").checked || !document.getElementById("paymentAuthorization").checked) {
         alert("Please tick both confirmation checkboxes");
         return;
       }
 
-      const data = new FormData();
-      data.append("firstName", document.getElementById("firstName").value.trim());
-      data.append("lastName",  document.getElementById("lastName").value.trim());
-      data.append("email",     document.getElementById("email").value.trim());
-      data.append("phone",     document.getElementById("phone").value.trim());
-      data.append("password",  document.getElementById("password").value);
+      const firstName = document.getElementById("firstName").value.trim();
+      const lastName  = document.getElementById("lastName").value.trim();
 
-      // (optional fields)
+      const email = document.getElementById("email").value.trim();
+      const phoneRaw = document.getElementById("phone").value.trim();
+      const phoneNormalized = normalizeSriLankaPhone(phoneRaw);
+
+      if(!phoneNormalized){
+        alert("Phone must be Sri Lanka mobile: 07XXXXXXXX or +947XXXXXXXX");
+        return;
+      }
+
+      // ✅ username generate
+      const username = (firstName + "_" + lastName)
+        .toLowerCase()
+        .replace(/\s+/g, "_")
+        .replace(/[^a-z0-9_]/g, "");
+
+      const data = new FormData();
+      data.append("firstName", firstName);
+      data.append("lastName", lastName);
+      data.append("username", username);
+      data.append("email", email);
+      data.append("phone", phoneNormalized); // ✅ +94 format
+      data.append("password", document.getElementById("password").value);
+
+      // optional fields
       data.append("dob", document.getElementById("dob").value);
       data.append("gender", document.getElementById("gender").value);
       data.append("height", document.getElementById("height").value);
@@ -410,25 +639,36 @@
       data.append("plan", selectedPlan);
       data.append("role", "member");
 
-      console.log("SENDING:", [...data.entries()]);
+      const cycle = getBillingCycle();
+      const method = getPaymentMethod();
+      const amount = calcAmount();
 
       try {
         const res = await fetch("backend/register.php", { method: "POST", body: data });
-        const json = await res.json();
-        console.log("RESPONSE:", json);
+
+        let json;
+        try {
+          json = await res.json();
+        } catch (e) {
+          alert("register.php JSON response varala. PHP error log check pannunga.");
+          return;
+        }
 
         if (json.status !== "success") {
           alert(json.message || "Register failed");
           return;
         }
 
-        // (optional) localStorage for dashboard greeting
-        const fullName = `${data.get("firstName")} ${data.get("lastName")}`.trim();
+        // save for greeting
+        const fullName = `${firstName} ${lastName}`.trim();
         localStorage.setItem("loggedUserName", fullName);
         localStorage.setItem("loggedUserRole", "member");
         localStorage.setItem("loggedUserPlan", selectedPlan);
 
-        window.location.href = "dashboard/member/dashboard.html";
+        // ✅ redirect to success page with correct values
+        window.location.href =
+          `success.html?plan=${encodeURIComponent(selectedPlan)}&amount=${encodeURIComponent(amount)}&cycle=${encodeURIComponent(cycle)}&payment=${encodeURIComponent(method)}`;
+
       } catch (err) {
         console.error(err);
         alert("Server error / fetch failed");
@@ -436,6 +676,8 @@
     });
 
     // init
+    // Ensure Premium is selected visually
+    selectPlan("premium", 2500);
     showStep(0);
   });
 </script>
