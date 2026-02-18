@@ -1,0 +1,339 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>BMI Calculator | Smart Fit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    body { background:#f6f7fb; }
+    .sidebar { min-height:100vh; background:#111827; color:#fff; }
+    .sidebar a{
+      color:#c7c7c7; text-decoration:none; display:block;
+      padding:12px 18px; border-radius:8px; margin-bottom:6px;
+    }
+    .sidebar a.active, .sidebar a:hover{ background:#1f2937; color:#fff; }
+    .content { padding:30px; }
+    .card { border-radius:16px; }
+  </style>
+</head>
+
+<body>
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- SIDEBAR -->
+    <div class="col-md-3 col-lg-2 sidebar p-3">
+      <h4 class="fw-bold mb-2">SMART FIT</h4>
+      <div class="small text-white-50 mb-4">
+        Hi, <span id="navUsername" class="text-white fw-semibold">Member</span>
+      </div>
+
+      <a href="dashboard.html">🏠 Dashboard</a>
+      <a href="workouts.html">💪 Workouts</a>
+      <a href="myworkout.html">🏋️ My Workouts</a>
+      <a href="progress.html">📈 Progress</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="subscription.html">💳 Subscription</a>
+      <a href="notifications.html">🔔 Notifications</a>
+      <a href="feedback.html">📝 Feedback</a>
+      <a href="bmi.html" class="active">📊 BMI</a>
+
+      <a href="../../index.html">🌐 Back to Website</a>
+      <a href="#" id="btnLogout" class="text-danger mt-3 d-block">🚪 Logout</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="col-md-9 col-lg-10 content">
+
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <div>
+          <h2 class="fw-bold mb-0">📊 BMI Calculator</h2>
+          <div class="text-muted">Calculate and track your BMI</div>
+        </div>
+        <div id="statusText" class="text-muted"></div>
+      </div>
+
+      <div id="msg" class="mb-3"></div>
+
+      <div class="row g-3">
+        <!-- LEFT: INPUT -->
+        <div class="col-lg-5">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="fw-bold mb-3">Enter Details</h5>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Height (cm)</label>
+                <input id="height" type="number" class="form-control" placeholder="Eg: 170" min="50" max="250">
+              </div>
+
+              <div class="mb-3">
+                <label class="form-label fw-semibold">Weight (kg)</label>
+                <input id="weight" type="number" class="form-control" placeholder="Eg: 70" min="10" max="300" step="0.1">
+              </div>
+
+              <button class="btn btn-success w-100" id="calcBtn">Calculate & Save</button>
+
+              <!-- RESULT -->
+              <div class="mt-3 p-3 bg-light rounded" id="resultBox" style="display:none;">
+                <div class="fw-bold">Your BMI: <span id="bmiVal">-</span></div>
+                <div class="text-muted">Category: <span id="bmiCat">-</span></div>
+              </div>
+
+              <!-- RECOMMENDATION -->
+              <div class="mt-3 p-3 bg-white border rounded" id="recBox" style="display:none;">
+                <div class="fw-bold mb-1">✅ Recommendation</div>
+                <div id="recText" class="text-muted"></div>
+                <div class="mt-2">
+                  <a class="btn btn-outline-dark btn-sm" href="workouts.html">Suggested Workouts</a>
+                  <a class="btn btn-success btn-sm" href="../../pricing.html">Upgrade Plan</a>
+                </div>
+              </div>
+
+              <div class="small text-muted mt-3">
+                * BMI is a general indicator. For medical advice, consult a professional.
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- RIGHT: HISTORY + CHART -->
+        <div class="col-lg-7">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h5 class="fw-bold mb-3">📈 BMI Trend</h5>
+
+              <div class="mb-3">
+                <canvas id="bmiChart" height="120"></canvas>
+              </div>
+
+              <h6 class="fw-bold mb-2">Recent BMI History</h6>
+              <div class="table-responsive">
+                <table class="table table-sm align-middle">
+                  <thead>
+                    <tr>
+                      <th>Date</th>
+                      <th>Height</th>
+                      <th>Weight</th>
+                      <th>BMI</th>
+                      <th>Category</th>
+                    </tr>
+                  </thead>
+                  <tbody id="histBody">
+                    <tr><td colspan="5" class="text-center text-muted">Loading...</td></tr>
+                  </tbody>
+                </table>
+              </div>
+
+              <div class="small text-muted">* Shows last 20 records</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<script>
+const API = {
+  whoami: "../../backend/whoami.php",
+  save: "../../backend/save_bmi.php",
+  history: "../../backend/get_bmi_history.php",
+  logout: "../../backend/logout.php"
+};
+
+let bmiChart;
+
+function setStatus(t){ document.getElementById("statusText").textContent = t || ""; }
+function showMsg(t, ok=false){
+  const el = document.getElementById("msg");
+  el.className = ok ? "text-success" : "text-danger";
+  el.textContent = t || "";
+}
+
+/* ✅ FAST UI: show name instantly */
+(function(){
+  const saved = localStorage.getItem("loggedUserName");
+  if(saved){
+    const nav = document.getElementById("navUsername");
+    if(nav) nav.textContent = saved;
+  }
+})();
+
+async function authGuard(){
+  const res = await fetch(API.whoami, { credentials:"same-origin" });
+  const me = await res.json();
+
+  if(!me.logged_in || (me.role||"").toLowerCase() !== "member"){
+    window.location.href = "../../login.html";
+    return null;
+  }
+
+  const name = (me.name || me.username || "Member").trim();
+  document.getElementById("navUsername").textContent = name;
+  localStorage.setItem("loggedUserName", name);
+  localStorage.setItem("loggedUserRole", (me.role || "member").toLowerCase());
+
+  return me;
+}
+
+function getRecommendation(category){
+  switch(String(category || "").toLowerCase()){
+    case "underweight":
+      return "Goal: Muscle gain. Do strength workouts 3–4 days/week + increase calories with protein-rich meals.";
+    case "normal":
+      return "Goal: Maintain fitness. Mix cardio + strength 3–5 days/week. Keep balanced diet and hydration.";
+    case "overweight":
+      return "Goal: Fat loss. Do cardio + HIIT 3–5 days/week + reduce sugar/fried foods. Track calories.";
+    case "obese":
+      return "Goal: Safe fat loss. Start with low-impact cardio (walking, cycling) + light strength. Consult a professional if needed.";
+    default:
+      return "Enter valid height/weight to get recommendations.";
+  }
+}
+
+function renderBMIChart(history){
+  const canvas = document.getElementById("bmiChart");
+  if(!canvas) return;
+
+  const rows = [...(history || [])].reverse(); // oldest -> newest
+  const labels = rows.map(r => String(r.created_at || "").slice(0,10));
+  const values = rows.map(r => Number(r.bmi_value || 0));
+
+  if(bmiChart) bmiChart.destroy();
+
+  bmiChart = new Chart(canvas, {
+    type: "line",
+    data: {
+      labels,
+      datasets: [{
+        label: "BMI",
+        data: values,
+        tension: 0.3
+      }]
+    },
+    options: {
+      responsive: true,
+      scales: { y: { beginAtZero: false } },
+      plugins: { legend: { display: true } }
+    }
+  });
+}
+
+async function loadHistory(){
+  const res = await fetch(API.history, { credentials:"same-origin" });
+  const data = await res.json();
+
+  const body = document.getElementById("histBody");
+  body.innerHTML = "";
+
+  if(!data.ok){
+    body.innerHTML = `<tr><td colspan="5" class="text-danger text-center">${data.message || "Failed"}</td></tr>`;
+    return;
+  }
+
+  const history = data.history || [];
+  renderBMIChart(history);
+
+  if(history.length === 0){
+    body.innerHTML = `<tr><td colspan="5" class="text-muted text-center">No records yet</td></tr>`;
+    return;
+  }
+
+  history.forEach(r=>{
+    body.innerHTML += `
+      <tr>
+        <td>${escapeHtml(r.created_at)}</td>
+        <td>${escapeHtml(r.height_cm)} cm</td>
+        <td>${escapeHtml(r.weight_kg)} kg</td>
+        <td><span class="fw-bold">${escapeHtml(r.bmi_value)}</span></td>
+        <td>${escapeHtml(r.category)}</td>
+      </tr>
+    `;
+  });
+}
+
+async function calculateAndSave(){
+  showMsg(""); setStatus("Saving...");
+
+  const height_cm = parseFloat(document.getElementById("height").value);
+  const weight_kg = parseFloat(document.getElementById("weight").value);
+
+  if(!height_cm || !weight_kg){
+    showMsg("Enter height and weight");
+    setStatus("");
+    return;
+  }
+
+  try{
+    const res = await fetch(API.save, {
+      method:"POST",
+      credentials:"same-origin",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify({ height_cm, weight_kg })
+    });
+    const data = await res.json();
+
+    if(!data.ok){
+      showMsg(data.message || "Failed");
+      setStatus("");
+      return;
+    }
+
+    // result
+    document.getElementById("resultBox").style.display = "block";
+    document.getElementById("bmiVal").textContent = data.bmi;
+    document.getElementById("bmiCat").textContent = data.category;
+
+    // recommendation
+    document.getElementById("recBox").style.display = "block";
+    document.getElementById("recText").textContent = getRecommendation(data.category);
+
+    showMsg("Saved ✅", true);
+    setStatus("Ready ✅");
+    await loadHistory();
+  }catch(e){
+    console.error(e);
+    showMsg("Network error while saving BMI");
+    setStatus("");
+  }
+}
+
+function escapeHtml(str){
+  return String(str ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+/* logout */
+document.getElementById("btnLogout").addEventListener("click", async (e)=>{
+  e.preventDefault();
+  try{ await fetch(API.logout, { method:"POST", credentials:"same-origin" }); }catch{}
+  localStorage.removeItem("loggedUserName");
+  localStorage.removeItem("loggedUserRole");
+  window.location.href = "../../login.html";
+});
+
+document.getElementById("calcBtn").addEventListener("click", calculateAndSave);
+
+/* init */
+(async ()=>{
+  const me = await authGuard();
+  if(me){
+    setStatus("Ready ✅");
+    loadHistory();
+  }
+})();
+</script>
+
+</body>
+</html>

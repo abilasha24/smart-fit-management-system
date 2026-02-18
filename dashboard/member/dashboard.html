@@ -20,6 +20,9 @@
     .stat-card { border-radius:18px; box-shadow:0 10px 25px rgba(0,0,0,.06); }
     .big { font-size:1.7rem; font-weight:800; }
     .quick a { text-decoration:none; }
+
+    /* custom orange */
+    .bg-orange { background:#f59e0b !important; }
   </style>
 </head>
 
@@ -42,10 +45,9 @@
       <a href="subscription.html">💳 Subscription</a>
       <a href="notifications.html">🔔 Notifications</a>
       <a href="feedback.html">📝 Feedback</a>
+      <a href="bmi.html">📊 BMI</a>
 
       <a href="../../index.html">🌐 Back to Website</a>
-
-      <!-- ✅ Logout -->
       <a href="#" id="btnLogout" class="text-danger mt-3 d-block">🚪 Logout</a>
     </div>
 
@@ -72,6 +74,7 @@
             </div>
           </div>
         </div>
+
         <div class="col-md-3">
           <div class="card stat-card">
             <div class="card-body">
@@ -80,6 +83,7 @@
             </div>
           </div>
         </div>
+
         <div class="col-md-3">
           <div class="card stat-card">
             <div class="card-body">
@@ -88,6 +92,7 @@
             </div>
           </div>
         </div>
+
         <div class="col-md-3">
           <div class="card stat-card">
             <div class="card-body">
@@ -96,6 +101,30 @@
             </div>
           </div>
         </div>
+
+        <!-- ✅ Latest BMI (badge + updated + warning + button) -->
+        <div class="col-md-3">
+          <div class="card stat-card">
+            <div class="card-body">
+              <div class="text-muted">Latest BMI</div>
+              <div class="big" id="bmiLatest">--</div>
+
+              <div class="mt-1">
+                <span id="bmiCatBadge" class="badge bg-secondary">No record</span>
+              </div>
+
+              <div class="small text-muted mt-2" id="bmiUpdated">Updated: -</div>
+
+              <!-- ✅ warning line (only underweight/obese) -->
+              <div class="small mt-2" id="bmiWarn" style="display:none;"></div>
+
+              <div class="mt-2">
+                <a href="bmi.html" class="btn btn-outline-dark btn-sm">View BMI</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
 
       <!-- SUBSCRIPTION SUMMARY + NOTIFICATIONS -->
@@ -134,7 +163,7 @@
             <div class="col-md-3"><a class="btn btn-outline-success w-100" href="workouts.html">Start Workout</a></div>
             <div class="col-md-3"><a class="btn btn-outline-dark w-100" href="myworkout.html">My Workouts</a></div>
             <div class="col-md-3"><a class="btn btn-outline-dark w-100" href="progress.html">View Progress</a></div>
-            <div class="col-md-3"><a class="btn btn-outline-dark w-100" href="profile.html">Edit Profile</a></div>
+            <div class="col-md-3"><a class="btn btn-outline-dark w-100" href="bmi.html">BMI Calculator</a></div>
           </div>
         </div>
       </div>
@@ -149,7 +178,7 @@
 const API = {
   whoami: "../../backend/whoami.php",
   stats: "../../backend/get_member_stats.php",
-  progress: "../../backend/get_progress.php",   // fallback
+  bmiLatest: "../../backend/get_latest_bmi.php",
   logout: "../../backend/logout.php"
 };
 
@@ -162,6 +191,15 @@ function setNumbers(completed, started, minutes, calories, unread){
   document.getElementById("minutes").textContent = minutes ?? 0;
   document.getElementById("calories").textContent = calories ?? 0;
   document.getElementById("unread").textContent = unread ?? 0;
+}
+
+function bmiBadgeClass(category){
+  const c = String(category || "").toLowerCase();
+  if(c === "normal") return "bg-success";
+  if(c === "underweight") return "bg-warning text-dark";
+  if(c === "overweight") return "bg-orange text-dark";
+  if(c === "obese") return "bg-danger";
+  return "bg-secondary";
 }
 
 function renderSubscription(sub){
@@ -177,28 +215,35 @@ function renderSubscription(sub){
   `;
 }
 
-/* ✅ 1) Immediately show name from localStorage (fast UI) */
-(function setNameFromLocal(){
+/* ✅ FAST UI: localStorage name show immediately */
+(function(){
   const saved = localStorage.getItem("loggedUserName");
-  if(saved) document.getElementById("navUsername").textContent = saved;
+  if(saved){
+    const nav = document.getElementById("navUsername");
+    if(nav) nav.textContent = saved;
+  }
 })();
 
-/* ✅ 2) Auth guard + get real name from session (whoami.php) */
+/* ✅ AUTH */
 async function authGuard(){
   try{
     const res = await fetch(API.whoami, { credentials:"same-origin" });
     const me = await res.json();
 
-    if(!me.logged_in || (me.role||"").toLowerCase() !== "member"){
+    if(!me.logged_in){
       window.location.href = "../../login.html";
       return null;
     }
 
-    const uname = me.username || "Member";
-    document.getElementById("navUsername").textContent = uname;
+    if(((me.role||"member").toLowerCase()) !== "member"){
+      window.location.href = "../../login.html";
+      return null;
+    }
 
-    // save for ALL other pages
-    localStorage.setItem("loggedUserName", uname);
+    const displayName = (me.name || me.username || "Member").trim();
+    document.getElementById("navUsername").textContent = displayName;
+
+    localStorage.setItem("loggedUserName", displayName);
     localStorage.setItem("loggedUserRole", (me.role || "member").toLowerCase());
 
     return me;
@@ -208,12 +253,11 @@ async function authGuard(){
   }
 }
 
-/* ✅ 3) Load stats (main) then fallback (progress) */
+/* ✅ Load stats */
 async function loadStats(){
   showMsg("");
   setStatus("Loading...");
 
-  // MAIN ENDPOINT
   try{
     const res = await fetch(API.stats, { credentials:"same-origin" });
     const data = await res.json();
@@ -227,52 +271,73 @@ async function loadStats(){
         s.total_calories ?? 0,
         s.unread_notifications ?? 0
       );
-      renderSubscription(data.subscription);
+      renderSubscription(data.subscription || null);
       setStatus("Ready ✅");
       return;
     } else {
-      console.warn("stats not ok:", data);
+      showMsg(data.message || "Failed to load stats");
+      setStatus("");
     }
   }catch(e){
-    console.warn("stats endpoint failed, trying fallback...", e);
-  }
-
-  // FALLBACK ENDPOINT (get_progress.php)
-  try{
-    const res2 = await fetch(API.progress, { credentials:"same-origin" });
-    const p = await res2.json();
-
-    if(!p.ok){
-      showMsg(p.message || "Failed to load stats");
-      setStatus("");
-      return;
-    }
-
-    const sc = p.statusCounts || {};
-    const daily = Array.isArray(p.daily) ? p.daily : [];
-
-    const completed = sc.completed ?? 0;
-    const started   = sc.started ?? 0;
-
-    let totalMinutes = 0;
-    let totalCalories = 0;
-    daily.forEach(d => {
-      totalMinutes += Number(d.minutes || 0);
-      totalCalories += Number(d.calories || 0);
-    });
-
-    setNumbers(completed, started, totalMinutes, totalCalories, 0);
-    renderSubscription(null);
-
-    setStatus("Ready ✅ (fallback)");
-  }catch(e2){
-    console.error(e2);
-    showMsg("Network / JSON error while loading stats");
+    showMsg("Network error while loading stats");
     setStatus("");
   }
 }
 
-/* ✅ 4) Logout (POST) */
+/* ✅ Load Latest BMI (+ warning line) */
+async function loadLatestBMI(){
+  try{
+    const res = await fetch(API.bmiLatest, { credentials:"same-origin" });
+    const data = await res.json();
+
+    const bmiEl = document.getElementById("bmiLatest");
+    const badge = document.getElementById("bmiCatBadge");
+    const upd = document.getElementById("bmiUpdated");
+    const warnEl = document.getElementById("bmiWarn");
+
+    if(!bmiEl || !badge || !upd || !warnEl) return;
+
+    // reset warning default
+    warnEl.style.display = "none";
+    warnEl.textContent = "";
+    warnEl.className = "small mt-2";
+
+    if(!data.ok || !data.latest){
+      bmiEl.textContent = "--";
+      badge.className = "badge bg-secondary";
+      badge.textContent = "No record";
+      upd.textContent = "Updated: -";
+      return;
+    }
+
+    const bmiVal = data.latest.bmi_value ?? "--";
+    const cat = data.latest.category ?? "-";
+    const created = data.latest.created_at ?? "-";
+
+    bmiEl.textContent = bmiVal;
+    badge.className = "badge " + bmiBadgeClass(cat);
+    badge.textContent = cat;
+
+    upd.textContent = "Updated: " + String(created).slice(0, 19);
+
+    // ✅ warning line only for Underweight / Obese
+    const c = String(cat || "").toLowerCase();
+    if(c === "underweight"){
+      warnEl.style.display = "block";
+      warnEl.className = "small mt-2 text-warning";
+      warnEl.textContent = "⚠ Increase calories + strength training";
+    } else if(c === "obese"){
+      warnEl.style.display = "block";
+      warnEl.className = "small mt-2 text-danger";
+      warnEl.textContent = "⚠ Low-impact cardio + consult professional";
+    }
+
+  }catch(e){
+    // silent
+  }
+}
+
+/* ✅ Logout */
 document.getElementById("btnLogout").addEventListener("click", async (e) => {
   e.preventDefault();
   try{
@@ -286,7 +351,10 @@ document.getElementById("btnLogout").addEventListener("click", async (e) => {
 /* ✅ init */
 (async function(){
   const me = await authGuard();
-  if(me) await loadStats();
+  if(me){
+    await loadStats();
+    await loadLatestBMI();
+  }
 })();
 </script>
 

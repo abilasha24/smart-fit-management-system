@@ -39,9 +39,11 @@
       <a href="subscription.html">💳 Subscription</a>
       <a href="notifications.html">🔔 Notifications</a>
       <a href="feedback.html">📝 Feedback</a>
+      <a href="bmi.html">📊 BMI</a>
+
 
       <a href="../../index.html">🌐 Back to Website</a>
-      <a href="../../backend/logout.php" class="text-danger mt-3">🚪 Logout</a>
+      <a href="#" id="btnLogout" class="text-danger mt-3 d-block">🚪 Logout</a>
     </div>
 
     <!-- MAIN -->
@@ -63,6 +65,7 @@
             <div class="mb-3">
               <label class="form-label fw-semibold">Username</label>
               <input id="username" class="form-control" minlength="3">
+              <div class="form-text">This is your login username (not the greeting name)</div>
             </div>
 
             <div class="mb-3">
@@ -85,10 +88,12 @@
 const API = {
   whoami: "../../backend/whoami.php",
   getProfile: "../../backend/get_profile.php",
-  updateProfile: "../../backend/update_profile.php"
+  updateProfile: "../../backend/update_profile.php",
+  logout: "../../backend/logout.php"
 };
 
 function setStatus(t){ document.getElementById("statusText").textContent = t || ""; }
+
 function showMsg(t, ok=false){
   const el = document.getElementById("msg");
   el.className = ok ? "text-success" : "text-danger";
@@ -100,21 +105,55 @@ async function fetchJSON(url, opts={}){
   return await res.json();
 }
 
+/* ✅ FAST UI: show saved name instantly */
+(function(){
+  const saved = localStorage.getItem("loggedUserName");
+  if(saved){
+    const nav = document.getElementById("navUsername");
+    if(nav) nav.textContent = saved;
+  }
+})();
+
 async function authGuard(){
-  const me = await fetchJSON(API.whoami);
-  if(!me.logged_in){
+  try{
+    const me = await fetchJSON(API.whoami);
+
+    if(!me.logged_in){
+      window.location.href = "../../login.html";
+      return null;
+    }
+
+    if(((me.role||"member").toLowerCase()) !== "member"){
+      window.location.href = "../../login.html";
+      return null;
+    }
+
+    // ✅ use name for greeting
+    const displayName = (me.name || me.username || "Member").trim();
+    const nav = document.getElementById("navUsername");
+    if(nav) nav.textContent = displayName;
+
+    localStorage.setItem("loggedUserName", displayName);
+    localStorage.setItem("loggedUserRole", (me.role || "member").toLowerCase());
+
+    return me;
+  }catch(e){
     window.location.href = "../../login.html";
     return null;
   }
-  document.getElementById("navUsername").textContent = me.username;
-  return me;
 }
 
 async function loadProfile(){
+  setStatus("Loading...");
   const data = await fetchJSON(API.getProfile);
+
   if(data.ok){
-    username.value = data.user.username;
-    email.value = data.user.email;
+    username.value = data.user.username || "";
+    email.value = data.user.email || "";
+    setStatus("Ready ✅");
+  }else{
+    showMsg(data.message || "Failed to load profile");
+    setStatus("");
   }
 }
 
@@ -126,10 +165,12 @@ async function saveProfile(){
   }
 
   setStatus("Saving...");
+  showMsg("");
 
-  const res = await fetch(API.updateProfile,{
+  const res = await fetch(API.updateProfile, {
     method:"POST",
     headers:{ "Content-Type":"application/json" },
+    credentials:"same-origin",
     body: JSON.stringify({ username: usernameVal })
   });
 
@@ -137,16 +178,29 @@ async function saveProfile(){
 
   if(data.ok){
     showMsg("Profile updated successfully ✅", true);
-    document.getElementById("navUsername").textContent = usernameVal;
     setStatus("Saved ✅");
+    // NOTE: Greeting name is full name (me.name), not username.
+    // If you want greeting to change too, update first_name/last_name in DB.
   }else{
     showMsg(data.message || "Update failed");
     setStatus("");
   }
 }
 
-saveBtn.onclick = saveProfile;
+document.getElementById("saveBtn").onclick = saveProfile;
 
+/* ✅ Logout */
+document.getElementById("btnLogout").addEventListener("click", async (e) => {
+  e.preventDefault();
+  try{
+    await fetch(API.logout, { method:"POST", credentials:"same-origin" });
+  }catch{}
+  localStorage.removeItem("loggedUserName");
+  localStorage.removeItem("loggedUserRole");
+  window.location.href = "../../login.html";
+});
+
+/* ✅ init */
 (async ()=>{
   const me = await authGuard();
   if(me) loadProfile();

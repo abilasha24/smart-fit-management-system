@@ -40,9 +40,11 @@
       <a href="subscription.html" class="active">💳 Subscription</a>
       <a href="notifications.html">🔔 Notifications</a>
       <a href="feedback.html">📝 Feedback</a>
+      <a href="bmi.html">📊 BMI</a>
+
 
       <a href="../../index.html">🌐 Back to Website</a>
-      <a href="../../backend/logout.php" class="text-danger mt-3">🚪 Logout</a>
+      <a href="#" id="btnLogout" class="text-danger mt-3 d-block">🚪 Logout</a>
     </div>
 
     <!-- MAIN -->
@@ -81,7 +83,8 @@
 <script>
 const API = {
   whoami: "../../backend/whoami.php",
-  sub: "../../backend/get_subscription.php"
+  sub: "../../backend/get_subscription.php",
+  logout: "../../backend/logout.php"
 };
 
 function setStatus(t){ document.getElementById("statusText").textContent = t || ""; }
@@ -92,14 +95,37 @@ async function fetchJSON(url, opts={}){
   return await res.json();
 }
 
+/* ✅ FAST UI: show saved name instantly */
+(function(){
+  const saved = localStorage.getItem("loggedUserName");
+  if(saved){
+    const nav = document.getElementById("navUsername");
+    if(nav) nav.textContent = saved;
+  }
+})();
+
 async function authGuard(){
   try{
     const me = await fetchJSON(API.whoami);
-    if(!me.logged_in || (me.role||"").toLowerCase() !== "member"){
+
+    if(!me.logged_in){
       window.location.href = "../../login.html";
       return null;
     }
-    document.getElementById("navUsername").textContent = me.username || "Member";
+
+    if(((me.role||"member").toLowerCase()) !== "member"){
+      window.location.href = "../../login.html";
+      return null;
+    }
+
+    const displayName = (me.name || me.username || "Member").trim();
+
+    const nav = document.getElementById("navUsername");
+    if(nav) nav.textContent = displayName;
+
+    localStorage.setItem("loggedUserName", displayName);
+    localStorage.setItem("loggedUserRole", (me.role || "member").toLowerCase());
+
     return me;
   }catch(e){
     window.location.href = "../../login.html";
@@ -109,6 +135,7 @@ async function authGuard(){
 
 async function loadSubscription(){
   showMsg(""); setStatus("Loading...");
+
   try{
     const data = await fetchJSON(API.sub);
 
@@ -182,6 +209,18 @@ async function loadSubscription(){
   }
 }
 
+/* ✅ Logout */
+document.getElementById("btnLogout").addEventListener("click", async (e) => {
+  e.preventDefault();
+  try{
+    await fetch(API.logout, { method:"POST", credentials:"same-origin" });
+  }catch{}
+  localStorage.removeItem("loggedUserName");
+  localStorage.removeItem("loggedUserRole");
+  window.location.href = "../../login.html";
+});
+
+/* ✅ init */
 (async function(){
   const me = await authGuard();
   if(me) await loadSubscription();

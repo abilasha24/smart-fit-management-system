@@ -40,9 +40,11 @@
       <a href="subscription.html">💳 Subscription</a>
       <a href="notifications.html" class="active">🔔 Notifications</a>
       <a href="feedback.html">📝 Feedback</a>
+      <a href="bmi.html">📊 BMI</a>
+
 
       <a href="../../index.html">🌐 Back to Website</a>
-      <a href="../../backend/logout.php" class="text-danger mt-3">🚪 Logout</a>
+      <a href="#" id="btnLogout" class="text-danger mt-3 d-block">🚪 Logout</a>
     </div>
 
     <!-- MAIN -->
@@ -74,21 +76,46 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
+const API = {
+  whoami: "../../backend/whoami.php",
+  getNotifications: "../../backend/get_notifications.php",
+  markRead: "../../backend/mark_notification_read.php",
+  logout: "../../backend/logout.php"
+};
+
 function showMsg(t, ok=false){
   const el = document.getElementById("msg");
   el.className = ok ? "text-success mb-3" : "text-danger mb-3";
   el.textContent = t || "";
 }
 
+/* ✅ FAST UI: show saved name instantly */
+(function(){
+  const saved = localStorage.getItem("loggedUserName");
+  if(saved){
+    const nav = document.getElementById("navUsername");
+    if(nav) nav.textContent = saved;
+  }
+})();
+
 async function authGuard(){
   try{
-    const res = await fetch("../../backend/whoami.php", { credentials:"same-origin" });
+    const res = await fetch(API.whoami, { credentials:"same-origin" });
     const me = await res.json();
+
     if(!me.logged_in || (me.role||"").toLowerCase() !== "member"){
       window.location.href = "../../login.html";
       return null;
     }
-    document.getElementById("navUsername").textContent = me.username || "Member";
+
+    const displayName = (me.name || me.username || "Member").trim();
+
+    const nav = document.getElementById("navUsername");
+    if(nav) nav.textContent = displayName;
+
+    localStorage.setItem("loggedUserName", displayName);
+    localStorage.setItem("loggedUserRole", (me.role || "member").toLowerCase());
+
     return me;
   }catch(e){
     window.location.href = "../../login.html";
@@ -98,7 +125,8 @@ async function authGuard(){
 
 async function loadNotifications(){
   showMsg("");
-  const res = await fetch("../../backend/get_notifications.php", { credentials:"same-origin" });
+
+  const res = await fetch(API.getNotifications, { credentials:"same-origin" });
   const data = await res.json();
 
   if(!data.ok){
@@ -159,7 +187,7 @@ async function loadNotifications(){
 
 async function markRead(id){
   showMsg("");
-  const res = await fetch("../../backend/mark_notification_read.php",{
+  const res = await fetch(API.markRead,{
     method:"POST",
     credentials:"same-origin",
     headers:{ "Content-Type":"application/json" },
@@ -177,7 +205,7 @@ async function markRead(id){
 
 async function markAllRead(){
   showMsg("");
-  const res = await fetch("../../backend/mark_notification_read.php",{
+  const res = await fetch(API.markRead,{
     method:"POST",
     credentials:"same-origin",
     headers:{ "Content-Type":"application/json" },
@@ -204,6 +232,18 @@ function escapeHtml(str){
 
 document.getElementById("markAllBtn").addEventListener("click", markAllRead);
 
+/* ✅ Logout */
+document.getElementById("btnLogout").addEventListener("click", async (e) => {
+  e.preventDefault();
+  try{
+    await fetch(API.logout, { method:"POST", credentials:"same-origin" });
+  }catch{}
+  localStorage.removeItem("loggedUserName");
+  localStorage.removeItem("loggedUserRole");
+  window.location.href = "../../login.html";
+});
+
+/* ✅ init */
 (async function(){
   const me = await authGuard();
   if(me) await loadNotifications();

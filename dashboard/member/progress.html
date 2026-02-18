@@ -24,7 +24,6 @@
 </head>
 
 <body>
-    
 
 <div class="container-fluid">
   <div class="row">
@@ -44,9 +43,11 @@
       <a href="subscription.html">💳 Subscription</a>
       <a href="notifications.html">🔔 Notifications</a>
       <a href="feedback.html">📝 Feedback</a>
+      <a href="bmi.html">📊 BMI</a>
+
 
       <a href="../../index.html">🌐 Back to Website</a>
-      <a href="../../backend/logout.php" class="text-danger mt-3">🚪 Logout</a>
+      <a href="#" id="btnLogout" class="text-danger mt-3 d-block">🚪 Logout</a>
     </div>
 
     <!-- MAIN -->
@@ -121,7 +122,8 @@
 <script>
 const API = {
   whoami: "../../backend/whoami.php",
-  progress: "../../backend/get_progress.php"
+  progress: "../../backend/get_progress.php",
+  logout: "../../backend/logout.php"
 };
 
 let statusChart, caloriesChart, minutesChart;
@@ -134,14 +136,40 @@ async function fetchJSON(url, opts={}){
   return await res.json();
 }
 
+/* ✅ FAST UI (show localStorage name instantly) */
+(function(){
+  const saved = localStorage.getItem("loggedUserName");
+  if(saved){
+    const nav = document.getElementById("navUsername");
+    if(nav) nav.textContent = saved;
+  }
+})();
+
+/* ✅ AUTH + REAL NAME from whoami (session) */
 async function authGuard(){
   try{
     const me = await fetchJSON(API.whoami);
-    if(!me.logged_in || (me.role||"").toLowerCase() !== "member"){
+
+    if(!me.logged_in){
       window.location.href = "../../login.html";
       return null;
     }
-    document.getElementById("navUsername").textContent = me.username || "Member";
+
+    if(((me.role||"member").toLowerCase()) !== "member"){
+      window.location.href = "../../login.html";
+      return null;
+    }
+
+    const displayName = (me.name || me.username || "Member").trim();
+
+    // ✅ update sidebar name
+    const nav = document.getElementById("navUsername");
+    if(nav) nav.textContent = displayName;
+
+    // ✅ save for all pages
+    localStorage.setItem("loggedUserName", displayName);
+    localStorage.setItem("loggedUserRole", (me.role || "member").toLowerCase());
+
     return me;
   }catch(e){
     window.location.href = "../../login.html";
@@ -166,7 +194,7 @@ async function loadProgress(){
     const started = Number(data.statusCounts?.started ?? 0);
     const completed = Number(data.statusCounts?.completed ?? 0);
 
-    const daily = data.daily || [];
+    const daily = Array.isArray(data.daily) ? data.daily : [];
     const labels = daily.map(x => x.date);
     const calories = daily.map(x => Number(x.calories||0));
     const minutes  = daily.map(x => Number(x.minutes||0));
@@ -215,6 +243,18 @@ function renderChart(id, label, labels, values, type){
   else minutesChart = ch;
 }
 
+/* ✅ Logout */
+document.getElementById("btnLogout").addEventListener("click", async (e) => {
+  e.preventDefault();
+  try{
+    await fetch(API.logout, { method:"POST", credentials:"same-origin" });
+  }catch{}
+  localStorage.removeItem("loggedUserName");
+  localStorage.removeItem("loggedUserRole");
+  window.location.href = "../../login.html";
+});
+
+/* ✅ init */
 (async function(){
   const me = await authGuard();
   if(me) await loadProgress();

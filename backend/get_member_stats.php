@@ -9,18 +9,6 @@ function respond($arr, $code=200){
   exit;
 }
 
-function table_exists($conn, $table){
-  $sql = "SHOW TABLES LIKE ?";
-  $st = $conn->prepare($sql);
-  if(!$st) return false;
-  $st->bind_param("s", $table);
-  $st->execute();
-  $r = $st->get_result();
-  $ok = ($r && $r->num_rows > 0);
-  $st->close();
-  return $ok;
-}
-
 if (empty($_SESSION["logged_in"])) {
   respond(["ok"=>false, "message"=>"Not logged in"], 401);
 }
@@ -28,53 +16,92 @@ if (empty($_SESSION["logged_in"])) {
 $userId = (int)($_SESSION["user_id"] ?? 0);
 if ($userId <= 0) respond(["ok"=>false, "message"=>"Invalid session user"], 401);
 
-/* ✅ Defaults */
+/* ---------- detect tracking table ---------- */
+$trackingTable = null;
+
+$res = $conn->query("SHOW TABLES LIKE 'member_workouts'");
+if($res && $res->num_rows > 0){
+  $trackingTable = "member_workouts";
+} else {
+  $res = $conn->query("SHOW TABLES LIKE 'user_workouts'");
+  if($res && $res->num_rows > 0){
+    $trackingTable = "user_workouts";
+  }
+}
+
+if(!$trackingTable){
+  respond(["ok"=>true, "stats"=>[
+    "completed"=>0,
+    "started"=>0,
+    "total_minutes"=>0,
+    "total_calories"=>0,
+    "unread_notifications"=>0
+  ]]);
+}
+
+/* ---------- Completed Count ---------- */
 $completed = 0;
+$st = $conn->prepare("
+  SELECT COUNT(*) c
+  FROM $trackingTable
+  WHERE user_id=? AND status='completed'
+");
+if($st){
+  $st->bind_param("i", $userId);
+  $st->execute();
+  $completed = (int)($st->get_result()->fetch_assoc()["c"] ?? 0);
+  $st->close();
+}
+
+/* ---------- Started Count ---------- */
 $started = 0;
+$st = $conn->prepare("
+  SELECT COUNT(*) c
+  FROM $trackingTable
+  WHERE user_id=? AND status='started'
+");
+if($st){
+  $st->bind_param("i", $userId);
+  $st->execute();
+  $started = (int)($st->get_result()->fetch_assoc()["c"] ?? 0);
+  $st->close();
+}
+
+/* ---------- Total Minutes + Calories (JOIN workouts) ---------- */
 $totalMinutes = 0;
 $totalCalories = 0;
 
-/*
-  Your project files show:
-  - get_my_workouts.php
-  - save_member_workout.php
-  - complete_workout.php
-  So common table name: member_workouts
-  We'll try member_workouts first; if not exist => return zeros.
-*/
-if (table_exists($conn, "member_workouts")) {
+$st = $conn->prepare("
+  SELECT
+    COALESCE(SUM(w.duration_min),0) AS mins,
+    COALESCE(SUM(w.calories),0) AS cals
+  FROM $trackingTable t
+  JOIN workouts w ON t.workout_id = w.id
+  WHERE t.user_id=? AND t.status='completed'
+");
 
-  // Completed count
-  $st = $conn->prepare("SELECT COUNT(*) c FROM member_workouts WHERE user_id=? AND status='completed'");
-  if ($st){
+if($st){
+  $st->bind_param("i", $userId);
+  $st->execute();
+  $row = $st->get_result()->fetch_assoc() ?? [];
+  $totalMinutes = (int)($row["mins"] ?? 0);
+  $totalCalories = (int)($row["cals"] ?? 0);
+  $st->close();
+}
+
+/* ---------- Unread Notifications ---------- */
+$unread = 0;
+$res = $conn->query("SHOW TABLES LIKE 'notifications'");
+if($res && $res->num_rows > 0){
+  $st = $conn->prepare("
+    SELECT COUNT(*) c
+    FROM notifications
+    WHERE user_id=? AND is_read=0
+  ");
+  if($st){
     $st->bind_param("i", $userId);
     $st->execute();
-    $completed = (int)($st->get_result()->fetch_assoc()["c"] ?? 0);
-    $st->close();
-  }
-
-  // Started count
-  $st = $conn->prepare("SELECT COUNT(*) c FROM member_workouts WHERE user_id=? AND status='started'");
-  if ($st){
-    $st->bind_param("i", $userId);
-    $st->execute();
-    $started = (int)($st->get_result()->fetch_assoc()["c"] ?? 0);
-    $st->close();
-  }
-
-  // Total minutes + calories (if columns exist, else safe 0)
-  // Try common columns: duration_min, calories
-  $st = $conn->prepare("SELECT
-      COALESCE(SUM(duration_min),0) AS mins,
-      COALESCE(SUM(calories),0) AS cals
-    FROM member_workouts
-    WHERE user_id=? AND status='completed'");
-  if ($st){
-    $st->bind_param("i", $userId);
-    $st->execute();
-    $row = $st->get_result()->fetch_assoc() ?? [];
-    $totalMinutes = (int)($row["mins"] ?? 0);
-    $totalCalories = (int)($row["cals"] ?? 0);
+    $unread = (int)($st->get_result()->fetch_assoc()["c"] ?? 0);
     $st->close();
   }
 }
@@ -85,6 +112,7 @@ respond([
     "completed" => $completed,
     "started" => $started,
     "total_minutes" => $totalMinutes,
-    "total_calories" => $totalCalories
+    "total_calories" => $totalCalories,
+    "unread_notifications" => $unread
   ]
 ]);
