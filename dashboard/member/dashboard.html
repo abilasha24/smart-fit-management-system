@@ -42,9 +42,11 @@
       <a href="subscription.html">💳 Subscription</a>
       <a href="notifications.html">🔔 Notifications</a>
       <a href="feedback.html">📝 Feedback</a>
-    
+
       <a href="../../index.html">🌐 Back to Website</a>
-      <a href="../../backend/logout.php" class="text-danger mt-3">🚪 Logout</a>
+
+      <!-- ✅ Logout -->
+      <a href="#" id="btnLogout" class="text-danger mt-3 d-block">🚪 Logout</a>
     </div>
 
     <!-- MAIN -->
@@ -146,26 +148,20 @@
 <script>
 const API = {
   whoami: "../../backend/whoami.php",
-  stats: "../../backend/get_member_stats.php"
+  stats: "../../backend/get_member_stats.php",
+  progress: "../../backend/get_progress.php",   // fallback
+  logout: "../../backend/logout.php"
 };
 
 function setStatus(t){ document.getElementById("statusText").textContent = t || ""; }
 function showMsg(t){ document.getElementById("msg").textContent = t || ""; }
 
-async function authGuard(){
-  try{
-    const res = await fetch(API.whoami, { credentials:"same-origin" });
-    const me = await res.json();
-    if(!me.logged_in || (me.role||"").toLowerCase() !== "member"){
-      window.location.href = "../../login.html";
-      return null;
-    }
-    document.getElementById("navUsername").textContent = me.username || "Member";
-    return me;
-  }catch(e){
-    window.location.href = "../../login.html";
-    return null;
-  }
+function setNumbers(completed, started, minutes, calories, unread){
+  document.getElementById("completed").textContent = completed ?? 0;
+  document.getElementById("started").textContent = started ?? 0;
+  document.getElementById("minutes").textContent = minutes ?? 0;
+  document.getElementById("calories").textContent = calories ?? 0;
+  document.getElementById("unread").textContent = unread ?? 0;
 }
 
 function renderSubscription(sub){
@@ -181,37 +177,113 @@ function renderSubscription(sub){
   `;
 }
 
-async function loadStats(){
-  showMsg(""); setStatus("Loading...");
+/* ✅ 1) Immediately show name from localStorage (fast UI) */
+(function setNameFromLocal(){
+  const saved = localStorage.getItem("loggedUserName");
+  if(saved) document.getElementById("navUsername").textContent = saved;
+})();
 
+/* ✅ 2) Auth guard + get real name from session (whoami.php) */
+async function authGuard(){
+  try{
+    const res = await fetch(API.whoami, { credentials:"same-origin" });
+    const me = await res.json();
+
+    if(!me.logged_in || (me.role||"").toLowerCase() !== "member"){
+      window.location.href = "../../login.html";
+      return null;
+    }
+
+    const uname = me.username || "Member";
+    document.getElementById("navUsername").textContent = uname;
+
+    // save for ALL other pages
+    localStorage.setItem("loggedUserName", uname);
+    localStorage.setItem("loggedUserRole", (me.role || "member").toLowerCase());
+
+    return me;
+  }catch(e){
+    window.location.href = "../../login.html";
+    return null;
+  }
+}
+
+/* ✅ 3) Load stats (main) then fallback (progress) */
+async function loadStats(){
+  showMsg("");
+  setStatus("Loading...");
+
+  // MAIN ENDPOINT
   try{
     const res = await fetch(API.stats, { credentials:"same-origin" });
     const data = await res.json();
 
-    if(!data.ok){
-      showMsg(data.message || "Failed to load stats");
+    if(data.ok){
+      const s = data.stats || {};
+      setNumbers(
+        s.completed ?? 0,
+        s.started ?? 0,
+        s.total_minutes ?? 0,
+        s.total_calories ?? 0,
+        s.unread_notifications ?? 0
+      );
+      renderSubscription(data.subscription);
+      setStatus("Ready ✅");
+      return;
+    } else {
+      console.warn("stats not ok:", data);
+    }
+  }catch(e){
+    console.warn("stats endpoint failed, trying fallback...", e);
+  }
+
+  // FALLBACK ENDPOINT (get_progress.php)
+  try{
+    const res2 = await fetch(API.progress, { credentials:"same-origin" });
+    const p = await res2.json();
+
+    if(!p.ok){
+      showMsg(p.message || "Failed to load stats");
       setStatus("");
       return;
     }
 
-    const s = data.stats;
+    const sc = p.statusCounts || {};
+    const daily = Array.isArray(p.daily) ? p.daily : [];
 
-    document.getElementById("completed").textContent = s.completed ?? 0;
-    document.getElementById("started").textContent = s.started ?? 0;
-    document.getElementById("minutes").textContent = s.total_minutes ?? 0;
-    document.getElementById("calories").textContent = s.total_calories ?? 0;
-    document.getElementById("unread").textContent = s.unread_notifications ?? 0;
+    const completed = sc.completed ?? 0;
+    const started   = sc.started ?? 0;
 
-    renderSubscription(data.subscription);
+    let totalMinutes = 0;
+    let totalCalories = 0;
+    daily.forEach(d => {
+      totalMinutes += Number(d.minutes || 0);
+      totalCalories += Number(d.calories || 0);
+    });
 
-    setStatus("Ready ✅");
-  }catch(e){
-    console.error(e);
+    setNumbers(completed, started, totalMinutes, totalCalories, 0);
+    renderSubscription(null);
+
+    setStatus("Ready ✅ (fallback)");
+  }catch(e2){
+    console.error(e2);
     showMsg("Network / JSON error while loading stats");
     setStatus("");
   }
 }
 
+/* ✅ 4) Logout (POST) */
+document.getElementById("btnLogout").addEventListener("click", async (e) => {
+  e.preventDefault();
+  try{
+    await fetch(API.logout, { method:"POST", credentials:"same-origin" });
+  }catch{}
+  localStorage.removeItem("loggedUserName");
+  localStorage.removeItem("loggedUserRole");
+  window.location.href = "../../login.html";
+});
+
+/* ✅ init */
 (async function(){
   const me = await authGuard();
   if(me) await loadStats();

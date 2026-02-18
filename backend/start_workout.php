@@ -1,7 +1,5 @@
 <?php
 header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: *");
-
 session_start();
 require_once "db.php";
 
@@ -16,36 +14,54 @@ if ($user_id <= 0) {
   exit;
 }
 
-$raw = file_get_contents("php://input");
-$body = json_decode($raw, true);
-$workout_id = intval($body["workout_id"] ?? 0);
+/*
+  ✅ Accept BOTH:
+  1) FormData -> $_POST['workout_id']
+  2) JSON body -> php://input
+*/
+$workout_id = 0;
+
+if (isset($_POST["workout_id"])) {
+  $workout_id = intval($_POST["workout_id"]);
+} else {
+  $raw = file_get_contents("php://input");
+  $body = json_decode($raw, true);
+  $workout_id = intval($body["workout_id"] ?? 0);
+}
 
 if ($workout_id <= 0) {
   echo json_encode(["ok"=>false, "message"=>"Missing workout_id"]);
   exit;
 }
 
-/* ✅ check already exists */
-$check = $conn->prepare("SELECT id, status FROM member_workouts WHERE user_id=? AND workout_id=? LIMIT 1");
+/*
+  ✅ Use correct table: user_workouts (not member_workouts)
+  - if already started -> return ok
+  - else insert started
+*/
+$check = $conn->prepare("
+  SELECT id, status
+  FROM user_workouts
+  WHERE user_id=? AND workout_id=?
+  ORDER BY id DESC
+  LIMIT 1
+");
 $check->bind_param("ii", $user_id, $workout_id);
 $check->execute();
 $res = $check->get_result();
 
 if ($res && $res->num_rows > 0) {
-  // already exists -> update to started
   $row = $res->fetch_assoc();
-  $upd = $conn->prepare("UPDATE member_workouts SET status='started', workout_date=CURDATE() WHERE id=?");
-  $upd->bind_param("i", $row["id"]);
-  $upd->execute();
-
-  echo json_encode(["ok"=>true, "message"=>"Workout started ✅"]);
-  exit;
+  if ($row["status"] === "started") {
+    echo json_encode(["ok"=>true, "message"=>"Already started ✅"]);
+    exit;
+  }
 }
 
-/* ✅ insert new */
+/* insert as started */
 $stmt = $conn->prepare("
-  INSERT INTO member_workouts (user_id, workout_id, workout_date, status, duration_min)
-  VALUES (?, ?, CURDATE(), 'started', 0)
+  INSERT INTO user_workouts (user_id, workout_id, status)
+  VALUES (?, ?, 'started')
 ");
 $stmt->bind_param("ii", $user_id, $workout_id);
 

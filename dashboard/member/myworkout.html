@@ -1,167 +1,247 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8">
-  <title>My Workouts | Smart Fit</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
+  <title>My Workouts - Member</title>
 
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="../../css/shared.css">
+  <link rel="stylesheet" href="../../css/style.css">
 
   <style>
-    body { background:#f6f7fb; }
-    .sidebar { min-height:100vh; background:#111827; color:#fff; }
-    .sidebar a{
-      color:#c7c7c7; text-decoration:none; display:block;
-      padding:12px 18px; border-radius:8px; margin-bottom:6px;
+    /* ===== Layout (SAME AS workouts.html) ===== */
+    body{ margin:0; background:#f6f8fb; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; }
+    .layout{ display:flex; min-height:100vh; }
+
+    /* Sidebar */
+    .sidebar{
+      width:260px; background:#0f172a; color:#fff;
+      padding:22px 16px; position:sticky; top:0; height:100vh;
+      box-shadow:0 10px 20px rgba(0,0,0,.25);
     }
-    .sidebar a.active, .sidebar a:hover{ background:#1f2937; color:#fff; }
-    .content { padding:30px; }
-    .card { border-radius:16px; }
+    .brand{ font-weight:800; letter-spacing:.6px; font-size:26px; margin-bottom:10px; }
+    .hello{ color:#cbd5e1; font-size:14px; margin:0 0 16px; }
+    .nav{ display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+    .nav a{
+      text-decoration:none; color:#e5e7eb;
+      padding:12px 12px; border-radius:12px;
+      display:flex; align-items:center; gap:10px;
+      background:rgba(255,255,255,.03);
+    }
+    .nav a:hover{ background:rgba(255,255,255,.08); }
+    .nav a.active{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.10); }
+    .nav .spacer{ height:10px; }
+    .nav a.logout{ color:#ffb4b4; background:rgba(255,0,0,.06); }
+    .nav a.logout:hover{ background:rgba(255,0,0,.10); }
+
+    /* Main */
+    .main{ flex:1; padding:24px; }
+    .topbar{
+      display:flex; justify-content:space-between; align-items:center;
+      margin-bottom:10px;
+    }
+    .status-top{ font-size:14px; color:#555; display:flex; align-items:center; gap:10px; }
+    .pill{
+      padding:6px 10px; border-radius:999px; font-size:12px;
+      border:1px solid #e5e7eb; background:#fff;
+    }
+
+    .alert { background:#fff3cd; border:1px solid #ffeeba; padding:12px 14px; border-radius:10px; color:#856404; }
+    .error { background:#ffe5e5; border:1px solid #ffbdbd; color:#7a0f0f; }
+    .hint { color:#6b7280; font-size:14px; margin:6px 0 0; }
+
+    /* Table */
+    .table-wrap{
+      margin-top:16px;
+      background:#fff; border-radius:14px;
+      box-shadow:0 10px 20px rgba(0,0,0,.06);
+      border:1px solid #eee; overflow:hidden;
+    }
+    table{ width:100%; border-collapse:collapse; }
+    thead th{
+      background:#1f252b; color:#fff;
+      text-align:left; padding:14px 16px; font-weight:800;
+    }
+    tbody td{
+      padding:14px 16px; border-top:1px solid #f0f0f0; color:#222;
+    }
+    tbody tr:hover{ background:#fafafa; }
+    .badge{
+      display:inline-block; padding:4px 10px; border-radius:999px;
+      font-size:12px; font-weight:800;
+    }
+    .badge-started{ background:#fff3cd; color:#856404; border:1px solid #ffeeba; }
+    .badge-completed{ background:#e9f7ef; color:#1e7e34; border:1px solid #c8ead6; }
+
+    @media (max-width: 900px){
+      .sidebar{ position:fixed; left:-9999px; }
+      .main{ padding:18px; }
+    }
   </style>
 </head>
 
 <body>
-<div class="container-fluid">
-  <div class="row">
+  <div class="layout">
 
-    <!-- SIDEBAR -->
-    <div class="col-md-3 col-lg-2 sidebar p-3">
-      <h4 class="fw-bold mb-2">SMART FIT</h4>
-      <div class="small text-white-50 mb-4">
-        Hi, <span id="navUsername" class="text-white fw-semibold">Member</span>
-      </div>
+    <!-- ===== Sidebar (SAME AS workouts.html) ===== -->
+    <aside class="sidebar">
+      <div class="brand">SMART FIT</div>
+      <p class="hello">Hi, <b id="helloName">Member</b></p>
 
-      <a href="dashboard.html">🏠 Dashboard</a>
-      <a href="workouts.html">💪 Workouts</a>
-      <a href="myworkout.html" class="active">🏋️ My Workouts</a>
-      <a href="progress.html">📈 Progress</a>
-      <a href="profile.html">👤 Profile</a>
-      <a href="subscription.html">💳 Subscription</a>
-      <a href="notifications.html">🔔 Notifications</a>
-      <a href="feedback.html">📝 Feedback</a>
-      
-      <a href="../../index.html">🌐 Back to Website</a>
-      <a href="../../backend/logout.php" class="text-danger mt-3">🚪 Logout</a>
-    </div>
+      <nav class="nav">
+        <a href="dashboard.html">🏠 Dashboard</a>
+        <a href="workouts.html">💪 Workouts</a>
+        <a class="active" href="myworkout.html">🏋️ My Workouts</a>
+        <a href="progress.html">📈 Progress</a>
+        <a href="profile.html">👤 Profile</a>
+        <a href="subscription.html">💳 Subscription</a>
+        <a href="notifications.html">🔔 Notifications</a>
+        <a href="feedback.html">📝 Feedback</a>
 
-    <!-- MAIN -->
-    <div class="col-md-9 col-lg-10 content">
-      <div class="d-flex align-items-center justify-content-between mb-3">
+        <div class="spacer"></div>
+
+        <a href="../../index.html">🌐 Back to Website</a>
+        <a class="logout" href="#" id="btnLogout">🚪 Logout</a>
+      </nav>
+    </aside>
+
+    <!-- ===== Main ===== -->
+    <main class="main">
+      <div class="topbar">
         <div>
-          <h2 class="fw-bold mb-0">🏋️ My Workouts</h2>
-          <div class="text-muted">Your workout history</div>
+          <h1 style="margin:0;">🏋️ My Workouts</h1>
+          <p class="hint">Your workout history</p>
         </div>
-        <div id="statusText" class="text-muted"></div>
-      </div>
 
-      <div id="msg" class="text-danger mb-3"></div>
-
-      <div class="card shadow-sm">
-        <div class="card-body">
-
-          <div class="table-responsive">
-            <table class="table table-hover align-middle">
-              <thead class="table-dark">
-                <tr>
-                  <th>#</th>
-                  <th>Workout</th>
-                  <th>Level</th>
-                  <th>Duration</th>
-                  <th>Calories</th>
-                  <th>Status</th>
-                  <th>Date</th>
-                </tr>
-              </thead>
-              <tbody id="tbody">
-                <tr>
-                  <td colspan="7" class="text-center">Loading...</td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-
+        <div class="status-top">
+          <span class="pill" id="statusTop">Loading...</span>
         </div>
       </div>
-    </div>
+
+      <div id="msg" style="margin:14px 0;"></div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:60px;">#</th>
+              <th>Workout</th>
+              <th style="width:140px;">Level</th>
+              <th style="width:140px;">Duration</th>
+              <th style="width:140px;">Calories</th>
+              <th style="width:140px;">Status</th>
+              <th style="width:220px;">Date</th>
+            </tr>
+          </thead>
+          <tbody id="rows">
+            <tr><td colspan="7">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </main>
 
   </div>
-</div>
-
-<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-function setStatus(t){ document.getElementById("statusText").textContent = t || ""; }
-function showMsg(t){ document.getElementById("msg").textContent = t || ""; }
+  const API_BASE = "../../backend";
 
-async function authGuard(){
-  try{
-    const res = await fetch("../../backend/whoami.php", { credentials:"same-origin" });
-    const me = await res.json();
-    if(!me.logged_in || (me.role||"").toLowerCase() !== "member"){
-      window.location.href = "../../login.html";
-      return null;
-    }
-    document.getElementById("navUsername").textContent = me.username || "Member";
-    return me;
-  }catch(e){
-    window.location.href = "../../login.html";
-    return null;
+  const msgEl = document.getElementById("msg");
+  const rowsEl = document.getElementById("rows");
+  const statusTop = document.getElementById("statusTop");
+
+  // Sidebar name (same as workouts.html method)
+  const savedName = localStorage.getItem("loggedUserName") || "Member";
+  document.getElementById("helloName").textContent = savedName;
+
+  function showMsg(html, type="warn"){
+    if(!html){ msgEl.innerHTML=""; return; }
+    const cls = (type==="error") ? "alert error" : "alert";
+    msgEl.innerHTML = `<div class="${cls}">${html}</div>`;
   }
-}
 
-async function loadMyWorkouts(){
-  showMsg(""); setStatus("Loading...");
-  try{
-    const res = await fetch("../../backend/get_my_workouts.php", { credentials:"same-origin" });
-    const data = await res.json();
-
-    if(!data.ok){
-      showMsg(data.message || "Failed to load workouts");
-      setStatus("");
-      return;
+  async function safeJson(res){
+    const txt = await res.text();
+    try { return JSON.parse(txt); }
+    catch(e){
+      console.error("JSON parse failed:", txt);
+      throw new Error("Invalid JSON");
     }
+  }
 
-    const tbody = document.getElementById("tbody");
-    tbody.innerHTML = "";
+  function esc(s) {
+    return String(s ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
+  }
 
-    if(!data.workouts.length){
-      tbody.innerHTML = `<tr><td colspan="7" class="text-center">No workouts yet</td></tr>`;
-      setStatus("");
-      return;
-    }
+  function badge(status){
+    const s = String(status || "").toLowerCase();
+    if (s === "completed") return `<span class="badge badge-completed">completed</span>`;
+    return `<span class="badge badge-started">${esc(status || "started")}</span>`;
+  }
 
-    let i = 1;
-    data.workouts.forEach(w=>{
-      const badge = (w.status === "completed")
-        ? `<span class="badge bg-success">Completed</span>`
-        : `<span class="badge bg-warning text-dark">Started</span>`;
+  async function loadMyWorkouts(){
+    try{
+      showMsg("");
+      statusTop.textContent = "Loading...";
 
-      tbody.innerHTML += `
+      const res = await fetch(`${API_BASE}/get_my_workouts.php`, {
+        method: "GET",
+        credentials: "same-origin"
+      });
+
+      const data = await safeJson(res);
+
+      if(!data.ok){
+        rowsEl.innerHTML = `<tr><td colspan="7">No data</td></tr>`;
+        statusTop.textContent = "Error ❌";
+        showMsg(data.message || "Failed to load workouts", "error");
+        return;
+      }
+
+      const items = Array.isArray(data.items) ? data.items : [];
+      statusTop.textContent = `Loaded ${items.length} ✅`;
+
+      if(items.length === 0){
+        rowsEl.innerHTML = `<tr><td colspan="7">No workouts yet. Go to Workouts page and Start/Complete one.</td></tr>`;
+        return;
+      }
+
+      rowsEl.innerHTML = items.map((it, idx) => `
         <tr>
-          <td>${i++}</td>
-          <td>${w.title}</td>
-          <td>${(w.level||"").toUpperCase()}</td>
-          <td>${w.duration_min} mins</td>
-          <td>${w.calories} cal</td>
-          <td>${badge}</td>
-          <td>${w.workout_date}</td>
+          <td>${idx+1}</td>
+          <td>${esc(it.title)}</td>
+          <td>${esc(it.level || "beginner")}</td>
+          <td>${Number(it.duration_min || 0)} mins</td>
+          <td>${Number(it.calories || 0)} cal</td>
+          <td>${badge(it.status)}</td>
+          <td>${esc(it.date || "")}</td>
         </tr>
-      `;
-    });
+      `).join("");
 
-    setStatus("Ready");
-  }catch(e){
-    console.error(e);
-    showMsg("Network / JSON error. Check backend/get_my_workouts.php");
-    setStatus("");
+    } catch(err){
+      console.error(err);
+      statusTop.textContent = "Error ❌";
+      showMsg(`Network/JSON error. Check ${API_BASE}/get_my_workouts.php`, "error");
+      rowsEl.innerHTML = `<tr><td colspan="7">Failed to load</td></tr>`;
+    }
   }
-}
 
-(async function(){
-  const me = await authGuard();
-  if(me) await loadMyWorkouts();
-})();
+  // Logout (same as workouts.html)
+  document.getElementById("btnLogout").addEventListener("click", async (e) => {
+    e.preventDefault();
+    try {
+      await fetch(`${API_BASE}/logout.php`, { method:"POST", credentials:"same-origin" });
+    } catch {}
+    localStorage.removeItem("loggedUserName");
+    localStorage.removeItem("loggedUserRole");
+    window.location.href = "../../login.html";
+  });
+
+  loadMyWorkouts();
 </script>
-
 </body>
 </html>

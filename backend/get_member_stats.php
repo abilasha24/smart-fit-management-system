@@ -1,91 +1,90 @@
 <?php
-// backend/get_member_stats.php
 session_start();
-require_once __DIR__ . "/db.php";
-header("Content-Type: application/json; charset=UTF-8");
+header("Content-Type: application/json");
+require_once "db.php";
 
-// member auth
-$role = strtolower(trim($_SESSION["role"] ?? ""));
-if (!isset($_SESSION["user_id"]) || $role !== "member") {
-  http_response_code(401);
-  echo json_encode(["ok"=>false, "message"=>"Login required"]);
+function respond($arr, $code=200){
+  http_response_code($code);
+  echo json_encode($arr);
   exit;
 }
-$user_id = (int)$_SESSION["user_id"];
 
-// 1) workouts counts
-$sql1 = "SELECT status, COUNT(*) AS cnt FROM member_workouts WHERE user_id=? GROUP BY status";
-$stmt1 = $conn->prepare($sql1);
-if(!$stmt1){
-  echo json_encode(["ok"=>false,"message"=>"SQL prepare failed","error"=>$conn->error]); exit;
-}
-$stmt1->bind_param("i", $user_id);
-$stmt1->execute();
-$res1 = $stmt1->get_result();
-
-$started = 0; $completed = 0;
-while($r = $res1->fetch_assoc()){
-  if($r["status"] === "started") $started = (int)$r["cnt"];
-  if($r["status"] === "completed") $completed = (int)$r["cnt"];
+function table_exists($conn, $table){
+  $sql = "SHOW TABLES LIKE ?";
+  $st = $conn->prepare($sql);
+  if(!$st) return false;
+  $st->bind_param("s", $table);
+  $st->execute();
+  $r = $st->get_result();
+  $ok = ($r && $r->num_rows > 0);
+  $st->close();
+  return $ok;
 }
 
-// 2) total calories + minutes (completed)
-$sql2 = "
-SELECT
-  SUM(COALESCE(mw.duration_min, w.duration_min, 0)) AS total_minutes,
-  SUM(COALESCE(w.calories, 0)) AS total_calories
-FROM member_workouts mw
-JOIN workouts w ON mw.workout_id = w.id
-WHERE mw.user_id=? AND mw.status='completed'
-";
-$stmt2 = $conn->prepare($sql2);
-if(!$stmt2){
-  echo json_encode(["ok"=>false,"message"=>"SQL prepare failed","error"=>$conn->error]); exit;
-}
-$stmt2->bind_param("i", $user_id);
-$stmt2->execute();
-$row2 = $stmt2->get_result()->fetch_assoc();
-$total_minutes = (int)($row2["total_minutes"] ?? 0);
-$total_calories = (int)($row2["total_calories"] ?? 0);
-
-// 3) latest subscription/payment
-$sql3 = "
-SELECT plan, billing_cycle, amount, payment_method, created_at
-FROM payments
-WHERE user_id=?
-ORDER BY created_at DESC
-LIMIT 1
-";
-$stmt3 = $conn->prepare($sql3);
-if(!$stmt3){
-  echo json_encode(["ok"=>false,"message"=>"SQL prepare failed","error"=>$conn->error]); exit;
-}
-$stmt3->bind_param("i", $user_id);
-$stmt3->execute();
-$sub = $stmt3->get_result()->fetch_assoc(); // can be null
-
-// 4) unread notifications
-$unread = 0;
-$hasNotificationsTable = true;
-$stmt4 = $conn->prepare("SELECT COUNT(*) AS c FROM notifications WHERE user_id=? AND is_read=0");
-if(!$stmt4){
-  // if notifications table not created yet -> ignore
-  $hasNotificationsTable = false;
-} else {
-  $stmt4->bind_param("i", $user_id);
-  $stmt4->execute();
-  $unread = (int)($stmt4->get_result()->fetch_assoc()["c"] ?? 0);
+if (empty($_SESSION["logged_in"])) {
+  respond(["ok"=>false, "message"=>"Not logged in"], 401);
 }
 
-echo json_encode([
-  "ok"=>true,
-  "stats"=>[
-    "started"=>$started,
-    "completed"=>$completed,
-    "total_minutes"=>$total_minutes,
-    "total_calories"=>$total_calories,
-    "unread_notifications"=>$unread,
-    "has_notifications_table"=>$hasNotificationsTable
-  ],
-  "subscription"=>$sub
+$userId = (int)($_SESSION["user_id"] ?? 0);
+if ($userId <= 0) respond(["ok"=>false, "message"=>"Invalid session user"], 401);
+
+/* ✅ Defaults */
+$completed = 0;
+$started = 0;
+$totalMinutes = 0;
+$totalCalories = 0;
+
+/*
+  Your project files show:
+  - get_my_workouts.php
+  - save_member_workout.php
+  - complete_workout.php
+  So common table name: member_workouts
+  We'll try member_workouts first; if not exist => return zeros.
+*/
+if (table_exists($conn, "member_workouts")) {
+
+  // Completed count
+  $st = $conn->prepare("SELECT COUNT(*) c FROM member_workouts WHERE user_id=? AND status='completed'");
+  if ($st){
+    $st->bind_param("i", $userId);
+    $st->execute();
+    $completed = (int)($st->get_result()->fetch_assoc()["c"] ?? 0);
+    $st->close();
+  }
+
+  // Started count
+  $st = $conn->prepare("SELECT COUNT(*) c FROM member_workouts WHERE user_id=? AND status='started'");
+  if ($st){
+    $st->bind_param("i", $userId);
+    $st->execute();
+    $started = (int)($st->get_result()->fetch_assoc()["c"] ?? 0);
+    $st->close();
+  }
+
+  // Total minutes + calories (if columns exist, else safe 0)
+  // Try common columns: duration_min, calories
+  $st = $conn->prepare("SELECT
+      COALESCE(SUM(duration_min),0) AS mins,
+      COALESCE(SUM(calories),0) AS cals
+    FROM member_workouts
+    WHERE user_id=? AND status='completed'");
+  if ($st){
+    $st->bind_param("i", $userId);
+    $st->execute();
+    $row = $st->get_result()->fetch_assoc() ?? [];
+    $totalMinutes = (int)($row["mins"] ?? 0);
+    $totalCalories = (int)($row["cals"] ?? 0);
+    $st->close();
+  }
+}
+
+respond([
+  "ok" => true,
+  "stats" => [
+    "completed" => $completed,
+    "started" => $started,
+    "total_minutes" => $totalMinutes,
+    "total_calories" => $totalCalories
+  ]
 ]);

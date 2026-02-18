@@ -5,11 +5,8 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Login - Smart Fit</title>
 
-  <!-- Bootstrap CSS -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-  <!-- Font Awesome -->
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-  <!-- Project CSS -->
   <link rel="stylesheet" href="css/shared.css">
   <link rel="stylesheet" href="css/style.css">
 
@@ -31,7 +28,6 @@
 
 <body>
 
-<!-- Navbar -->
 <nav class="navbar navbar-expand-lg navbar-dark bg-dark sticky-top">
   <div class="container">
     <a class="navbar-brand" href="index.html">
@@ -56,7 +52,6 @@
   </div>
 </nav>
 
-<!-- Login Form -->
 <div class="login-container">
   <div class="login-card">
     <div class="login-header">
@@ -64,7 +59,6 @@
       <p>Sign in to your Smart Fit account</p>
     </div>
 
-    <!-- Role Selection -->
     <div class="user-role text-center">
       <p class="mb-2">I am a:</p>
       <div class="d-flex justify-content-center flex-wrap gap-2">
@@ -74,16 +68,15 @@
       </div>
     </div>
 
-    <form id="loginForm" novalidate>
-      <!-- hidden role -->
-      <input type="hidden" id="role" value="member">
+    <form id="loginForm" novalidate autocomplete="off">
+      <input type="hidden" id="role" name="role" value="member">
 
       <div class="mb-3">
-        <input id="email" type="email" class="form-control" placeholder="Email Address" required>
+        <input id="email" name="email" type="email" class="form-control" placeholder="Email Address" required>
       </div>
 
       <div class="mb-3">
-        <input id="password" type="password" class="form-control" placeholder="Password" required>
+        <input id="password" name="password" type="password" class="form-control" placeholder="Password" required>
       </div>
 
       <button type="submit" class="btn btn-login">Login</button>
@@ -98,7 +91,6 @@
       </p>
     </div>
 
-    <!-- Demo Credentials -->
     <div class="mt-4 p-3 bg-light rounded">
       <small class="text-muted">
         <strong>Demo Login:</strong><br>
@@ -110,18 +102,15 @@
   </div>
 </div>
 
-<!-- Footer -->
 <footer class="bg-dark text-white py-4">
   <div class="container text-center">
     <p class="mb-0">&copy; 2024 Smart Fit. All rights reserved.</p>
   </div>
 </footer>
 
-<!-- Bootstrap JS -->
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  // ✅ Role selection
   document.querySelectorAll('.role-badge').forEach(badge => {
     badge.addEventListener('click', function () {
       document.querySelectorAll('.role-badge').forEach(b => b.classList.remove('active'));
@@ -130,7 +119,6 @@
     });
   });
 
-  // ✅ Form submission
   document.getElementById('loginForm').addEventListener('submit', async function (e) {
     e.preventDefault();
 
@@ -143,46 +131,42 @@
       return;
     }
 
-    const payload = { email, password, role };
+    // ✅ MOST RELIABLE for PHP: application/x-www-form-urlencoded
+    const body = new URLSearchParams();
+    body.append("email", email);
+    body.append("password", password);
+    body.append("role", role);
 
     try {
-      const res = await fetch('backend/login.php', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(payload)
+      const res = await fetch("./backend/login.php?v=" + Date.now(), {
+        method: "POST",
+        headers: { "Content-Type": "application/x-www-form-urlencoded" },
+        body: body.toString(),
+        cache: "no-store"
       });
 
-      let data;
-      try {
-        data = await res.json();
-      } catch (jsonErr) {
-        console.error("Invalid JSON response:", jsonErr);
-        alert("Server error: JSON response varala. login.php check pannunga.");
+      const data = await res.json();
+
+      const ok = (data.ok === true) || (data.status === "success");
+      if (!ok) {
+        alert(data.message || "Login failed");
+        // optional debug
+        if (data.debug) console.log("LOGIN DEBUG:", data.debug);
         return;
       }
 
-      if (!data.ok) {
-        alert(data.message || 'Login failed');
-        return;
-      }
-
-      // ✅ Pick best display name
-      const fallbackName = email.split("@")[0];
-      const displayName = (data.full_name && data.full_name.trim())
-        ? data.full_name.trim()
-        : ((data.username && data.username.trim()) ? data.username.trim() : fallbackName);
-
+      const displayName = (data.full_name && data.full_name.trim()) ? data.full_name.trim() : email.split("@")[0];
       localStorage.setItem("loggedUserName", displayName);
-      localStorage.setItem("loggedUserRole", data.role);
+      localStorage.setItem("loggedUserRole", data.role || role);
 
-      // ✅ redirect (relative is safest)
-      if (data.role === 'member')  window.location.href = "dashboard/member/dashboard.html";
-      if (data.role === 'trainer') window.location.href = "dashboard/trainer/dashboard.html";
-      if (data.role === 'admin')   window.location.href = "dashboard/admin/dashboard.html";
+      const r = data.role || role;
+      if (r === "member")  window.location.href = "dashboard/member/dashboard.html";
+      if (r === "trainer") window.location.href = "dashboard/trainer/dashboard.html";
+      if (r === "admin")   window.location.href = "dashboard/admin/dashboard.html";
 
     } catch (err) {
       console.error(err);
-      alert("Network/Path error. Apache ON + backend/login.php path correct ah check pannunga.");
+      alert("Network/Server error. Console check pannunga.");
     }
   });
 </script>
