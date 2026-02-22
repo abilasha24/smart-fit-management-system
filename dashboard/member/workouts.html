@@ -1,319 +1,265 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>Workouts - Member</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>💪 Workouts | SMART FIT</title>
 
-  <link rel="stylesheet" href="../../css/shared.css">
-  <link rel="stylesheet" href="../../css/style.css">
+<style>
+body{ margin:0; background:#f6f8fb; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; }
+.layout{ display:flex; min-height:100vh; }
 
-  <style>
-    /* ===== Layout (Member panel look) ===== */
-    body{ margin:0; background:#f6f8fb; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; }
-    .layout{ display:flex; min-height:100vh; }
+/* Sidebar */
+.sidebar{
+  width:260px; background:#0f172a; color:#fff;
+  padding:22px 16px; position:sticky; top:0; height:100vh;
+  box-shadow:0 10px 20px rgba(0,0,0,.25);
+}
+.brand{ font-weight:800; letter-spacing:.6px; font-size:26px; margin-bottom:10px; }
+.hello{ color:#cbd5e1; font-size:14px; margin:0 0 16px; }
+.nav{ display:flex; flex-direction:column; gap:8px; margin-top:10px; }
+.nav a{
+  text-decoration:none; color:#e5e7eb;
+  padding:12px 12px; border-radius:12px;
+  display:flex; align-items:center; gap:10px;
+  background:rgba(255,255,255,.03);
+}
+.nav a:hover{ background:rgba(255,255,255,.08); }
+.nav a.active{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.10); }
+.nav .spacer{ height:10px; }
+.nav a.logout{ color:#ffb4b4; background:rgba(255,0,0,.06); }
+.nav a.logout:hover{ background:rgba(255,0,0,.10); }
 
-    /* Sidebar */
-    .sidebar{
-      width:260px; background:#0f172a; color:#fff;
-      padding:22px 16px; position:sticky; top:0; height:100vh;
-      box-shadow:0 10px 20px rgba(0,0,0,.25);
-    }
-    .brand{ font-weight:800; letter-spacing:.6px; font-size:26px; margin-bottom:10px; }
-    .hello{ color:#cbd5e1; font-size:14px; margin:0 0 16px; }
-    .nav{ display:flex; flex-direction:column; gap:8px; margin-top:10px; }
-    .nav a{
-      text-decoration:none; color:#e5e7eb;
-      padding:12px 12px; border-radius:12px;
-      display:flex; align-items:center; gap:10px;
-      background:rgba(255,255,255,.03);
-    }
-    .nav a:hover{ background:rgba(255,255,255,.08); }
-    .nav a.active{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.10); }
-    .nav .spacer{ height:10px; }
-    .nav a.logout{ color:#ffb4b4; background:rgba(255,0,0,.06); }
-    .nav a.logout:hover{ background:rgba(255,0,0,.10); }
+/* Main */
+.main{ flex:1; padding:24px; }
+.topbar{ display:flex; justify-content:space-between; align-items:center; margin-bottom:10px; }
+.pill{
+  padding:6px 10px; border-radius:999px; font-size:12px;
+  border:1px solid #e5e7eb; background:#fff; color:#111;
+}
 
-    /* Main */
-    .main{ flex:1; padding:24px; }
-    .topbar{
-      display:flex; justify-content:space-between; align-items:center;
-      margin-bottom:10px;
-    }
-    .status-top{ font-size:14px; color:#555; display:flex; align-items:center; gap:10px; }
-    .pill{
-      padding:6px 10px; border-radius:999px; font-size:12px;
-      border:1px solid #e5e7eb; background:#fff;
-    }
+/* Cards */
+.grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; margin-top:16px; }
+.card{
+  background:#fff; border-radius:14px; padding:18px;
+  box-shadow:0 8px 18px rgba(0,0,0,.06);
+  border:1px solid #eee;
+}
+.badge{
+  display:inline-block; background:#e9f7ef; color:#166534;
+  padding:4px 10px; border-radius:999px; font-size:12px; margin-bottom:10px;
+}
+.meta{ display:flex; gap:16px; color:#666; margin:8px 0; }
+.state{ margin:8px 0; font-weight:800; color:#0f7a4b; min-height:20px; }
 
-    /* Cards */
-    .grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:20px; margin-top:16px; }
-    .card {
-      background:#fff; border-radius:14px; padding:18px;
-      box-shadow:0 10px 20px rgba(0,0,0,.06); border:1px solid #eee;
-    }
-    .badge {
-      display:inline-block; padding:4px 10px; border-radius:999px;
-      background:#e9f7ef; color:#1e7e34; font-size:12px; margin-bottom:10px;
-      text-transform:lowercase;
-    }
-    .meta { color:#666; display:flex; gap:12px; margin:8px 0 10px; }
-    .state { margin:6px 0 12px; font-weight:700; color:#0f7a4b; min-height:18px; }
-    .btn {
-      width:100%; padding:10px 12px; border-radius:10px;
-      border:1px solid #0f7a4b; cursor:pointer; font-weight:700;
-    }
-    .btn-start { background:#0f7a4b; color:#fff; margin-bottom:10px; }
-    .btn-complete { background:#fff; color:#0f7a4b; }
-    .btn:disabled{
-      opacity:.55; cursor:not-allowed;
-    }
+.btn{
+  width:100%; padding:10px; border-radius:10px;
+  font-weight:800; border:none; cursor:pointer; margin-bottom:8px;
+}
+.btn-start{ background:#0f7a4b; color:#fff; }
+.btn-complete{ background:#fff; border:1px solid #0f7a4b; color:#0f7a4b; }
+.btn-watch{
+  display:block; text-align:center; text-decoration:none;
+  background:#111827; color:#fff; padding:10px; border-radius:10px; font-weight:800;
+}
+.btn:disabled{ opacity:.55; cursor:not-allowed; }
 
-    .alert { background:#fff3cd; border:1px solid #ffeeba; padding:12px 14px; border-radius:10px; color:#856404; }
-    .error { background:#ffe5e5; border:1px solid #ffbdbd; color:#7a0f0f; }
-    .hint { color:#6b7280; font-size:14px; margin:6px 0 0; }
-
-    @media (max-width: 900px){
-      .sidebar{ position:fixed; left:-9999px; } /* simple hide on mobile */
-      .main{ padding:18px; }
-    }
-  </style>
+.alert{
+  background:#fff3cd; padding:12px; border-radius:10px;
+  border:1px solid #ffeeba; margin:12px 0;
+}
+.error{ background:#ffe5e5; border:1px solid #ffbdbd; color:#7a0f0f; }
+</style>
 </head>
 
 <body>
-  <div class="layout">
+<div class="layout">
 
-    <!-- ===== Sidebar (Member) ===== -->
-    <aside class="sidebar">
-      <div class="brand">SMART FIT</div>
-      <p class="hello">Hi, <b id="helloName">Member</b></p>
+<aside class="sidebar">
+  <div class="brand">SMART FIT</div>
+  <p class="hello">Hi, <b id="helloName">Member</b></p>
 
-      <nav class="nav">
-        <a href="dashboard.html">🏠 Dashboard</a>
-        <a class="active" href="workouts.html">💪 Workouts</a>
-        <a href="myworkout.html">🏋️ My Workouts</a>
-        <a href="progress.html">📈 Progress</a>
-        <a href="profile.html">👤 Profile</a>
-        <a href="subscription.html">💳 Subscription</a>
-        <a href="notifications.html">🔔 Notifications</a>
-        <a href="feedback.html">📝 Feedback</a>
-        <a href="bmi.html">📊 BMI</a>
+  <nav class="nav">
+    <a href="dashboard.html">🏠 Dashboard</a>
+    <a class="active" href="workouts.html">💪 Workouts</a>
+    <a href="myworkout.html">🏋️ My Workouts</a>
+    <a href="progress.html">📈 Progress</a>
+    <a href="meal_plans.html">🥗 Meal Plans</a>
+    <a href="profile.html">👤 Profile</a>
+    <a href="subscription.html">💳 Subscription</a>
+    <a href="notifications.html">🔔 Notifications</a>
+    <a href="feedback.html">📝 Feedback</a>
+    <a href="bmi.html">📊 BMI</a>
 
+    <div class="spacer"></div>
 
-        <div class="spacer"></div>
+    <a href="../../index.html">🌐 Back to Website</a>
+    <a class="logout" href="#" id="btnLogout">🚪 Logout</a>
+  </nav>
+</aside>
 
-        <a href="../../index.html">🌐 Back to Website</a>
-        <a class="logout" href="#" id="btnLogout">🚪 Logout</a>
-      </nav>
-    </aside>
-
-    <!-- ===== Main ===== -->
-    <main class="main">
-      <div class="topbar">
-        <div>
-          <h1 style="margin:0;">💪 Workouts</h1>
-          <p class="hint">Start and complete workouts (Member panel)</p>
-        </div>
-        <div class="status-top">
-          <span class="pill" id="statusTop">Loading...</span>
-        </div>
-      </div>
-
-      <div id="msg" style="margin:14px 0;"></div>
-      <div class="grid" id="cards"></div>
-    </main>
-
+<main class="main">
+  <div class="topbar">
+    <div>
+      <h1>💪 Workouts</h1>
+      <p>Start and complete workouts</p>
+    </div>
+    <div class="pill" id="statusTop">⏳ Loading...</div>
   </div>
 
+  <div id="msg"></div>
+  <div class="grid" id="cards"></div>
+</main>
+
+</div>
+
 <script>
-  // ✅ IMPORTANT: correct backend base path (because we are inside /dashboard/member/)
-  const API_BASE = "../../backend";
+/** IMPORTANT: keep relative to avoid SMART_FIT vs smart_fit issues */
+const API_BASE = "../../backend";
 
-  const cardsEl  = document.getElementById("cards");
-  const msgEl    = document.getElementById("msg");
-  const statusTop= document.getElementById("statusTop");
+const cardsEl = document.getElementById("cards");
+const statusTop = document.getElementById("statusTop");
+const msgEl = document.getElementById("msg");
 
-  // Show name in sidebar
-  const savedName = localStorage.getItem("loggedUserName") || "Member";
-  document.getElementById("helloName").textContent = savedName;
+document.getElementById("helloName").textContent =
+  localStorage.getItem("loggedUserName") || "Member";
 
-  function showMsg(html, type="warn") {
-    if(!html){ msgEl.innerHTML=""; return; }
-    const cls = (type==="error") ? "alert error" : "alert";
-    msgEl.innerHTML = `<div class="${cls}">${html}</div>`;
+function showMsg(text,type="warn"){
+  if(!text){ msgEl.innerHTML=""; return; }
+  msgEl.innerHTML = `<div class="alert ${type==='error'?'error':''}">${text}</div>`;
+}
+
+async function safeJson(res){
+  const t = await res.text();
+  try { return JSON.parse(t); } catch { return { ok:false, message:t }; }
+}
+
+function esc(s){
+  return (s ?? "").toString()
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;");
+}
+
+function setCardState(id,state){
+  const stateEl=document.getElementById("state-"+id);
+  const btnS=document.getElementById("start-"+id);
+  const btnC=document.getElementById("complete-"+id);
+
+  if(state==="started"){
+    stateEl.textContent="▶️ Started";
+    btnS.disabled=true;
+  } else if(state==="completed"){
+    stateEl.textContent="✅ Completed";
+    btnS.disabled=true;
+    btnC.disabled=true;
+  } else {
+    stateEl.textContent="";
+    btnS.disabled=false;
+    btnC.disabled=false;
   }
+}
 
-  async function safeJson(res){
-    const txt = await res.text();
-    try { return JSON.parse(txt); }
-    catch(e){
-      console.error("JSON parse failed:", txt);
-      throw new Error("Invalid JSON");
+function renderCard(w){
+  const yt = (w.youtube_url || "").trim();
+
+  return `
+  <div class="card">
+    <div class="badge">${esc(w.level||"beginner")}</div>
+    <h3>${esc(w.title||"Workout")}</h3>
+
+    <div class="meta">
+      <span>⏱ ${esc(w.duration_min||0)} mins</span>
+      <span>🔥 ${esc(w.calories||0)} cal</span>
+    </div>
+
+    <div class="state" id="state-${w.id}"></div>
+
+    <button class="btn btn-start" id="start-${w.id}" onclick="startWorkout(${w.id})">▶️ Start</button>
+    <button class="btn btn-complete" id="complete-${w.id}" onclick="completeWorkout(${w.id})">✅ Complete</button>
+
+    ${yt ? `<a class="btn-watch" href="${esc(yt)}" target="_blank">🎥 Watch Video</a>` : ``}
+  </div>`;
+}
+
+async function loadWorkouts(){
+  try{
+    statusTop.textContent="⏳ Loading...";
+    showMsg("");
+
+    const res=await fetch(API_BASE+"/get_workouts.php", { credentials:"include" });
+    const data=await safeJson(res);
+
+    if(!data.ok){
+      showMsg("❌ Failed to load workouts: " + (data.message||""), "error");
+      statusTop.textContent="❌ Error";
+      return;
     }
-  }
 
-  function escapeHtml(str) {
-    return String(str)
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
-  }
+    const items=data.workouts||[];
+    statusTop.textContent=`✅ Loaded ${items.length} workouts`;
 
-  function setCardState(id, state){
-    const stateEl = document.getElementById(`state-${id}`);
-    const btnS = document.getElementById(`start-${id}`);
-    const btnC = document.getElementById(`complete-${id}`);
-
-    if(!stateEl || !btnS || !btnC) return;
-
-    if(state === "started"){
-      stateEl.textContent = "Started ✅";
-      btnS.disabled = true;
-      btnC.disabled = false;
-    } else if(state === "completed"){
-      stateEl.textContent = "Completed ✅";
-      btnS.disabled = true;
-      btnC.disabled = true;
-    } else {
-      stateEl.textContent = "";
-      btnS.disabled = false;
-      btnC.disabled = false;
+    if(!items.length){
+      cardsEl.innerHTML="<div class='alert'>⚠️ No workouts found</div>";
+      return;
     }
+
+    cardsEl.innerHTML=items.map(renderCard).join("");
+  }catch(e){
+    showMsg("❌ Network error", "error");
+    statusTop.textContent="❌ Error";
   }
+}
 
-  async function loadWorkouts() {
-    try {
-      showMsg("");
-      statusTop.textContent = "Loading workouts...";
+async function startWorkout(id){
+  try{
+    setCardState(id,"started");
+    const fd=new FormData();
+    fd.append("workout_id",id);
 
-      const res = await fetch(`${API_BASE}/get_workouts.php`, {
-        method: "GET",
-        credentials: "same-origin"
-      });
+    const res = await fetch(API_BASE+"/start_workout.php", { method:"POST", body:fd, credentials:"include" });
+    const data = await safeJson(res);
 
-      const data = await safeJson(res);
-
-      if (!data.ok) {
-        showMsg(`Failed: ${data.message || "Cannot load workouts"}`, "error");
-        statusTop.textContent = "Error ❌";
-        return;
-      }
-
-      const workouts = data.workouts || [];
-      statusTop.textContent = `Loaded ${workouts.length} workouts ✅`;
-
-      if (workouts.length === 0) {
-        cardsEl.innerHTML = `<div class="alert">No workouts found.</div>`;
-        return;
-      }
-
-      cardsEl.innerHTML = workouts.map(w => `
-        <div class="card" id="card-${Number(w.id)}">
-          <div class="badge">${escapeHtml(w.level || "beginner")}</div>
-          <h3 style="margin:0 0 6px;">${escapeHtml(w.title || "")}</h3>
-
-          <div class="meta">
-            <span>⏱ ${escapeHtml(w.duration_min || 0)} mins</span>
-            <span>🔥 ${escapeHtml(w.calories || 0)} cal</span>
-          </div>
-
-          <div class="state" id="state-${Number(w.id)}"></div>
-
-          <button class="btn btn-start" id="start-${Number(w.id)}" onclick="startWorkout(${Number(w.id)})">Start</button>
-          <button class="btn btn-complete" id="complete-${Number(w.id)}" onclick="completeWorkout(${Number(w.id)})">Complete</button>
-        </div>
-      `).join("");
-
-      // Optional: if backend later provides status, you can set it here.
-      // For now: default state empty.
-
-    } catch (e) {
-      console.error(e);
-      showMsg(`Network/JSON error. Check ${API_BASE}/get_workouts.php`, "error");
-      statusTop.textContent = "Error ❌";
+    if(!data.ok){
+      setCardState(id,"");
+      showMsg("❌ Start failed: " + (data.message||"Error"), "error");
+      return;
     }
+    showMsg("✅ Started!", "warn");
+  }catch(e){
+    setCardState(id,"");
+    showMsg("❌ Start failed (network)", "error");
   }
+}
 
-  async function startWorkout(workoutId) {
-    try {
-      // UI optimistic
-      setCardState(workoutId, "started");
+async function completeWorkout(id){
+  try{
+    setCardState(id,"completed");
+    const fd=new FormData();
+    fd.append("workout_id",id);
 
-      const fd = new FormData();
-      fd.append("workout_id", workoutId);
+    const res = await fetch(API_BASE+"/complete_workout.php", { method:"POST", body:fd, credentials:"include" });
+    const data = await safeJson(res);
 
-      const res = await fetch(`${API_BASE}/start_workout.php`, {
-        method: "POST",
-        body: fd,
-        credentials: "same-origin"
-      });
-
-      const data = await safeJson(res);
-
-      if (!data.ok) {
-        // rollback UI
-        setCardState(workoutId, "none");
-        alert(data.message || "Start failed");
-        return;
-      }
-
-      alert("Workout started ✅");
-
-    } catch (e) {
-      console.error(e);
-      setCardState(workoutId, "none");
-      alert("Network/JSON error while starting workout. start_workout.php check pannunga.");
+    if(!data.ok){
+      setCardState(id,"started");
+      showMsg("❌ Complete failed: " + (data.message||"Error"), "error");
+      return;
     }
+    showMsg("✅ Completed!", "warn");
+  }catch(e){
+    showMsg("❌ Complete failed (network)", "error");
   }
+}
 
-  async function completeWorkout(workoutId) {
-    try {
-      // UI optimistic
-      setCardState(workoutId, "completed");
+document.getElementById("btnLogout").addEventListener("click", async (e)=>{
+  e.preventDefault();
+  await fetch(API_BASE+"/logout.php", { method:"POST", credentials:"include" });
+  window.location.href="../../index.html";
+});
 
-      const fd = new FormData();
-      fd.append("workout_id", workoutId);
-
-      const res = await fetch(`${API_BASE}/complete_workout.php`, {
-        method: "POST",
-        body: fd,
-        credentials: "same-origin"
-      });
-
-      const data = await safeJson(res);
-
-      if (!data.ok) {
-        // rollback UI (go back to started because user may have started)
-        setCardState(workoutId, "started");
-        alert(data.message || "Complete failed");
-        return;
-      }
-
-      alert("Workout completed ✅");
-      // Optional: take user to history page
-      // window.location.href = "myworkout.html";
-
-    } catch (e) {
-      console.error(e);
-      setCardState(workoutId, "started");
-      alert("Network/JSON error while completing workout. complete_workout.php check pannunga.");
-    }
-  }
-
-  // Logout (if you have backend/logout.php)
-  document.getElementById("btnLogout").addEventListener("click", async (e) => {
-    e.preventDefault();
-    try {
-      await fetch(`${API_BASE}/logout.php`, { method:"POST", credentials:"same-origin" });
-    } catch {}
-    localStorage.removeItem("loggedUserName");
-    localStorage.removeItem("loggedUserRole");
-    window.location.href = "../../login.html";
-  });
-
-  loadWorkouts();
+loadWorkouts();
 </script>
+
 </body>
 </html>

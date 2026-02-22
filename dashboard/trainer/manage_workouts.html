@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Workouts | Trainer</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <link rel="stylesheet" href="trainer_layout.css">
+</head>
+
+<body data-active="workouts">
+<div class="app d-flex">
+
+  <aside class="sidebar">
+    <div class="brand">SMART FIT</div>
+    <div class="hello">Hi, <span id="trainerName">trainer</span></div>
+
+    <a class="nav-item" data-key="dashboard" href="dashboard.html"><span class="nav-ico chip-sky"><i class="bi bi-speedometer2"></i></span><span class="nav-label">Dashboard</span></a>
+    <a class="nav-item" data-key="members" href="members.html"><span class="nav-ico chip-violet"><i class="bi bi-people"></i></span><span class="nav-label">Members & Assign</span></a>
+    <a class="nav-item" data-key="workouts" href="manage_workouts.html"><span class="nav-ico chip-amber"><i class="bi bi-activity"></i></span><span class="nav-label">Workouts</span></a>
+    <a class="nav-item" data-key="progress" href="member_progress.html"><span class="nav-ico chip-cyan"><i class="bi bi-graph-up-arrow"></i></span><span class="nav-label">Progress</span></a>
+    <a class="nav-item" data-key="meal" href="meal_plans.html"><span class="nav-ico chip-green"><i class="bi bi-egg-fried"></i></span><span class="nav-label">Meal Plans</span></a>
+    <a class="nav-item" data-key="profile" href="profile.html"><span class="nav-ico chip-slate"><i class="bi bi-person"></i></span><span class="nav-label">Profile</span></a>
+    <a class="nav-item" data-key="nutrition" href="nutrition.html"><span class="nav-ico chip-rose"><i class="bi bi-apple"></i></span><span class="nav-label">Nutrition</span></a>
+    <a class="nav-item" data-key="schedule" href="schedule.html"><span class="nav-ico chip-indigo"><i class="bi bi-calendar2-week"></i></span><span class="nav-label">Schedule</span></a>
+    <a class="nav-item" data-key="back" href="../../index.html"><span class="nav-ico chip-slate"><i class="bi bi-globe"></i></span><span class="nav-label">Back to Website</span></a>
+
+    <hr class="nav-sep">
+    <a class="nav-item logout" href="#" id="btnLogout">
+      <span class="nav-ico" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.18)"><i class="bi bi-box-arrow-right"></i></span>
+      <span class="nav-label">Logout</span>
+    </a>
+
+    <div class="sidebar-footer"><div class="fw-bold">Trainer Panel</div><div class="mini">Smart Fit • v1.0</div></div>
+  </aside>
+
+  <main class="main flex-grow-1">
+    <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
+      <div>
+        <h3 class="mb-1 d-flex align-items-center gap-2">
+          <span class="chip chip-amber"><i class="bi bi-activity"></i></span>
+          Manage Workouts
+        </h3>
+        <div class="subtitle">Add / edit / delete workouts and YouTube video links</div>
+      </div>
+
+      <button class="btn btn-dark btn-pill" id="btnNew"><i class="bi bi-plus-circle me-2"></i>Add Workout</button>
+    </div>
+
+    <div class="d-flex flex-wrap gap-2 mt-2">
+      <a class="btn btn-outline-dark btn-pill" href="nutrition.html"><i class="bi bi-apple me-2"></i>Nutrition</a>
+      <a class="btn btn-outline-dark btn-pill" href="meal_plans.html"><i class="bi bi-egg-fried me-2"></i>Meal Plans</a>
+      <a class="btn btn-outline-dark btn-pill" href="schedule.html"><i class="bi bi-calendar2-week me-2"></i>Schedule</a>
+      <a class="btn btn-outline-dark btn-pill" href="profile.html"><i class="bi bi-person me-2"></i>Profile</a>
+    </div>
+
+    <div class="card-soft p-3 mt-3">
+      <div class="row g-2">
+        <div class="col-md-4">
+          <input id="q" class="form-control" placeholder="Search title/level..." />
+        </div>
+        <div class="col-md-3">
+          <select id="level" class="form-select">
+            <option value="">All levels</option>
+            <option>beginner</option><option>intermediate</option><option>advanced</option>
+          </select>
+        </div>
+        <div class="col-md-3">
+          <button class="btn btn-outline-dark btn-pill w-100" id="btnFilter"><i class="bi bi-funnel me-2"></i>Filter</button>
+        </div>
+      </div>
+
+      <div class="table-responsive mt-3">
+        <table class="table table-sm mb-0">
+          <thead>
+            <tr>
+              <th>#</th><th>Title</th><th>Level</th><th>Duration</th><th>Calories</th><th>YouTube</th><th style="width:170px;">Actions</th>
+            </tr>
+          </thead>
+          <tbody id="rows">
+            <tr><td colspan="7" class="subtitle">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Modal -->
+<div class="modal fade" id="mdl" tabindex="-1">
+  <div class="modal-dialog">
+    <div class="modal-content" style="border-radius:18px;">
+      <div class="modal-header">
+        <h5 class="modal-title" id="mdlTitle">Add Workout</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="id" />
+        <div class="mb-2">
+          <label class="form-label">Title</label>
+          <input class="form-control" id="title" placeholder="e.g., Cardio Burn" />
+        </div>
+        <div class="mb-2">
+          <label class="form-label">Level</label>
+          <select class="form-select" id="mLevel">
+            <option>beginner</option><option>intermediate</option><option>advanced</option>
+          </select>
+        </div>
+        <div class="row g-2">
+          <div class="col">
+            <label class="form-label">Duration (min)</label>
+            <input class="form-control" id="duration_min" type="number" min="1" />
+          </div>
+          <div class="col">
+            <label class="form-label">Calories</label>
+            <input class="form-control" id="calories" type="number" min="0" />
+          </div>
+        </div>
+        <div class="mt-2">
+          <label class="form-label">YouTube URL</label>
+          <input class="form-control mono" id="youtube_url" placeholder="https://youtube.com/watch?v=..." />
+          <div class="subtitle" style="font-size:12px">Member workouts page-ல click பண்ணி video பார்க்கலாம்.</div>
+        </div>
+        <div class="alert alert-danger mt-3 d-none" id="err"></div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn btn-outline-secondary btn-pill" data-bs-dismiss="modal">Cancel</button>
+        <button class="btn btn-dark btn-pill" id="btnSave">Save</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+<script src="trainer_layout.js"></script>
+<script>
+  const mdl  = new bootstrap.Modal(document.getElementById("mdl"));
+
+  async function load(){
+    const params = new URLSearchParams();
+    if(q.value.trim()) params.set("q", q.value.trim());
+    if(level.value) params.set("level", level.value);
+
+    const r = await fetch(API+"trainer_workouts_list.php?"+params.toString(),{credentials:"include"});
+    const d = await r.json();
+    if(!d.ok){ rows.innerHTML = `<tr><td colspan="7" class="text-danger">Failed</td></tr>`; return; }
+    const items = d.items || [];
+    if(!items.length){ rows.innerHTML = `<tr><td colspan="7" class="subtitle">No workouts</td></tr>`; return; }
+
+    rows.innerHTML = items.map((it,i)=>`
+      <tr>
+        <td>${i+1}</td>
+        <td class="fw-bold">${esc(it.title)}</td>
+        <td>${esc(it.level)}</td>
+        <td>${Number(it.duration_min||0)} min</td>
+        <td>${Number(it.calories||0)}</td>
+        <td>${it.youtube_url ? `<a target="_blank" href="${esc(it.youtube_url)}">Open</a>` : `<span class="subtitle">—</span>`}</td>
+        <td>
+          <button class="btn btn-sm btn-outline-dark btn-pill" onclick='edit(${JSON.stringify(it)})'>Edit</button>
+          <button class="btn btn-sm btn-outline-danger btn-pill" onclick="delWorkout(${it.id})">Delete</button>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  function openNew(){
+    err.classList.add("d-none"); err.textContent="";
+    mdlTitle.textContent = "Add Workout";
+    id.value=""; title.value=""; mLevel.value="beginner";
+    duration_min.value=20; calories.value=200; youtube_url.value="";
+    mdl.show();
+  }
+
+  function edit(it){
+    err.classList.add("d-none"); err.textContent="";
+    mdlTitle.textContent = "Edit Workout";
+    id.value = it.id;
+    title.value = it.title || "";
+    mLevel.value = it.level || "beginner";
+    duration_min.value = it.duration_min || 0;
+    calories.value = it.calories || 0;
+    youtube_url.value = it.youtube_url || "";
+    mdl.show();
+  }
+
+  async function save(){
+    err.classList.add("d-none"); err.textContent="";
+    const payload = {
+      id: id.value ? Number(id.value) : 0,
+      title: title.value.trim(),
+      level: mLevel.value,
+      duration_min: Number(duration_min.value||0),
+      calories: Number(calories.value||0),
+      youtube_url: youtube_url.value.trim()
+    };
+    if(!payload.title){ err.textContent="Title required"; err.classList.remove("d-none"); return; }
+
+    const r = await fetch(API+"trainer_workout_save.php",{
+      method:"POST", credentials:"include",
+      headers: {"Content-Type":"application/json"},
+      body: JSON.stringify(payload)
+    });
+    const d = await r.json();
+    if(!d.ok){ err.textContent=d.message||"Save failed"; err.classList.remove("d-none"); return; }
+    mdl.hide(); load();
+  }
+
+  async function delWorkout(workoutId){
+    if(!confirm("Delete this workout?")) return;
+    const r = await fetch(API+"trainer_workout_delete.php?id="+encodeURIComponent(workoutId),{credentials:"include"});
+    const d = await r.json();
+    if(!d.ok) return alert(d.message||"Delete failed");
+    load();
+  }
+
+  btnNew.addEventListener("click", openNew);
+  btnSave.addEventListener("click", save);
+  btnFilter.addEventListener("click", load);
+
+  load();
+</script>
+</body>
+</html>

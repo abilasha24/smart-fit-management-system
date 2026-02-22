@@ -1,10 +1,11 @@
 <?php
 header("Content-Type: application/json");
-header("Access-Control-Allow-Origin: *");
-require_once "db.php";
+require_once __DIR__ . "/db.php";
 
 try {
-  $q = $conn->query("SELECT id, title, level, duration_min, calories FROM workouts ORDER BY id DESC");
+  $q = $conn->query("SELECT id, title, level, duration_min, calories, COALESCE(youtube_url,'') AS youtube_url
+                     FROM workouts
+                     ORDER BY id DESC");
   $rows = [];
   if ($q) {
     while ($r = $q->fetch_assoc()) $rows[] = $r;

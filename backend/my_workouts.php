@@ -16,7 +16,8 @@ $sql = "
     uw.workout_id,
     uw.status,
     COALESCE(uw.completed_at, uw.started_at, uw.assigned_at, uw.created_at) AS date,
-    w.title, w.level, w.duration_min, w.calories
+    w.title, w.level, w.duration_min, w.calories,
+    COALESCE(w.youtube_url,'') AS youtube_url
   FROM user_workouts uw
   JOIN workouts w ON w.id = uw.workout_id
   WHERE uw.user_id=?
@@ -28,6 +29,7 @@ if(!$stmt){
   echo json_encode(["ok"=>false,"message"=>"Prepare failed: ".$conn->error]);
   exit;
 }
+
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
 $res = $stmt->get_result();

@@ -1,47 +1,77 @@
 <?php
-header("Content-Type: application/json");
 session_start();
-require_once "db.php";
+header("Content-Type: application/json");
 
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-  echo json_encode(["ok"=>false, "message"=>"Invalid request"]);
+if (empty($_SESSION["logged_in"]) || ($_SESSION["role"] ?? "") !== "member") {
+  http_response_code(403);
+  echo json_encode(["ok"=>false,"message"=>"Forbidden"]);
   exit;
 }
 
-$user_id = intval($_SESSION["user_id"] ?? 0);
-if ($user_id <= 0) {
-  echo json_encode(["ok"=>false, "message"=>"Not logged in"]);
-  exit;
-}
+require_once __DIR__ . "/db.php";
 
-$workout_id = 0;
-
-if (isset($_POST["workout_id"])) {
-  $workout_id = intval($_POST["workout_id"]);
-} else {
-  $raw = file_get_contents("php://input");
-  $body = json_decode($raw, true);
-  $workout_id = intval($body["workout_id"] ?? 0);
-}
+$user_id = (int)$_SESSION["user_id"];
+$workout_id = (int)($_POST["workout_id"] ?? 0);
 
 if ($workout_id <= 0) {
-  echo json_encode(["ok"=>false, "message"=>"Missing workout_id"]);
+  echo json_encode(["ok"=>false,"message"=>"workout_id required"]);
   exit;
 }
 
-/* ✅ update latest started row to completed */
-$upd = $conn->prepare("
-  UPDATE user_workouts
-  SET status='completed', completed_at=NOW()
-  WHERE user_id=? AND workout_id=? AND status='started'
-  ORDER BY id DESC
-  LIMIT 1
-");
-$upd->bind_param("ii", $user_id, $workout_id);
-$ok = $upd->execute();
-
-if ($ok && $upd->affected_rows > 0) {
-  echo json_encode(["ok"=>true, "message"=>"Workout completed ✅"]);
-} else {
-  echo json_encode(["ok"=>false, "message"=>"No started workout to complete"]);
+$check = $conn->prepare("SELECT id, status FROM user_workouts WHERE user_id=? AND workout_id=? ORDER BY id DESC LIMIT 1");
+if(!$check){
+  echo json_encode(["ok"=>false,"message"=>"Prepare failed: ".$conn->error]);
+  exit;
 }
+$check->bind_param("ii", $user_id, $workout_id);
+$check->execute();
+$res = $check->get_result();
+$row = $res->fetch_assoc();
+$check->close();
+
+if ($row) {
+  $id = (int)$row["id"];
+
+  $upd = $conn->prepare("
+    UPDATE user_workouts
+    SET status='completed',
+        completed_at = NOW(),
+        started_at = COALESCE(started_at, NOW())
+    WHERE id=?
+  ");
+  if(!$upd){
+    echo json_encode(["ok"=>false,"message"=>"Prepare failed: ".$conn->error]);
+    exit;
+  }
+  $upd->bind_param("i", $id);
+  $ok = $upd->execute();
+  $upd->close();
+
+  if(!$ok){
+    echo json_encode(["ok"=>false,"message"=>"Update failed"]);
+    exit;
+  }
+
+  echo json_encode(["ok"=>true,"message"=>"Completed (updated)"]);
+  exit;
+}
+
+// If no row exists, insert completed record directly
+$ins = $conn->prepare("
+  INSERT INTO user_workouts (user_id, workout_id, status, started_at, completed_at, created_at)
+  VALUES (?, ?, 'completed', NOW(), NOW(), NOW())
+");
+if(!$ins){
+  echo json_encode(["ok"=>false,"message"=>"Prepare failed: ".$conn->error]);
+  exit;
+}
+$ins->bind_param("ii", $user_id, $workout_id);
+$ok = $ins->execute();
+$ins->close();
+
+if(!$ok){
+  echo json_encode(["ok"=>false,"message"=>"Insert failed"]);
+  exit;
+}
+
+echo json_encode(["ok"=>true,"message"=>"Completed (inserted)"]);

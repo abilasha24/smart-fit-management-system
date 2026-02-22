@@ -41,6 +41,10 @@
       <a href="workouts.html">💪 Workouts</a>
       <a href="myworkout.html">🏋️ My Workouts</a>
       <a href="progress.html">📈 Progress</a>
+
+      <!-- ✅ Meal Plans -->
+      <a href="meal_plans.html">🥗 Meal Plans</a>
+
       <a href="profile.html">👤 Profile</a>
       <a href="subscription.html">💳 Subscription</a>
       <a href="notifications.html">🔔 Notifications</a>
@@ -102,7 +106,7 @@
           </div>
         </div>
 
-        <!-- ✅ Latest BMI (badge + updated + warning + button) -->
+        <!-- ✅ Latest BMI -->
         <div class="col-md-3">
           <div class="card stat-card">
             <div class="card-body">
@@ -155,6 +159,18 @@
         </div>
       </div>
 
+      <!-- ✅ LATEST MEAL PLAN (NEW) -->
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+          <h5 class="fw-bold mb-2">🥗 Latest Meal Plan</h5>
+          <div id="latestMealBox" class="text-muted">Loading...</div>
+
+          <div class="mt-3">
+            <a class="btn btn-outline-success btn-sm" href="meal_plans.html">Open Meal Plans</a>
+          </div>
+        </div>
+      </div>
+
       <!-- QUICK SHORTCUTS -->
       <div class="card shadow-sm quick">
         <div class="card-body">
@@ -175,187 +191,229 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-const API = {
-  whoami: "../../backend/whoami.php",
-  stats: "../../backend/get_member_stats.php",
-  bmiLatest: "../../backend/get_latest_bmi.php",
-  logout: "../../backend/logout.php"
-};
+  // ✅ absolute project base (your project runs under /smart_fit/)
+  const BASE_WEB = "/smart_fit/";
+  const API = {
+    whoami: BASE_WEB + "backend/whoami.php",
+    stats: BASE_WEB + "backend/get_member_stats.php",
+    bmiLatest: BASE_WEB + "backend/get_latest_bmi.php",
+    mealPlans: BASE_WEB + "backend/member_meal_plans_list.php",
+    // optional subscription endpoint (if exists) — if not, we fallback
+    subscription: BASE_WEB + "backend/get_member_subscription.php",
+    logout: BASE_WEB + "backend/logout.php"
+  };
 
-function setStatus(t){ document.getElementById("statusText").textContent = t || ""; }
-function showMsg(t){ document.getElementById("msg").textContent = t || ""; }
+  function setStatus(t){ document.getElementById("statusText").textContent = t || ""; }
+  function showMsg(t){ document.getElementById("msg").textContent = t || ""; }
 
-function setNumbers(completed, started, minutes, calories, unread){
-  document.getElementById("completed").textContent = completed ?? 0;
-  document.getElementById("started").textContent = started ?? 0;
-  document.getElementById("minutes").textContent = minutes ?? 0;
-  document.getElementById("calories").textContent = calories ?? 0;
-  document.getElementById("unread").textContent = unread ?? 0;
-}
-
-function bmiBadgeClass(category){
-  const c = String(category || "").toLowerCase();
-  if(c === "normal") return "bg-success";
-  if(c === "underweight") return "bg-warning text-dark";
-  if(c === "overweight") return "bg-orange text-dark";
-  if(c === "obese") return "bg-danger";
-  return "bg-secondary";
-}
-
-function renderSubscription(sub){
-  const box = document.getElementById("subBox");
-  if(!sub){
-    box.innerHTML = `<div>No subscription found. <a href="../../pricing.html">Buy a plan</a></div>`;
-    return;
+  function setNumbers(completed, started, minutes, calories, unread){
+    document.getElementById("completed").textContent = completed ?? 0;
+    document.getElementById("started").textContent = started ?? 0;
+    document.getElementById("minutes").textContent = minutes ?? 0;
+    document.getElementById("calories").textContent = calories ?? 0;
+    document.getElementById("unread").textContent = unread ?? 0;
   }
-  box.innerHTML = `
-    <div class="fw-semibold">${sub.plan} <span class="text-muted">(${sub.billing_cycle})</span></div>
-    <div class="text-muted">Paid: Rs. ${sub.amount} via ${sub.payment_method}</div>
-    <div class="small text-muted">Date: ${sub.created_at}</div>
-  `;
-}
 
-/* ✅ FAST UI: localStorage name show immediately */
-(function(){
-  const saved = localStorage.getItem("loggedUserName");
-  if(saved){
-    const nav = document.getElementById("navUsername");
-    if(nav) nav.textContent = saved;
+  function bmiBadgeClass(category){
+    const c = String(category || "").toLowerCase();
+    if(c.includes("under")) return "bg-info text-dark";
+    if(c.includes("normal")) return "bg-success";
+    if(c.includes("over")) return "bg-orange text-dark";
+    if(c.includes("obese")) return "bg-danger";
+    return "bg-secondary";
   }
-})();
 
-/* ✅ AUTH */
-async function authGuard(){
-  try{
-    const res = await fetch(API.whoami, { credentials:"same-origin" });
-    const me = await res.json();
+  function bmiWarningText(category){
+    const c = String(category || "").toLowerCase();
+    if(c.includes("under")) return { show:true, cls:"text-info", text:"⚠️ Increase calories + strength training" };
+    if(c.includes("obese")) return { show:true, cls:"text-danger", text:"⚠️ Low-impact cardio + consult professional" };
+    return { show:false };
+  }
 
-    if(!me.logged_in){
-      window.location.href = "../../login.html";
+  async function authGuard(){
+    try{
+      const r = await fetch(API.whoami, { credentials:"include" });
+      if(r.status === 401){
+        location.href = BASE_WEB + "login.html";
+        return null;
+      }
+      const me = await r.json().catch(()=>null);
+      if(!me || !me.logged_in){
+        location.href = BASE_WEB + "login.html";
+        return null;
+      }
+      if(me.role && me.role !== "member"){
+        // role redirect (optional safety)
+        if(me.role === "trainer") location.href = BASE_WEB + "dashboard/trainer/dashboard.html";
+        if(me.role === "admin")   location.href = BASE_WEB + "dashboard/admin/dashboard.html";
+        return null;
+      }
+      document.getElementById("navUsername").textContent = me.username || me.name || "Member";
+      return me;
+    }catch(e){
+      showMsg("Server not reachable. Check Apache/XAMPP.");
       return null;
     }
-
-    if(((me.role||"member").toLowerCase()) !== "member"){
-      window.location.href = "../../login.html";
-      return null;
-    }
-
-    const displayName = (me.name || me.username || "Member").trim();
-    document.getElementById("navUsername").textContent = displayName;
-
-    localStorage.setItem("loggedUserName", displayName);
-    localStorage.setItem("loggedUserRole", (me.role || "member").toLowerCase());
-
-    return me;
-  }catch(e){
-    window.location.href = "../../login.html";
-    return null;
   }
-}
 
-/* ✅ Load stats */
-async function loadStats(){
-  showMsg("");
-  setStatus("Loading...");
+  async function loadStats(){
+    setStatus("Loading stats...");
+    try{
+      const r = await fetch(API.stats, { credentials:"include" });
+      const d = await r.json().catch(()=>({ok:false}));
+      if(!d.ok){
+        setStatus("");
+        return;
+      }
 
-  try{
-    const res = await fetch(API.stats, { credentials:"same-origin" });
-    const data = await res.json();
+      // ✅ flexible mapping (works even if keys differ)
+      const completed = d.completed ?? d.stats?.completed ?? 0;
+      const started   = d.started ?? d.stats?.started ?? 0;
+      const minutes   = d.minutes ?? d.stats?.minutes ?? d.total_minutes ?? 0;
+      const calories  = d.calories ?? d.stats?.calories ?? d.total_calories ?? 0;
+      const unread    = d.unread ?? d.notifications_unread ?? 0;
 
-    if(data.ok){
-      const s = data.stats || {};
-      setNumbers(
-        s.completed ?? 0,
-        s.started ?? 0,
-        s.total_minutes ?? 0,
-        s.total_calories ?? 0,
-        s.unread_notifications ?? 0
-      );
-      renderSubscription(data.subscription || null);
-      setStatus("Ready ✅");
-      return;
-    } else {
-      showMsg(data.message || "Failed to load stats");
+      setNumbers(completed, started, minutes, calories, unread);
+
+      // Subscription summary fallback from stats if present
+      const subBox = document.getElementById("subBox");
+      if(d.subscription){
+        // if backend already provides a ready subscription string/object
+        if(typeof d.subscription === "string") subBox.textContent = d.subscription;
+        else{
+          const plan = d.subscription.plan || d.subscription.name || "Active";
+          const exp  = d.subscription.expires_at || d.subscription.ends_at || "";
+          subBox.innerHTML = `<div><b>${plan}</b></div>` + (exp ? `<div class="text-muted small">Valid till: ${exp}</div>` : "");
+        }
+      }else{
+        // keep until loadSubscription tries
+        subBox.textContent = "Active plan details loading...";
+      }
+
+      setStatus("");
+    }catch(e){
       setStatus("");
     }
-  }catch(e){
-    showMsg("Network error while loading stats");
-    setStatus("");
   }
-}
 
-/* ✅ Load Latest BMI (+ warning line) */
-async function loadLatestBMI(){
-  try{
-    const res = await fetch(API.bmiLatest, { credentials:"same-origin" });
-    const data = await res.json();
-
-    const bmiEl = document.getElementById("bmiLatest");
-    const badge = document.getElementById("bmiCatBadge");
-    const upd = document.getElementById("bmiUpdated");
-    const warnEl = document.getElementById("bmiWarn");
-
-    if(!bmiEl || !badge || !upd || !warnEl) return;
-
-    // reset warning default
-    warnEl.style.display = "none";
-    warnEl.textContent = "";
-    warnEl.className = "small mt-2";
-
-    if(!data.ok || !data.latest){
-      bmiEl.textContent = "--";
-      badge.className = "badge bg-secondary";
-      badge.textContent = "No record";
-      upd.textContent = "Updated: -";
-      return;
+  async function loadSubscription(){
+    // optional endpoint; if it doesn't exist, keep fallback
+    const subBox = document.getElementById("subBox");
+    try{
+      const r = await fetch(API.subscription, { credentials:"include" });
+      if(!r.ok) throw new Error("no sub endpoint");
+      const d = await r.json().catch(()=>({ok:false}));
+      if(!d.ok) throw new Error("bad sub");
+      // expected: {ok:true, plan, status, expires_at}
+      const plan = d.plan || d.name || "Active";
+      const status = d.status || "";
+      const exp = d.expires_at || d.ends_at || "";
+      subBox.innerHTML =
+        `<div><b>${plan}</b> ${status ? `<span class="badge bg-success ms-2">${status}</span>` : ""}</div>` +
+        (exp ? `<div class="text-muted small mt-1">Valid till: ${exp}</div>` : "");
+    }catch(e){
+      // fallback message (no endpoint)
+      if(subBox.textContent.includes("Loading") || subBox.textContent.includes("Active plan details")){
+        subBox.textContent = "No subscription details available (open Subscription page).";
+      }
     }
-
-    const bmiVal = data.latest.bmi_value ?? "--";
-    const cat = data.latest.category ?? "-";
-    const created = data.latest.created_at ?? "-";
-
-    bmiEl.textContent = bmiVal;
-    badge.className = "badge " + bmiBadgeClass(cat);
-    badge.textContent = cat;
-
-    upd.textContent = "Updated: " + String(created).slice(0, 19);
-
-    // ✅ warning line only for Underweight / Obese
-    const c = String(cat || "").toLowerCase();
-    if(c === "underweight"){
-      warnEl.style.display = "block";
-      warnEl.className = "small mt-2 text-warning";
-      warnEl.textContent = "⚠ Increase calories + strength training";
-    } else if(c === "obese"){
-      warnEl.style.display = "block";
-      warnEl.className = "small mt-2 text-danger";
-      warnEl.textContent = "⚠ Low-impact cardio + consult professional";
-    }
-
-  }catch(e){
-    // silent
   }
-}
 
-/* ✅ Logout */
-document.getElementById("btnLogout").addEventListener("click", async (e) => {
-  e.preventDefault();
-  try{
-    await fetch(API.logout, { method:"POST", credentials:"same-origin" });
-  }catch{}
-  localStorage.removeItem("loggedUserName");
-  localStorage.removeItem("loggedUserRole");
-  window.location.href = "../../login.html";
-});
+  async function loadLatestBMI(){
+    try{
+      const r = await fetch(API.bmiLatest, { credentials:"include" });
+      const d = await r.json().catch(()=>({ok:false}));
 
-/* ✅ init */
-(async function(){
-  const me = await authGuard();
-  if(me){
+      const bmiLatest = document.getElementById("bmiLatest");
+      const badge = document.getElementById("bmiCatBadge");
+      const updated = document.getElementById("bmiUpdated");
+      const warn = document.getElementById("bmiWarn");
+
+      if(!d.ok || !d.bmi){
+        bmiLatest.textContent = "--";
+        badge.className = "badge bg-secondary";
+        badge.textContent = "No record";
+        updated.textContent = "Updated: -";
+        warn.style.display = "none";
+        return;
+      }
+
+      bmiLatest.textContent = d.bmi;
+      const cat = d.category || "Recorded";
+      badge.className = "badge " + bmiBadgeClass(cat);
+      badge.textContent = cat;
+
+      updated.textContent = "Updated: " + (d.created_at || d.updated_at || "-");
+
+      const w = bmiWarningText(cat);
+      if(w.show){
+        warn.style.display = "block";
+        warn.className = "small mt-2 " + (w.cls || "");
+        warn.textContent = w.text;
+      }else{
+        warn.style.display = "none";
+      }
+    }catch(e){}
+  }
+
+  async function loadLatestMeal(){
+    const box = document.getElementById("latestMealBox");
+    box.className = "text-muted";
+    box.textContent = "Loading...";
+
+    try{
+      const r = await fetch(API.mealPlans, { credentials:"include" });
+      if(!r.ok){
+        box.className = "text-danger";
+        box.textContent = "Login required";
+        return;
+      }
+      const d = await r.json().catch(()=>({ok:false}));
+      if(!d.ok || !d.plans || !d.plans.length){
+        box.className = "text-muted";
+        box.textContent = "No meal plans available";
+        return;
+      }
+
+      const p = d.plans[0];
+      const preview = (p.content || "").length > 140 ? (p.content.substring(0,140) + "...") : (p.content || "");
+
+      box.className = "";
+      box.innerHTML = `
+        <div class="fw-bold">${escapeHtml(p.title || "Meal Plan")}</div>
+        <div class="text-muted small mt-1">${escapeHtml(preview)}</div>
+        <div class="text-muted small mt-1">${escapeHtml(p.created_at || "")}</div>
+      `;
+    }catch(e){
+      box.className = "text-danger";
+      box.textContent = "Failed to load meal plan";
+    }
+  }
+
+  function escapeHtml(str){
+    return String(str ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;");
+  }
+
+  // Logout
+  document.getElementById("btnLogout").addEventListener("click", async (e)=>{
+    e.preventDefault();
+    try{ await fetch(API.logout, { method:"POST", credentials:"include" }); }catch(err){}
+    location.href = BASE_WEB + "login.html";
+  });
+
+  // Init
+  (async function(){
+    const me = await authGuard();
+    if(!me) return;
+
     await loadStats();
+    await loadSubscription(); // optional
     await loadLatestBMI();
-  }
-})();
+    await loadLatestMeal();
+  })();
 </script>
 
 </body>

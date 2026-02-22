@@ -1,249 +1,236 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1.0" />
-  <title>My Workouts - Member</title>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1.0" />
+<title>🏋️ My Workouts - Member</title>
 
-  <link rel="stylesheet" href="../../css/shared.css">
-  <link rel="stylesheet" href="../../css/style.css">
+<style>
+  body{ margin:0; background:#f6f8fb; font-family:system-ui,-apple-system,Segoe UI,Roboto; }
+  .layout{ display:flex; min-height:100vh; }
 
-  <style>
-    /* ===== Layout (SAME AS workouts.html) ===== */
-    body{ margin:0; background:#f6f8fb; font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial; }
-    .layout{ display:flex; min-height:100vh; }
+  /* Sidebar */
+  .sidebar{
+    width:260px; background:#0f172a; color:#fff; padding:22px 16px; height:100vh;
+  }
+  .brand{ font-size:26px; font-weight:800; margin-bottom:10px; }
+  .hello{ color:#cbd5e1; margin-bottom:16px; }
+  .nav{ display:flex; flex-direction:column; gap:8px; }
+  .nav a{
+    text-decoration:none; color:#e5e7eb; padding:12px; border-radius:12px;
+    display:flex; align-items:center; gap:10px;
+  }
+  .nav a:hover{ background:rgba(255,255,255,.08); }
+  .nav a.active{ background:rgba(255,255,255,.15); }
+  .nav .spacer{ height:10px; }
+  .nav a.logout{ color:#ffb4b4; }
 
-    /* Sidebar */
-    .sidebar{
-      width:260px; background:#0f172a; color:#fff;
-      padding:22px 16px; position:sticky; top:0; height:100vh;
-      box-shadow:0 10px 20px rgba(0,0,0,.25);
-    }
-    .brand{ font-weight:800; letter-spacing:.6px; font-size:26px; margin-bottom:10px; }
-    .hello{ color:#cbd5e1; font-size:14px; margin:0 0 16px; }
-    .nav{ display:flex; flex-direction:column; gap:8px; margin-top:10px; }
-    .nav a{
-      text-decoration:none; color:#e5e7eb;
-      padding:12px 12px; border-radius:12px;
-      display:flex; align-items:center; gap:10px;
-      background:rgba(255,255,255,.03);
-    }
-    .nav a:hover{ background:rgba(255,255,255,.08); }
-    .nav a.active{ background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.10); }
-    .nav .spacer{ height:10px; }
-    .nav a.logout{ color:#ffb4b4; background:rgba(255,0,0,.06); }
-    .nav a.logout:hover{ background:rgba(255,0,0,.10); }
+  /* Main */
+  .main{ flex:1; padding:24px; }
+  .topbar{ display:flex; justify-content:space-between; align-items:center; }
+  .pill{
+    background:#fff; padding:6px 12px; border-radius:999px; border:1px solid #ddd; font-size:13px;
+  }
 
-    /* Main */
-    .main{ flex:1; padding:24px; }
-    .topbar{
-      display:flex; justify-content:space-between; align-items:center;
-      margin-bottom:10px;
-    }
-    .status-top{ font-size:14px; color:#555; display:flex; align-items:center; gap:10px; }
-    .pill{
-      padding:6px 10px; border-radius:999px; font-size:12px;
-      border:1px solid #e5e7eb; background:#fff;
-    }
+  .card{
+    background:#fff; border-radius:14px; padding:18px;
+    box-shadow:0 8px 18px rgba(0,0,0,.06); border:1px solid #eee;
+  }
 
-    .alert { background:#fff3cd; border:1px solid #ffeeba; padding:12px 14px; border-radius:10px; color:#856404; }
-    .error { background:#ffe5e5; border:1px solid #ffbdbd; color:#7a0f0f; }
-    .hint { color:#6b7280; font-size:14px; margin:6px 0 0; }
+  table{ width:100%; border-collapse:collapse; overflow:hidden; border-radius:12px; }
+  thead th{
+    background:#111827; color:#fff; text-align:left; padding:12px 14px; font-weight:800;
+  }
+  tbody td{ padding:12px 14px; border-bottom:1px solid #eee; }
+  tbody tr:hover{ background:#f8fafc; }
 
-    /* Table */
-    .table-wrap{
-      margin-top:16px;
-      background:#fff; border-radius:14px;
-      box-shadow:0 10px 20px rgba(0,0,0,.06);
-      border:1px solid #eee; overflow:hidden;
-    }
-    table{ width:100%; border-collapse:collapse; }
-    thead th{
-      background:#1f252b; color:#fff;
-      text-align:left; padding:14px 16px; font-weight:800;
-    }
-    tbody td{
-      padding:14px 16px; border-top:1px solid #f0f0f0; color:#222;
-    }
-    tbody tr:hover{ background:#fafafa; }
-    .badge{
-      display:inline-block; padding:4px 10px; border-radius:999px;
-      font-size:12px; font-weight:800;
-    }
-    .badge-started{ background:#fff3cd; color:#856404; border:1px solid #ffeeba; }
-    .badge-completed{ background:#e9f7ef; color:#1e7e34; border:1px solid #c8ead6; }
+  .badge{
+    display:inline-block; padding:4px 10px; border-radius:999px; font-size:12px; font-weight:700;
+  }
+  .b-assigned{ background:#fff7ed; color:#9a3412; }
+  .b-started{ background:#eef2ff; color:#3730a3; }
+  .b-completed{ background:#ecfdf5; color:#166534; }
 
-    @media (max-width: 900px){
-      .sidebar{ position:fixed; left:-9999px; }
-      .main{ padding:18px; }
-    }
-  </style>
+  .btn{
+    display:inline-block; padding:8px 12px; border-radius:10px; font-weight:800;
+    border:1px solid #111827; background:#111827; color:#fff; text-decoration:none;
+  }
+
+  .alert{
+    background:#fff3cd; padding:12px; border-radius:10px; border:1px solid #ffeeba; margin:14px 0;
+  }
+  .error{
+    background:#ffe5e5; border:1px solid #ffbdbd; color:#7a0f0f;
+  }
+</style>
 </head>
 
 <body>
-  <div class="layout">
+<div class="layout">
 
-    <!-- ===== Sidebar (SAME AS workouts.html) ===== -->
-    <aside class="sidebar">
-      <div class="brand">SMART FIT</div>
-      <p class="hello">Hi, <b id="helloName">Member</b></p>
+  <!-- Sidebar -->
+  <aside class="sidebar">
+    <div class="brand">SMART FIT</div>
+    <p class="hello">Hi, <b id="helloName">Member</b></p>
 
-      <nav class="nav">
-        <a href="dashboard.html">🏠 Dashboard</a>
-        <a href="workouts.html">💪 Workouts</a>
-        <a class="active" href="myworkout.html">🏋️ My Workouts</a>
-        <a href="progress.html">📈 Progress</a>
-        <a href="profile.html">👤 Profile</a>
-        <a href="subscription.html">💳 Subscription</a>
-        <a href="notifications.html">🔔 Notifications</a>
-        <a href="feedback.html">📝 Feedback</a>
-        <a href="bmi.html">📊 BMI</a>
+    <nav class="nav">
+      <a href="dashboard.html">🏠 Dashboard</a>
+      <a href="workouts.html">💪 Workouts</a>
+      <a class="active" href="myworkout.html">🏋️ My Workouts</a>
+      <a href="progress.html">📈 Progress</a>
+      <a href="meal_plans.html">🥗 Meal Plans</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="subscription.html">💳 Subscription</a>
+      <a href="notifications.html">🔔 Notifications</a>
+      <a href="feedback.html">📝 Feedback</a>
+      <a href="bmi.html">📊 BMI</a>
 
+      <div class="spacer"></div>
 
-        <div class="spacer"></div>
+      <a href="../../index.html">🌐 Back to Website</a>
+      <a class="logout" href="#" id="btnLogout">🚪 Logout</a>
+    </nav>
+  </aside>
 
-        <a href="../../index.html">🌐 Back to Website</a>
-        <a class="logout" href="#" id="btnLogout">🚪 Logout</a>
-      </nav>
-    </aside>
+  <!-- Main -->
+  <main class="main">
 
-    <!-- ===== Main ===== -->
-    <main class="main">
-      <div class="topbar">
-        <div>
-          <h1 style="margin:0;">🏋️ My Workouts</h1>
-          <p class="hint">Your workout history</p>
-        </div>
-
-        <div class="status-top">
-          <span class="pill" id="statusTop">Loading...</span>
-        </div>
+    <div class="topbar">
+      <div>
+        <h1>🏋️ My Workouts</h1>
+        <p>Your workout history</p>
       </div>
+      <div class="pill" id="statusTop">⏳ Loading...</div>
+    </div>
 
-      <div id="msg" style="margin:14px 0;"></div>
+    <div id="msg"></div>
 
-      <div class="table-wrap">
-        <table>
-          <thead>
-            <tr>
-              <th style="width:60px;">#</th>
-              <th>Workout</th>
-              <th style="width:140px;">Level</th>
-              <th style="width:140px;">Duration</th>
-              <th style="width:140px;">Calories</th>
-              <th style="width:140px;">Status</th>
-              <th style="width:220px;">Date</th>
-            </tr>
-          </thead>
-          <tbody id="rows">
-            <tr><td colspan="7">Loading...</td></tr>
-          </tbody>
-        </table>
-      </div>
-    </main>
+    <div class="card">
+      <table>
+        <thead>
+          <tr>
+            <th>#</th>
+            <th>🏷️ Workout</th>
+            <th>🎚️ Level</th>
+            <th>⏱️ Duration</th>
+            <th>🔥 Calories</th>
+            <th>✅ Status</th>
+            <th>📅 Date</th>
+            <th>🎥 Video</th>
+          </tr>
+        </thead>
+        <tbody id="rows">
+          <tr><td colspan="8">Loading...</td></tr>
+        </tbody>
+      </table>
+    </div>
 
-  </div>
+  </main>
+</div>
 
 <script>
-  const API_BASE = "../../backend";
+  // ✅ IMPORTANT: Your project folder is SMART_FIT (CAPS)
+  const API_BASE = "/SMART_FIT/backend";
 
-  const msgEl = document.getElementById("msg");
   const rowsEl = document.getElementById("rows");
   const statusTop = document.getElementById("statusTop");
+  const msgEl = document.getElementById("msg");
 
-  // Sidebar name (same as workouts.html method)
-  const savedName = localStorage.getItem("loggedUserName") || "Member";
-  document.getElementById("helloName").textContent = savedName;
+  document.getElementById("helloName").textContent =
+    localStorage.getItem("loggedUserName") || "Member";
 
-  function showMsg(html, type="warn"){
-    if(!html){ msgEl.innerHTML=""; return; }
-    const cls = (type==="error") ? "alert error" : "alert";
-    msgEl.innerHTML = `<div class="${cls}">${html}</div>`;
+  function showMsg(text,type="warn"){
+    if(!text){ msgEl.innerHTML=""; return; }
+    msgEl.innerHTML = `<div class="${type==='error'?'alert error':'alert'}">${text}</div>`;
   }
 
   async function safeJson(res){
-    const txt = await res.text();
-    try { return JSON.parse(txt); }
+    const t = await res.text();
+    // If backend returns HTML 404, show it clearly
+    try { return JSON.parse(t); }
     catch(e){
-      console.error("JSON parse failed:", txt);
-      throw new Error("Invalid JSON");
+      throw new Error(t);
     }
   }
 
-  function esc(s) {
-    return String(s ?? "")
+  function esc(s){
+    return (s ?? "").toString()
       .replaceAll("&","&amp;")
       .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;")
-      .replaceAll("'","&#039;");
+      .replaceAll(">","&gt;");
   }
 
-  function badge(status){
-    const s = String(status || "").toLowerCase();
-    if (s === "completed") return `<span class="badge badge-completed">completed</span>`;
-    return `<span class="badge badge-started">${esc(status || "started")}</span>`;
+  function statusBadge(st){
+    const s = (st||"").toLowerCase();
+    if(s === "completed") return `<span class="badge b-completed">✅ completed</span>`;
+    if(s === "started") return `<span class="badge b-started">▶️ started</span>`;
+    return `<span class="badge b-assigned">📝 assigned</span>`;
+  }
+
+  function fmtDate(d){
+    if(!d) return "-";
+    return esc(d.replace("T"," ").slice(0,19));
+  }
+
+  function rowHtml(item, idx){
+    const yt = item.youtube_url || "";
+    return `
+      <tr>
+        <td>${idx+1}</td>
+        <td><b>${esc(item.title || "Workout")}</b></td>
+        <td>${esc(item.level || "-")}</td>
+        <td>${esc(item.duration_min || 0)} min</td>
+        <td>${esc(item.calories || 0)} cal</td>
+        <td>${statusBadge(item.status)}</td>
+        <td>${fmtDate(item.date)}</td>
+        <td>
+          ${yt ? `<a class="btn" href="${esc(yt)}" target="_blank">▶️ Watch</a>` : `—`}
+        </td>
+      </tr>
+    `;
   }
 
   async function loadMyWorkouts(){
     try{
+      statusTop.textContent = "⏳ Loading...";
       showMsg("");
-      statusTop.textContent = "Loading...";
 
-      const res = await fetch(`${API_BASE}/get_my_workouts.php`, {
-        method: "GET",
-        credentials: "same-origin"
-      });
-
+      // ✅ This must exist: /SMART_FIT/backend/my_workouts.php
+      const res = await fetch(API_BASE + "/my_workouts.php", { credentials:"include" });
       const data = await safeJson(res);
 
       if(!data.ok){
-        rowsEl.innerHTML = `<tr><td colspan="7">No data</td></tr>`;
-        statusTop.textContent = "Error ❌";
-        showMsg(data.message || "Failed to load workouts", "error");
+        statusTop.textContent = "❌ Error";
+        showMsg("❌ " + (data.message || "Failed"), "error");
+        rowsEl.innerHTML = `<tr><td colspan="8">No data</td></tr>`;
         return;
       }
 
-      const items = Array.isArray(data.items) ? data.items : [];
-      statusTop.textContent = `Loaded ${items.length} ✅`;
+      const items = data.items || [];
+      statusTop.textContent = `✅ Loaded ${items.length}`;
 
-      if(items.length === 0){
-        rowsEl.innerHTML = `<tr><td colspan="7">No workouts yet. Go to Workouts page and Start/Complete one.</td></tr>`;
+      if(!items.length){
+        rowsEl.innerHTML = `<tr><td colspan="8">No workouts yet. Go to 💪 Workouts page and Start/Complete one.</td></tr>`;
         return;
       }
 
-      rowsEl.innerHTML = items.map((it, idx) => `
-        <tr>
-          <td>${idx+1}</td>
-          <td>${esc(it.title)}</td>
-          <td>${esc(it.level || "beginner")}</td>
-          <td>${Number(it.duration_min || 0)} mins</td>
-          <td>${Number(it.calories || 0)} cal</td>
-          <td>${badge(it.status)}</td>
-          <td>${esc(it.date || "")}</td>
-        </tr>
-      `).join("");
+      rowsEl.innerHTML = items.map(rowHtml).join("");
 
-    } catch(err){
-      console.error(err);
-      statusTop.textContent = "Error ❌";
-      showMsg(`Network/JSON error. Check ${API_BASE}/get_my_workouts.php`, "error");
-      rowsEl.innerHTML = `<tr><td colspan="7">Failed to load</td></tr>`;
+    }catch(err){
+      statusTop.textContent = "❌ Error";
+      showMsg("❌ Failed to load: <br><br>" + esc(err.message), "error");
+      rowsEl.innerHTML = `<tr><td colspan="8">No data</td></tr>`;
     }
   }
 
-  // Logout (same as workouts.html)
-  document.getElementById("btnLogout").addEventListener("click", async (e) => {
+  document.getElementById("btnLogout").addEventListener("click", async (e)=>{
     e.preventDefault();
-    try {
-      await fetch(`${API_BASE}/logout.php`, { method:"POST", credentials:"same-origin" });
-    } catch {}
-    localStorage.removeItem("loggedUserName");
-    localStorage.removeItem("loggedUserRole");
-    window.location.href = "../../login.html";
+    await fetch(API_BASE + "/logout.php", { method:"POST", credentials:"include" });
+    window.location.href = "../../index.html";
   });
 
   loadMyWorkouts();
 </script>
+
 </body>
 </html>

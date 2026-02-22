@@ -1,0 +1,103 @@
+:root{
+  --bg:#f6f7fb;
+  --sidebar:#0b1220; --sidebar2:#0f172a;
+  --text:#0f172a; --muted:#6b7280;
+  --card:#ffffff; --line:#e5e7eb;
+}
+
+*{ box-sizing:border-box; }
+body{ background:var(--bg); color:var(--text); }
+.app{ min-height:100vh; }
+
+/* Sidebar */
+.sidebar{
+  width:270px; min-height:100vh; position:sticky; top:0;
+  background:linear-gradient(180deg,var(--sidebar),var(--sidebar2));
+  color:#fff; padding:18px 16px;
+  box-shadow:10px 0 30px rgba(0,0,0,.08);
+  display:flex; flex-direction:column;
+  border-top-right-radius:18px;
+  border-bottom-right-radius:18px;
+}
+.brand{ font-weight:900; font-size:28px; margin-bottom:8px; letter-spacing:.6px; }
+.hello{ color:#cbd5e1; font-size:14px; margin-bottom:16px; }
+
+.nav-item{
+  display:flex; align-items:center; gap:12px;
+  padding:12px 14px; border-radius:14px;
+  color:#e5e7eb; text-decoration:none;
+  margin-bottom:10px; transition:.15s ease;
+  position:relative;
+}
+.nav-item:hover{ background:rgba(255,255,255,.06); color:#fff; }
+
+.nav-item.active{
+  background:rgba(255,255,255,.10);
+  box-shadow: inset 0 0 0 1px rgba(255,255,255,.10);
+  color:#fff;
+}
+.nav-item.active::before{
+  content:"";
+  position:absolute;
+  left:-6px; top:10px;
+  width:4px; height:calc(100% - 20px);
+  border-radius:99px;
+  background:rgba(59,130,246,.95);
+  box-shadow:0 0 18px rgba(59,130,246,.55);
+}
+
+/* Icon chip */
+.nav-ico{
+  width:42px;height:42px;border-radius:14px;
+  display:grid;place-items:center;
+  background:rgba(255,255,255,.08);
+  border:1px solid rgba(255,255,255,.10);
+  flex:0 0 auto;
+}
+.nav-ico i{ font-size:18px; opacity:.98; }
+
+.nav-label{ font-weight:600; letter-spacing:.1px; }
+
+.nav-sep{ border-color:rgba(255,255,255,.12)!important; margin:14px 0; }
+.logout{ color:#fca5a5; }
+.logout:hover{ background:rgba(239,68,68,.12); color:#fecaca; }
+
+/* Footer */
+.sidebar-footer{ margin-top:auto; padding:12px 10px 6px; color:rgba(226,232,240,.75); font-size:12px; }
+.sidebar-footer .mini{ opacity:.8; font-size:11px; }
+
+/* Main area */
+.main{ padding:26px 28px; }
+.subtitle{ color:var(--muted); }
+
+/* Cards */
+.card-soft{
+  background:var(--card);
+  border:1px solid var(--line);
+  border-radius:18px;
+  box-shadow:0 10px 22px rgba(15,23,42,.06);
+}
+.btn-pill{ border-radius:999px; }
+.badge-pill{ border-radius:999px; padding:.35rem .6rem; }
+
+.table td{ vertical-align:middle; }
+.table thead th{ color:var(--muted); font-weight:700; font-size:13px; }
+
+.chip{
+  width:40px;height:40px;border-radius:14px;
+  display:grid;place-items:center;
+  border:1px solid var(--line);
+  background:#f8fafc;
+  color:#111827;
+  font-size:18px;
+}
+.chip-sky{ background:#eff6ff; border-color:#dbeafe; color:#1d4ed8; }
+.chip-green{ background:#ecfdf5; border-color:#bbf7d0; color:#15803d; }
+.chip-amber{ background:#fffbeb; border-color:#fde68a; color:#b45309; }
+.chip-indigo{ background:#eef2ff; border-color:#c7d2fe; color:#4338ca; }
+.chip-cyan{ background:#ecfeff; border-color:#a5f3fc; color:#0e7490; }
+.chip-rose{ background:#fff1f2; border-color:#fecdd3; color:#be123c; }
+.chip-violet{ background:#f5f3ff; border-color:#ddd6fe; color:#6d28d9; }
+.chip-slate{ background:#f1f5f9; border-color:#e2e8f0; color:#334155; }
+
+.mono{font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono","Courier New", monospace;}

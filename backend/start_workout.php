@@ -1,72 +1,41 @@
 <?php
-header("Content-Type: application/json");
 session_start();
-require_once "db.php";
+header("Content-Type: application/json");
 
-if ($_SERVER["REQUEST_METHOD"] !== "POST") {
-  echo json_encode(["ok"=>false, "message"=>"Invalid request"]);
+if (empty($_SESSION["logged_in"]) || ($_SESSION["role"] ?? "") !== "member") {
+  http_response_code(403);
+  echo json_encode(["ok"=>false,"message"=>"Forbidden"]);
   exit;
 }
 
-$user_id = intval($_SESSION["user_id"] ?? 0);
-if ($user_id <= 0) {
-  echo json_encode(["ok"=>false, "message"=>"Not logged in"]);
+require_once __DIR__ . "/db.php";
+$user_id = (int)$_SESSION["user_id"];
+
+$sql = "
+  SELECT
+    uw.workout_id,
+    uw.status,
+    COALESCE(uw.completed_at, uw.started_at, uw.assigned_at, uw.created_at) AS date,
+    w.title, w.level, w.duration_min, w.calories
+  FROM user_workouts uw
+  JOIN workouts w ON w.id = uw.workout_id
+  WHERE uw.user_id=?
+  ORDER BY COALESCE(uw.completed_at, uw.started_at, uw.assigned_at, uw.created_at) DESC
+";
+
+$stmt = $conn->prepare($sql);
+if(!$stmt){
+  echo json_encode(["ok"=>false,"message"=>"Prepare failed: ".$conn->error]);
   exit;
 }
+$stmt->bind_param("i", $user_id);
+$stmt->execute();
+$res = $stmt->get_result();
 
-/*
-  ✅ Accept BOTH:
-  1) FormData -> $_POST['workout_id']
-  2) JSON body -> php://input
-*/
-$workout_id = 0;
-
-if (isset($_POST["workout_id"])) {
-  $workout_id = intval($_POST["workout_id"]);
-} else {
-  $raw = file_get_contents("php://input");
-  $body = json_decode($raw, true);
-  $workout_id = intval($body["workout_id"] ?? 0);
+$items = [];
+while($row = $res->fetch_assoc()){
+  $items[] = $row;
 }
+$stmt->close();
 
-if ($workout_id <= 0) {
-  echo json_encode(["ok"=>false, "message"=>"Missing workout_id"]);
-  exit;
-}
-
-/*
-  ✅ Use correct table: user_workouts (not member_workouts)
-  - if already started -> return ok
-  - else insert started
-*/
-$check = $conn->prepare("
-  SELECT id, status
-  FROM user_workouts
-  WHERE user_id=? AND workout_id=?
-  ORDER BY id DESC
-  LIMIT 1
-");
-$check->bind_param("ii", $user_id, $workout_id);
-$check->execute();
-$res = $check->get_result();
-
-if ($res && $res->num_rows > 0) {
-  $row = $res->fetch_assoc();
-  if ($row["status"] === "started") {
-    echo json_encode(["ok"=>true, "message"=>"Already started ✅"]);
-    exit;
-  }
-}
-
-/* insert as started */
-$stmt = $conn->prepare("
-  INSERT INTO user_workouts (user_id, workout_id, status)
-  VALUES (?, ?, 'started')
-");
-$stmt->bind_param("ii", $user_id, $workout_id);
-
-if ($stmt->execute()) {
-  echo json_encode(["ok"=>true, "message"=>"Workout started ✅"]);
-} else {
-  echo json_encode(["ok"=>false, "message"=>"Insert failed: ".$stmt->error]);
-}
+echo json_encode(["ok"=>true,"items"=>$items]);
