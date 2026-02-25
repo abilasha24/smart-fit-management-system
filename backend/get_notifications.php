@@ -4,28 +4,35 @@ session_start();
 require_once __DIR__ . "/db.php";
 header("Content-Type: application/json; charset=UTF-8");
 
-// member auth
 $role = strtolower(trim($_SESSION["role"] ?? ""));
-if (!isset($_SESSION["user_id"]) || $role !== "member") {
+$user_id = (int)($_SESSION["user_id"] ?? 0);
+
+if ($user_id <= 0 || !in_array($role, ["member","trainer","admin"])) {
   http_response_code(401);
   echo json_encode(["ok"=>false, "message"=>"Login required"]);
   exit;
 }
-$user_id = (int)$_SESSION["user_id"];
 
-// list notifications
+// Optional query: ?limit=20
+$limit = (int)($_GET["limit"] ?? 50);
+if ($limit <= 0) $limit = 50;
+if ($limit > 200) $limit = 200;
+
 $sql = "
-SELECT id, title, message, is_read, created_at
-FROM notifications
-WHERE user_id=?
-ORDER BY created_at DESC, id DESC
+  SELECT id, title, message, is_read, created_at
+  FROM notifications
+  WHERE user_id=?
+  ORDER BY created_at DESC, id DESC
+  LIMIT ?
 ";
+
 $stmt = $conn->prepare($sql);
 if(!$stmt){
   echo json_encode(["ok"=>false, "message"=>"SQL prepare failed", "error"=>$conn->error]);
   exit;
 }
-$stmt->bind_param("i", $user_id);
+
+$stmt->bind_param("ii", $user_id, $limit);
 $stmt->execute();
 $res = $stmt->get_result();
 

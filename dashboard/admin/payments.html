@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Payments | Smart Fit</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body{background:#f6f7fb}
+    .sidebar{width:260px;min-height:100vh;background:#111827;color:#fff}
+    .sidebar a{color:#cbd5e1;text-decoration:none;display:block;padding:10px 14px;border-radius:10px}
+    .sidebar a:hover,.sidebar a.active{background:#1f2937;color:#fff}
+    .brand{font-weight:700;letter-spacing:.5px}
+    .card-soft{border:0;border-radius:16px;box-shadow:0 6px 18px rgba(17,24,39,.08)}
+    .muted{color:#6b7280}
+    .table thead th{font-size:.85rem;color:#6b7280;font-weight:600}
+  </style>
+</head>
+<body>
+
+<div class="d-flex">
+  <aside class="sidebar p-3">
+    <div class="brand fs-5 mb-3">SMART FIT • Admin</div>
+    <div class="small text-white-50 mb-3">Control Center</div>
+
+    <a href="dashboard.html">Dashboard</a>
+    <a href="users.html">Manage Users</a>
+    <a href="trainers.html">Manage Trainers</a>
+    <a href="workouts.html">Manage Workouts</a>
+    <a class="active" href="payments.html">Payments</a>
+    <a href="feedback.html">Feedback</a>
+    <a href="../../index.html">← Back to Home</a>
+
+    <hr class="border-secondary my-3"/>
+    <button id="btnLogout" class="btn btn-outline-light w-100">Logout</button>
+  </aside>
+
+  <main class="flex-grow-1 p-4">
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <div>
+        <h3 class="mb-0">Payments</h3>
+        <div class="muted">Track revenue and subscriptions</div>
+      </div>
+      <div class="small muted">Role: admin</div>
+    </div>
+
+    <!-- summary cards -->
+    <div class="row g-3 mb-3">
+      <div class="col-md-3">
+        <div class="card card-soft p-3">
+          <div class="muted small">Total Revenue</div>
+          <div class="fs-4 fw-bold" id="sTotalRev">—</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-soft p-3">
+          <div class="muted small">This Month</div>
+          <div class="fs-4 fw-bold" id="sMonthRev">—</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-soft p-3">
+          <div class="muted small">Paid Transactions</div>
+          <div class="fs-4 fw-bold" id="sPaidTx">—</div>
+        </div>
+      </div>
+      <div class="col-md-3">
+        <div class="card card-soft p-3">
+          <div class="muted small">Active Members</div>
+          <div class="fs-4 fw-bold" id="sActive">—</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- filters (Month + Status + Plan + Search) -->
+    <div class="card card-soft p-3 mb-3">
+      <div class="row g-2 align-items-center">
+        <div class="col-md-4">
+          <input id="txtQ" class="form-control" placeholder="Search by email / method / cycle / plan..." />
+        </div>
+
+        <div class="col-md-2">
+          <select id="selMonth" class="form-select">
+            <option value="all">All months</option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <select id="selStatus" class="form-select">
+            <option value="all">All status</option>
+            <option value="paid">paid</option>
+            <option value="free">free</option>
+          </select>
+        </div>
+
+        <div class="col-md-2">
+          <select id="selPlan" class="form-select">
+            <option value="all">All plans</option>
+            <option value="basic">basic</option>
+            <option value="premium">premium</option>
+            <option value="pro">pro</option>
+          </select>
+        </div>
+
+        <div class="col-md-1 d-grid">
+          <button id="btnSearch" class="btn btn-dark">Go</button>
+        </div>
+
+        <div class="col-md-1 d-grid">
+          <button id="btnReset" class="btn btn-outline-dark">Reset</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card card-soft p-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="fw-semibold">Payment Records</div>
+        <div class="small muted" id="lblCount">—</div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>User</th>
+              <th>Plan</th>
+              <th>Cycle</th>
+              <th>Method</th>
+              <th>Status</th>
+              <th class="text-end">Amount</th>
+              <th>Created</th>
+            </tr>
+          </thead>
+          <tbody id="tbPay">
+            <tr><td colspan="8" class="text-center muted py-4">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="msg" class="mt-2"></div>
+    </div>
+
+  </main>
+</div>
+
+<script>
+  const BASE = "../../";
+
+  async function guardAdmin() {
+    const r = await fetch(BASE + "backend/check_auth.php", { credentials:"include" });
+    if (r.status === 401) { location.href = BASE + "login.html"; return false; }
+    const data = await r.json();
+    if ((data.role || "") !== "admin") {
+      if (data.role === "trainer") location.href = BASE + "dashboard/trainer/dashboard.html";
+      else location.href = BASE + "dashboard/member/dashboard.html";
+      return false;
+    }
+    return true;
+  }
+
+  async function logout() {
+    await fetch(BASE + "backend/logout.php", { credentials:"include" }).catch(()=>{});
+    location.href = BASE + "login.html";
+  }
+
+  function esc(s){ return String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+  function money(x){ return "LKR " + Number(x || 0).toFixed(2); }
+
+  function badgeStatus(st){
+    const s = (st||"").toLowerCase();
+    if (s === "paid") return `<span class="badge text-bg-success">paid</span>`;
+    if (s === "free") return `<span class="badge text-bg-secondary">free</span>`;
+    return `<span class="badge text-bg-light text-dark">${esc(st)}</span>`;
+  }
+
+  function fillMonths(months){
+    const sel = document.getElementById("selMonth");
+    const keep = sel.value || "all";
+    sel.innerHTML =
+      `<option value="all">All months</option>` +
+      (months||[]).map(m => `<option value="${esc(m)}">${esc(m)}</option>`).join("");
+    sel.value = (months||[]).includes(keep) ? keep : "all";
+  }
+
+  // OPTIONAL: If you already have this endpoint, it will show Active Members
+  async function loadActiveMembersCard(){
+    try{
+      const r = await fetch(BASE + "backend/admin_get_revenue_stats.php", { credentials:"include" });
+      const data = await r.json();
+      if (data && data.ok && data.stats && data.stats.active_members != null) {
+        document.getElementById("sActive").textContent = data.stats.active_members;
+      } else {
+        document.getElementById("sActive").textContent = "—";
+      }
+    }catch(e){
+      document.getElementById("sActive").textContent = "—";
+    }
+  }
+
+  async function loadPayments(){
+    const q = document.getElementById("txtQ").value.trim();
+    const plan = document.getElementById("selPlan").value;
+    const month = document.getElementById("selMonth").value;
+    const status = document.getElementById("selStatus").value;
+
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (plan && plan !== "all") params.set("plan", plan);
+    if (month && month !== "all") params.set("month", month);
+    if (status && status !== "all") params.set("status", status);
+
+    const url = BASE + "backend/admin_get_payments.php" + (params.toString() ? ("?" + params.toString()) : "");
+    const tb = document.getElementById("tbPay");
+    tb.innerHTML = `<tr><td colspan="8" class="text-center muted py-4">Loading…</td></tr>`;
+
+    const r = await fetch(url, { credentials:"include" });
+    const data = await r.json().catch(()=>({ok:false}));
+
+    if (!data.ok) {
+      tb.innerHTML = `<tr><td colspan="8" class="text-center text-danger py-4">Failed to load</td></tr>`;
+      return;
+    }
+
+    // Cards from this endpoint
+    const s = data.stats || {};
+    document.getElementById("sTotalRev").textContent = money(s.total_revenue);
+    document.getElementById("sMonthRev").textContent = money(s.this_month_revenue);
+    document.getElementById("sPaidTx").textContent = s.paid_transactions ?? "0";
+
+    // Months dropdown
+    fillMonths(data.months || []);
+
+    const rows = data.payments || [];
+    document.getElementById("lblCount").textContent = `${rows.length} record(s)`;
+
+    if (!rows.length){
+      tb.innerHTML = `<tr><td colspan="8" class="text-center muted py-4">No records</td></tr>`;
+      return;
+    }
+
+    tb.innerHTML = rows.map(p => `
+      <tr>
+        <td>${esc(p.id)}</td>
+        <td>
+          <div class="fw-semibold">${esc(p.user_email)}</div>
+          <div class="small muted">User ID: ${esc(p.user_id)}</div>
+        </td>
+        <td><span class="badge text-bg-dark">${esc(p.plan)}</span></td>
+        <td>${esc(p.billing_cycle)}</td>
+        <td>${esc(p.payment_method)}</td>
+        <td>${badgeStatus(p.status)}</td>
+        <td class="text-end fw-semibold">${money(p.amount)}</td>
+        <td class="small muted">${esc(p.created_at)}</td>
+      </tr>
+    `).join("");
+  }
+
+  document.getElementById("btnLogout").addEventListener("click", logout);
+  document.getElementById("btnSearch").addEventListener("click", loadPayments);
+  document.getElementById("btnReset").addEventListener("click", ()=>{
+    document.getElementById("txtQ").value = "";
+    document.getElementById("selPlan").value = "all";
+    document.getElementById("selMonth").value = "all";
+    document.getElementById("selStatus").value = "all";
+    loadPayments();
+  });
+
+  // Optional: instant filter on Enter key
+  document.getElementById("txtQ").addEventListener("keydown", (e)=>{
+    if (e.key === "Enter") loadPayments();
+  });
+
+  (async ()=>{
+    const ok = await guardAdmin();
+    if (!ok) return;
+    await loadActiveMembersCard(); // safe optional
+    await loadPayments();
+  })();
+</script>
+
+</body>
+</html>

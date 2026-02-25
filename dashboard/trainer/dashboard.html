@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Trainer Dashboard | Smart Fit</title>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
   <link rel="stylesheet" href="trainer_layout.css">
@@ -12,6 +13,7 @@
 <body data-active="dashboard">
 <div class="app d-flex">
 
+  <!-- Sidebar -->
   <aside class="sidebar">
     <div class="brand">SMART FIT</div>
     <div class="hello">Hi, <span id="trainerName">trainer</span></div>
@@ -56,12 +58,22 @@
       <span class="nav-label">Schedule</span>
     </a>
 
+    <!-- ✅ Notifications (badge auto-updates via trainer_layout.js) -->
+    <a class="nav-item" data-key="notifications" href="notifications.html">
+      <span class="nav-ico chip-amber">
+        <i class="bi bi-bell"></i>
+        <span id="notifBadge">0</span>
+      </span>
+      <span class="nav-label">Notifications</span>
+    </a>
+
     <a class="nav-item" data-key="back" href="../../index.html">
       <span class="nav-ico chip-slate"><i class="bi bi-globe"></i></span>
       <span class="nav-label">Back to Website</span>
     </a>
 
     <hr class="nav-sep">
+
     <a class="nav-item logout" href="#" id="btnLogout">
       <span class="nav-ico" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.18)">
         <i class="bi bi-box-arrow-right"></i>
@@ -75,7 +87,9 @@
     </div>
   </aside>
 
+  <!-- Main -->
   <main class="main flex-grow-1">
+
     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
       <div>
         <h3 class="mb-1 d-flex align-items-center gap-2">
@@ -87,6 +101,7 @@
       <span class="badge text-bg-dark badge-pill" id="rolePill">Role: Trainer</span>
     </div>
 
+    <!-- Stats -->
     <div class="row g-3 mt-2">
       <div class="col-md-3">
         <div class="card-soft p-3">
@@ -96,6 +111,7 @@
           <div class="fs-2 fw-bold" id="stMembers">0</div>
         </div>
       </div>
+
       <div class="col-md-3">
         <div class="card-soft p-3">
           <div class="subtitle d-flex align-items-center gap-2">
@@ -104,6 +120,7 @@
           <div class="fs-2 fw-bold" id="stActive">0</div>
         </div>
       </div>
+
       <div class="col-md-3">
         <div class="card-soft p-3">
           <div class="subtitle d-flex align-items-center gap-2">
@@ -112,6 +129,7 @@
           <div class="fs-2 fw-bold" id="stCompleted">0</div>
         </div>
       </div>
+
       <div class="col-md-3">
         <div class="card-soft p-3">
           <div class="subtitle d-flex align-items-center gap-2">
@@ -122,10 +140,12 @@
       </div>
     </div>
 
+    <!-- Quick Actions + Recent -->
     <div class="row g-3 mt-2">
       <div class="col-lg-5">
         <div class="card-soft p-3">
           <div class="fw-bold mb-2"><i class="bi bi-lightning-charge me-2"></i>Quick Actions</div>
+
           <div class="d-flex flex-wrap gap-2">
             <a class="btn btn-dark btn-pill" href="members.html"><i class="bi bi-people me-2"></i>Members</a>
             <a class="btn btn-outline-dark btn-pill" href="manage_workouts.html"><i class="bi bi-activity me-2"></i>Workouts</a>
@@ -134,7 +154,9 @@
             <a class="btn btn-outline-dark btn-pill" href="nutrition.html"><i class="bi bi-apple me-2"></i>Nutrition</a>
             <a class="btn btn-outline-dark btn-pill" href="schedule.html"><i class="bi bi-calendar2-week me-2"></i>Schedule</a>
             <a class="btn btn-outline-dark btn-pill" href="profile.html"><i class="bi bi-person me-2"></i>Profile</a>
+            <a class="btn btn-outline-dark btn-pill" href="notifications.html"><i class="bi bi-bell me-2"></i>Notifications</a>
           </div>
+
           <div class="subtitle mt-2" style="font-size:14px;">Tip: YouTube links add பண்ணினா member learning easy.</div>
         </div>
       </div>
@@ -142,19 +164,28 @@
       <div class="col-lg-7">
         <div class="card-soft p-3">
           <div class="fw-bold mb-2"><i class="bi bi-clock-history me-2"></i>Recent Assignments</div>
+
           <div class="table-responsive">
             <table class="table table-sm mb-0">
-              <thead><tr><th>Member</th><th>Workout</th><th>Status</th><th>Date</th></tr></thead>
+              <thead>
+                <tr>
+                  <th>Member</th>
+                  <th>Workout</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
               <tbody id="recentRows">
                 <tr><td colspan="4" class="subtitle">Loading...</td></tr>
               </tbody>
             </table>
           </div>
+
         </div>
       </div>
     </div>
 
-    <!-- ✅ NEW: Meal Plan Adherence -->
+    <!-- Meal Plan Adherence -->
     <div class="row g-3 mt-2">
       <div class="col-12">
         <div class="card-soft p-3">
@@ -172,7 +203,7 @@
             </div>
           </div>
 
-          <div id="mealAdhereBox" class="subtitle mt-3">Loading...</div>
+          <div id="mealAdhereBox" class="mt-3 subtitle">Loading...</div>
         </div>
       </div>
     </div>
@@ -180,134 +211,200 @@
   </main>
 </div>
 
+<!-- layout js -->
 <script src="trainer_layout.js"></script>
-<script src="trainer_layout.js"></script>
+
 <script>
-  const API = "../../backend/";
+/** ✅ Use only ONE base const (avoid "API already declared") */
+const API_BASE = (window.API && typeof window.API === "string" && window.API.trim() !== "")
+  ? window.API
+  : "/SMART_FIT/backend/";
 
-  function esc(s){
-    return String(s??"")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;");
+function esc(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+async function safeJson(res){
+  const txt = await res.text();
+  try { return JSON.parse(txt); }
+  catch {
+    console.log("❌ Invalid JSON from:", res.url);
+    console.log(txt);
+    return { ok:false, message:"Invalid JSON" };
   }
+}
 
-  function badge(status){
-    const s = String(status||"").toLowerCase();
-    if(s==="completed") return `<span class="badge text-bg-success badge-pill">completed</span>`;
-    return `<span class="badge text-bg-secondary badge-pill">${esc(status||"started")}</span>`;
-  }
+function badge(status){
+  const s = String(status || "assigned").toLowerCase();
+  if(s === "completed") return `<span class="badge text-bg-success badge-pill">completed</span>`;
+  if(s === "started")   return `<span class="badge text-bg-primary badge-pill">started</span>`;
+  return `<span class="badge text-bg-warning badge-pill text-dark">assigned</span>`;
+}
 
-  async function loadStats(){
-    const r = await fetch(API+"trainer_get_stats.php",{credentials:"include"});
-    const d = await r.json().catch(()=>({ok:false}));
-    if(!d.ok) return;
-    stMembers.textContent   = d.total_members ?? 0;
-    stActive.textContent    = d.active_assignments ?? 0;
-    stCompleted.textContent = d.completed_workouts ?? 0;
-    stWorkouts.textContent  = d.total_workouts ?? 0;
-  }
+function setCardError(){
+  document.getElementById("stMembers").textContent   = "—";
+  document.getElementById("stActive").textContent    = "—";
+  document.getElementById("stCompleted").textContent = "—";
+  document.getElementById("stWorkouts").textContent  = "—";
+}
 
-  async function loadRecent(){
-    const r = await fetch(API+"trainer_recent_assignments.php",{credentials:"include"});
-    const d = await r.json().catch(()=>({ok:false}));
+/** ---------- Stats ---------- */
+async function loadStats(){
+  try{
+    const r = await fetch(API_BASE + "trainer_get_stats.php", {
+      credentials:"include",
+      cache:"no-store"
+    });
+    const d = await safeJson(r);
+
     if(!d.ok){
-      recentRows.innerHTML = `<tr><td colspan="4" class="text-danger">Failed</td></tr>`;
+      console.log("Stats API failed:", d);
+      setCardError();
       return;
     }
-    const items = d.items || [];
+
+    document.getElementById("stMembers").textContent   = d.total_members ?? 0;
+    document.getElementById("stActive").textContent    = d.active_assignments ?? 0;
+    document.getElementById("stCompleted").textContent = d.completed_workouts ?? 0;
+    document.getElementById("stWorkouts").textContent  = d.total_workouts ?? 0;
+
+  }catch(err){
+    console.error("Stats error", err);
+    setCardError();
+  }
+}
+
+/** ---------- Recent Assignments ---------- */
+async function loadRecent(){
+  const recentRows = document.getElementById("recentRows");
+
+  try{
+    const r = await fetch(API_BASE + "trainer_recent_assignments.php", {
+      credentials:"include",
+      cache:"no-store"
+    });
+    const d = await safeJson(r);
+
+    if(!d.ok){
+      recentRows.innerHTML = `<tr><td colspan="4" class="text-danger">${esc(d.message || "Failed")}</td></tr>`;
+      return;
+    }
+
+    const items = Array.isArray(d.items) ? d.items : [];
     if(!items.length){
       recentRows.innerHTML = `<tr><td colspan="4" class="subtitle">No recent records</td></tr>`;
       return;
     }
-    recentRows.innerHTML = items.map(it=>`
+
+    recentRows.innerHTML = items.map(it => `
       <tr>
-        <td>
-          <div class="fw-bold">${esc(it.member_name||"")}</div>
-          <div class="subtitle" style="font-size:12px">${esc(it.member_email||"")}</div>
-        </td>
-        <td>
-          <div class="fw-bold">${esc(it.workout_title||"")}</div>
-          <div class="subtitle" style="font-size:12px">${esc(it.level||"")}</div>
-        </td>
+        <td><div class="fw-bold">${esc(it.member_name || it.member_email || "")}</div></td>
+        <td><div class="fw-bold">${esc(it.workout_title || "")}</div></td>
         <td>${badge(it.status)}</td>
-        <td>${esc(it.date||"")}</td>
+        <td>${esc(it.assigned_at || "")}</td>
       </tr>
     `).join("");
+
+  }catch(err){
+    console.error("Recent error", err);
+    recentRows.innerHTML = `<tr><td colspan="4" class="text-danger">Network/JS error (see Console)</td></tr>`;
   }
+}
 
-  async function loadMealAdherence(){
-    const box = document.getElementById("mealAdhereBox");
-    if(!box) return;
-    box.textContent = "Loading...";
+/** ---------- Meal Adherence ---------- */
+function pctBadge(p){
+  const n = Number(p || 0);
+  if(n >= 70) return `<span class="badge text-bg-success">${n}%</span>`;
+  if(n >= 30) return `<span class="badge text-bg-warning text-dark">${n}%</span>`;
+  return `<span class="badge text-bg-danger">${n}%</span>`;
+}
 
-    const q = (document.getElementById("mealQ")?.value || "").trim();
-    const url = API + "trainer_meal_adherence.php?limit=8" + (q ? ("&q="+encodeURIComponent(q)) : "");
+function todayBadge(ok){
+  return ok
+    ? `<span class="badge text-bg-success">Today ✓</span>`
+    : `<span class="badge text-bg-secondary">Today ✗</span>`;
+}
 
-    const r = await fetch(url, { credentials:"include" });
-    const d = await r.json().catch(()=>({ok:false}));
+async function loadMealAdherence(){
+  const box = document.getElementById("mealAdhereBox");
+  const q = (document.getElementById("mealQ").value || "").trim().toLowerCase();
+
+  try{
+    box.innerHTML = `Loading...`;
+
+    const params = new URLSearchParams();
+    params.set("limit", "8");
+    if(q) params.set("q", q);
+
+    const r = await fetch(API_BASE + "trainer_meal_adherence.php?" + params.toString(), {
+      credentials:"include",
+      cache:"no-store"
+    });
+    const d = await safeJson(r);
 
     if(!d.ok){
-      box.innerHTML = `<div class="text-danger">Failed: ${esc(d.message || "API error")}</div>`;
+      box.innerHTML = `<div class="text-danger">${esc(d.message || "Failed")}</div>`;
       return;
     }
 
-    const items = d.items || [];
+    const items = Array.isArray(d.items) ? d.items : [];
     if(!items.length){
-      box.innerHTML = `<div class="subtitle">No adherence logs yet</div>`;
+      box.innerHTML = `<div class="subtitle">No data</div>`;
       return;
     }
 
     box.innerHTML = `
       <div class="table-responsive">
-        <table class="table align-middle mb-0">
+        <table class="table table-sm mb-0">
           <thead>
-            <tr class="small text-muted">
+            <tr>
               <th>Member</th>
-              <th class="text-center">Last 7</th>
-              <th class="text-center">Rate</th>
-              <th class="text-center">Today</th>
-              <th class="text-end">Last Follow</th>
+              <th>Email</th>
+              <th>Last 7 Days</th>
+              <th>Adherence</th>
+              <th>Today</th>
+              <th>Last Follow</th>
             </tr>
           </thead>
           <tbody>
-            ${items.map(m=>`
+            ${items.map(it => `
               <tr>
-                <td>
-                  <div class="fw-semibold">${esc(m.name)}</div>
-                  <div class="small text-muted">${esc(m.email)}</div>
-                </td>
-                <td class="text-center">
-                  <span class="badge rounded-pill text-bg-dark">${m.last7_days}/7</span>
-                </td>
-                <td class="text-center">
-                  <div class="progress" style="height:8px;">
-                    <div class="progress-bar" role="progressbar" style="width:${m.adherence_pct}%;"></div>
-                  </div>
-                  <div class="small text-muted mt-1">${m.adherence_pct}%</div>
-                </td>
-                <td class="text-center">
-                  ${m.followed_today ? `<span class="badge rounded-pill text-bg-success">Yes</span>` : `<span class="badge rounded-pill text-bg-secondary">No</span>`}
-                </td>
-                <td class="text-end small text-muted">${esc(m.last_follow_date || "-")}</td>
+                <td class="fw-bold">${esc(it.name || "Member")}</td>
+                <td class="subtitle">${esc(it.email || "")}</td>
+                <td>${esc(it.last7_days ?? 0)}</td>
+                <td>${pctBadge(it.adherence_pct)}</td>
+                <td>${todayBadge(!!it.followed_today)}</td>
+                <td class="subtitle">${esc(it.last_follow_date || "-")}</td>
               </tr>
             `).join("")}
           </tbody>
         </table>
       </div>
     `;
-  }
 
-  document.getElementById("btnMealReload")?.addEventListener("click", loadMealAdherence);
-  document.getElementById("mealQ")?.addEventListener("keyup", (e)=>{
+  }catch(err){
+    console.error("Meal adherence error", err);
+    box.innerHTML = `<div class="text-danger">Network/JS error (see Console)</div>`;
+  }
+}
+
+/** ---------- Init ---------- */
+window.addEventListener("DOMContentLoaded", () => {
+  loadStats();
+  loadRecent();
+  loadMealAdherence();
+
+  document.getElementById("btnMealReload").addEventListener("click", () => loadMealAdherence());
+  document.getElementById("mealQ").addEventListener("keydown", (e) => {
     if(e.key === "Enter") loadMealAdherence();
   });
-
-  (async()=>{
-    loadStats();
-    loadRecent();
-    loadMealAdherence();
-  })();
+});
 </script>
+
 </body>
 </html>

@@ -1,670 +1,338 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>User Management - Admin | Smart Fit</title>
-    
-    <!-- Bootstrap 5 CSS -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    
-    <!-- Font Awesome Icons -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- DataTables CSS -->
-    <link rel="stylesheet" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap5.min.css">
-    
-    <!-- Custom CSS -->
-    <link rel="stylesheet" href="../../style.css">
-    <link rel="stylesheet" href="../../shared.css">
-    
-    <style>
-        .user-avatar-sm {
-            width: 35px;
-            height: 35px;
-            border-radius: 50%;
-            object-fit: cover;
-        }
-        
-        .user-role-badge {
-            padding: 3px 10px;
-            border-radius: 15px;
-            font-size: 0.75rem;
-            font-weight: 500;
-        }
-        
-        .role-member {
-            background: rgba(76, 175, 80, 0.1);
-            color: #4CAF50;
-        }
-        
-        .role-trainer {
-            background: rgba(255, 107, 53, 0.1);
-            color: #FF6B35;
-        }
-        
-        .role-admin {
-            background: rgba(33, 150, 243, 0.1);
-            color: #2196F3;
-        }
-        
-        .status-active {
-            color: #4CAF50;
-        }
-        
-        .status-inactive {
-            color: #f44336;
-        }
-        
-        .status-pending {
-            color: #ff9800;
-        }
-        
-        .quick-stats {
-            background: white;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 30px;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
-        }
-        
-        .search-box {
-            position: relative;
-        }
-        
-        .search-box input {
-            padding-left: 40px;
-        }
-        
-        .search-box i {
-            position: absolute;
-            left: 15px;
-            top: 50%;
-            transform: translateY(-50%);
-            color: #6c757d;
-        }
-        
-        .user-actions {
-            display: flex;
-            gap: 5px;
-        }
-        
-        .btn-action {
-            width: 35px;
-            height: 35px;
-            padding: 0;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Manage Users | Smart Fit</title>
+
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <style>
+    body{background:#f6f7fb}
+
+    .sidebar{width:260px;min-height:100vh;background:#111827;color:#fff}
+    .sidebar a{color:#cbd5e1;text-decoration:none;display:block;padding:10px 14px;border-radius:10px}
+    .sidebar a:hover,.sidebar a.active{background:#1f2937;color:#fff}
+
+    .brand{font-weight:700;letter-spacing:.5px;display:flex;align-items:center;gap:10px}
+    .brand-mark{
+      width:34px;height:34px;border-radius:12px;
+      background:linear-gradient(135deg,#16a34a,#22c55e);
+      display:flex;align-items:center;justify-content:center;
+      box-shadow:0 6px 18px rgba(34,197,94,.25);
+    }
+    .brand-mark i{color:#fff;font-size:18px}
+
+    .nav-ico{width:22px;display:inline-flex;justify-content:center;margin-right:10px}
+
+    .card-soft{border:0;border-radius:16px;box-shadow:0 6px 18px rgba(17,24,39,.08)}
+    .muted{color:#6b7280}
+
+    .table thead th{font-size:.85rem;color:#6b7280;font-weight:600}
+
+    .badge-soft{font-size:.75rem;padding:.35rem .55rem;border-radius:999px}
+
+    .page-title{display:flex;align-items:center;gap:10px}
+    .btn i{margin-right:6px}
+  </style>
 </head>
 <body>
-    <div class="dashboard-container">
-        <!-- Sidebar (Same as admin/index.html) -->
-        <div class="dashboard-sidebar">
-            <div class="sidebar-header">
-                <a href="../../index.html" class="sidebar-brand">
-                    <i class="fas fa-dumbbell"></i>
-                    <span class="menu-text">Smart Fit</span>
-                </a>
-                <small class="text-muted d-block mt-2">Admin Panel</small>
-            </div>
-            
-            <div class="sidebar-menu">
-                <ul>
-                    <li>
-                        <a href="index.html">
-                            <i class="fas fa-tachometer-alt"></i>
-                            <span class="menu-text">Dashboard</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="users.html" class="active">
-                            <i class="fas fa-users"></i>
-                            <span class="menu-text">Users</span>
-                            <span class="badge bg-danger ms-auto">24</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="payment.html">
-                            <i class="fas fa-credit-card"></i>
-                            <span class="menu-text">Payments</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fas fa-dumbbell"></i>
-                            <span class="menu-text">Workouts</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fas fa-user-tie"></i>
-                            <span class="menu-text">Trainers</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fas fa-chart-line"></i>
-                            <span class="menu-text">Analytics</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="#">
-                            <i class="fas fa-cog"></i>
-                            <span class="menu-text">Settings</span>
-                        </a>
-                    </li>
-                    <li class="mt-4">
-                        <a href="../../index.html">
-                            <i class="fas fa-home"></i>
-                            <span class="menu-text">Main Site</span>
-                        </a>
-                    </li>
-                    <li>
-                        <a href="../../login.html">
-                            <i class="fas fa-sign-out-alt"></i>
-                            <span class="menu-text">Logout</span>
-                        </a>
-                    </li>
-                </ul>
-            </div>
-        </div>
-        
-        <!-- Main Content -->
-        <div class="dashboard-main">
-            <!-- Header -->
-            <header class="dashboard-header">
-                <div class="header-left">
-                    <button class="sidebar-toggle" id="sidebarToggle">
-                        <i class="fas fa-bars"></i>
-                    </button>
-                    <h4 class="mb-0">User Management</h4>
-                </div>
-                
-                <div class="header-right">
-                    <button class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addUserModal">
-                        <i class="fas fa-user-plus me-2"></i> Add New User
-                    </button>
-                </div>
-            </header>
-            
-            <!-- Content Area -->
-            <main class="dashboard-content">
-                <!-- Quick Stats -->
-                <div class="quick-stats">
-                    <div class="row g-4">
-                        <div class="col-md-3">
-                            <div class="text-center">
-                                <h3 class="text-primary">1,524</h3>
-                                <p class="text-muted mb-0">Total Users</p>
-                                <small class="text-success">+12 this week</small>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="text-center">
-                                <h3 class="text-success">1,420</h3>
-                                <p class="text-muted mb-0">Members</p>
-                                <small class="text-success">85% of total</small>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="text-center">
-                                <h3 class="text-warning">85</h3>
-                                <p class="text-muted mb-0">Trainers</p>
-                                <small class="text-success">+5 this month</small>
-                            </div>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="text-center">
-                                <h3 class="text-info">3</h3>
-                                <p class="text-muted mb-0">Admins</p>
-                                <small class="text-muted">System administrators</small>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Filters and Search -->
-                <div class="dashboard-card mb-4">
-                    <div class="row g-3 align-items-center">
-                        <div class="col-md-3">
-                            <div class="search-box">
-                                <i class="fas fa-search"></i>
-                                <input type="text" class="form-control-dashboard" placeholder="Search users...">
-                            </div>
-                        </div>
-                        <div class="col-md-2">
-                            <select class="form-control-dashboard">
-                                <option>All Roles</option>
-                                <option>Member</option>
-                                <option>Trainer</option>
-                                <option>Admin</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <select class="form-control-dashboard">
-                                <option>All Status</option>
-                                <option>Active</option>
-                                <option>Inactive</option>
-                                <option>Pending</option>
-                            </select>
-                        </div>
-                        <div class="col-md-2">
-                            <select class="form-control-dashboard">
-                                <option>All Plans</option>
-                                <option>Basic</option>
-                                <option>Premium</option>
-                                <option>Pro</option>
-                            </select>
-                        </div>
-                        <div class="col-md-3">
-                            <div class="d-flex gap-2">
-                                <button class="btn btn-primary flex-grow-1">
-                                    <i class="fas fa-filter me-2"></i> Filter
-                                </button>
-                                <button class="btn btn-outline-secondary">
-                                    <i class="fas fa-redo"></i>
-                                </button>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                
-                <!-- Users Table -->
-                <div class="dashboard-card">
-                    <div class="card-body">
-                        <div class="table-responsive">
-                            <table class="table table-hover" id="usersTable">
-                                <thead>
-                                    <tr>
-                                        <th>User</th>
-                                        <th>Email</th>
-                                        <th>Role</th>
-                                        <th>Plan</th>
-                                        <th>Joined</th>
-                                        <th>Status</th>
-                                        <th>Actions</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <!-- User 1 -->
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=50&q=80" 
-                                                     alt="User" class="user-avatar-sm me-3">
-                                                <div>
-                                                    <div class="fw-bold">John Doe</div>
-                                                    <small class="text-muted">ID: USR-001</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>john.doe@example.com</td>
-                                        <td>
-                                            <span class="user-role-badge role-member">Member</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-success">Premium</span>
-                                        </td>
-                                        <td>Oct 15, 2024</td>
-                                        <td>
-                                            <span class="status-active">
-                                                <i class="fas fa-circle me-1"></i> Active
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div class="user-actions">
-                                                <button class="btn btn-action btn-outline-primary" 
-                                                        data-bs-toggle="modal" data-bs-target="#viewUserModal"
-                                                        onclick="viewUser(1)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-outline-success"
-                                                        onclick="editUser(1)">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-outline-danger"
-                                                        onclick="deleteUser(1)">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    
-                                    <!-- User 2 -->
-                                    <tr>
-                                        <td>
-                                            <div class="d-flex align-items-center">
-                                                <img src="https://images.unsplash.com/photo-1494790108755-2616b612b786?ixlib=rb-4.0.3&auto=format&fit=crop&w=50&q=80" 
-                                                     alt="User" class="user-avatar-sm me-3">
-                                                <div>
-                                                    <div class="fw-bold">Sarah Smith</div>
-                                                    <small class="text-muted">ID: USR-002</small>
-                                                </div>
-                                            </div>
-                                        </td>
-                                        <td>sarah.smith@example.com</td>
-                                        <td>
-                                            <span class="user-role-badge role-trainer">Trainer</span>
-                                        </td>
-                                        <td>
-                                            <span class="badge bg-primary">Professional</span>
-                                        </td>
-                                        <td>Oct 10, 2024</td>
-                                        <td>
-                                            <span class="status-active">
-                                                <i class="fas fa-circle me-1"></i> Active
-                                            </span>
-                                        </td>
-                                        <td>
-                                            <div class="user-actions">
-                                                <button class="btn btn-action btn-outline-primary"
-                                                        data-bs-toggle="modal" data-bs-target="#viewUserModal"
-                                                        onclick="viewUser(2)">
-                                                    <i class="fas fa-eye"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-outline-success"
-                                                        onclick="editUser(2)">
-                                                    <i class="fas fa-edit"></i>
-                                                </button>
-                                                <button class="btn btn-action btn-outline-danger"
-                                                        onclick="deleteUser(2)">
-                                                    <i class="fas fa-trash"></i>
-                                                </button>
-                                            </div>
-                                        </td>
-                                    </tr>
-                                    
-                                    <!-- Add more users as needed -->
-                                </tbody>
-                            </table>
-                        </div>
-                        
-                        <!-- Pagination -->
-                        <nav aria-label="User pagination" class="mt-4">
-                            <ul class="pagination justify-content-center">
-                                <li class="page-item disabled">
-                                    <a class="page-link" href="#" tabindex="-1">Previous</a>
-                                </li>
-                                <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                                <li class="page-item"><a class="page-link" href="#">2</a></li>
-                                <li class="page-item"><a class="page-link" href="#">3</a></li>
-                                <li class="page-item">
-                                    <a class="page-link" href="#">Next</a>
-                                </li>
-                            </ul>
-                        </nav>
-                    </div>
-                </div>
-            </main>
-        </div>
-        
-        <!-- Mobile Sidebar Overlay -->
-        <div class="sidebar-overlay" id="sidebarOverlay"></div>
+
+<div class="d-flex">
+  <aside class="sidebar p-3">
+    <div class="brand fs-5 mb-3">
+      <span class="brand-mark"><i class="bi bi-heart-pulse-fill"></i></span>
+      <span>SMART FIT • Admin</span>
     </div>
 
-    <!-- View User Modal -->
-    <div class="modal fade" id="viewUserModal" tabindex="-1">
-        <div class="modal-dialog modal-lg">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">User Details</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="row">
-                        <div class="col-md-4 text-center">
-                            <img src="https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?ixlib=rb-4.0.3&auto=format&fit=crop&w=200&q=80" 
-                                 alt="User" class="rounded-circle mb-3" width="120" height="120">
-                            <h5 id="viewUserName">John Doe</h5>
-                            <p class="text-muted" id="viewUserRole">Member</p>
-                            <div class="mb-3">
-                                <span class="badge bg-success" id="viewUserStatus">Active</span>
-                                <span class="badge bg-primary" id="viewUserPlan">Premium</span>
-                            </div>
-                        </div>
-                        <div class="col-md-8">
-                            <table class="table table-borderless">
-                                <tr>
-                                    <td width="30%"><strong>User ID:</strong></td>
-                                    <td id="viewUserId">USR-001</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Email:</strong></td>
-                                    <td id="viewUserEmail">john.doe@example.com</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Phone:</strong></td>
-                                    <td id="viewUserPhone">+94 77 123 4567</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Joined Date:</strong></td>
-                                    <td id="viewUserJoined">October 15, 2024</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Last Login:</strong></td>
-                                    <td id="viewUserLastLogin">Today, 10:30 AM</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Workouts:</strong></td>
-                                    <td id="viewUserWorkouts">24 completed</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Subscription:</strong></td>
-                                    <td id="viewUserSubscription">Premium (Expires: Nov 15, 2024)</td>
-                                </tr>
-                                <tr>
-                                    <td><strong>Payment Method:</strong></td>
-                                    <td id="viewUserPayment">Visa **** 1234</td>
-                                </tr>
-                            </table>
-                        </div>
-                    </div>
-                    
-                    <!-- Additional Info -->
-                    <div class="mt-4 pt-4 border-top">
-                        <h6>Additional Information</h6>
-                        <div class="row mt-3">
-                            <div class="col-md-6">
-                                <small class="text-muted d-block">Fitness Goals</small>
-                                <span id="viewUserGoals">Weight Loss, Muscle Gain</span>
-                            </div>
-                            <div class="col-md-6">
-                                <small class="text-muted d-block">Preferred Workout Time</small>
-                                <span id="viewUserWorkoutTime">Morning (6 AM - 9 AM)</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Close</button>
-                    <button type="button" class="btn btn-primary">
-                        <i class="fas fa-edit me-2"></i> Edit User
-                    </button>
-                </div>
-            </div>
+    <div class="small text-white-50 mb-3">Control Center</div>
+
+    <a href="dashboard.html"><span class="nav-ico"><i class="bi bi-speedometer2"></i></span>Dashboard</a>
+    <a class="active" href="users.html"><span class="nav-ico"><i class="bi bi-people"></i></span>Manage Users</a>
+    <a href="trainers.html"><span class="nav-ico"><i class="bi bi-person-badge"></i></span>Manage Trainers</a>
+    <a href="workouts.html"><span class="nav-ico"><i class="bi bi-activity"></i></span>Manage Workouts</a>
+    <a href="payments.html"><span class="nav-ico"><i class="bi bi-cash-coin"></i></span>Payments</a>
+    <a href="feedback.html"><span class="nav-ico"><i class="bi bi-chat-left-text"></i></span>Feedback</a>
+    <a href="../../index.html"><span class="nav-ico"><i class="bi bi-arrow-left"></i></span>Back to Home</a>
+
+    <hr class="border-secondary my-3"/>
+    <button id="btnLogout" class="btn btn-outline-light w-100">
+      <i class="bi bi-box-arrow-right"></i> Logout
+    </button>
+  </aside>
+
+  <main class="flex-grow-1 p-4">
+
+    <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
+      <div>
+        <h3 class="mb-0 page-title">
+          <i class="bi bi-people"></i> Manage Users
+        </h3>
+        <div class="muted">
+          <i class="bi bi-sliders"></i>
+          Search / filter and update role, plan & status
         </div>
+      </div>
+      <div class="text-end small muted">
+        <i class="bi bi-shield-check"></i> Role: admin
+      </div>
     </div>
 
-    <!-- Add User Modal -->
-    <div class="modal fade" id="addUserModal" tabindex="-1">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <h5 class="modal-title">Add New User</h5>
-                    <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
-                </div>
-                <div class="modal-body">
-                    <form id="addUserForm">
-                        <div class="form-group mb-3">
-                            <label class="form-label">Full Name</label>
-                            <input type="text" class="form-control-dashboard" placeholder="Enter full name" required>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label class="form-label">Email Address</label>
-                            <input type="email" class="form-control-dashboard" placeholder="Enter email" required>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label class="form-label">Password</label>
-                            <input type="password" class="form-control-dashboard" placeholder="Enter password" required>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label class="form-label">Role</label>
-                            <select class="form-control-dashboard" required>
-                                <option value="">Select role</option>
-                                <option value="member">Member</option>
-                                <option value="trainer">Trainer</option>
-                                <option value="admin">Admin</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label class="form-label">Subscription Plan</label>
-                            <select class="form-control-dashboard">
-                                <option value="">Select plan</option>
-                                <option value="basic">Basic</option>
-                                <option value="premium">Premium</option>
-                                <option value="pro">Pro</option>
-                                <option value="none">No Subscription</option>
-                            </select>
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <label class="form-label">Phone Number</label>
-                            <input type="tel" class="form-control-dashboard" placeholder="Enter phone number">
-                        </div>
-                        
-                        <div class="form-group mb-3">
-                            <div class="form-check">
-                                <input class="form-check-input" type="checkbox" id="sendWelcomeEmail">
-                                <label class="form-check-label" for="sendWelcomeEmail">
-                                    Send welcome email
-                                </label>
-                            </div>
-                        </div>
-                    </form>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                    <button type="submit" form="addUserForm" class="btn btn-primary">
-                        <i class="fas fa-save me-2"></i> Create User
-                    </button>
-                </div>
-            </div>
+    <!-- Filter Card -->
+    <div class="card card-soft p-3 mb-3">
+      <div class="row g-2 align-items-center">
+        <div class="col-md-5">
+          <input id="txtQ" class="form-control" placeholder="🔍 Search by name, email, phone..." />
         </div>
+        <div class="col-md-3">
+          <select id="selRole" class="form-select">
+            <option value="all">All roles</option>
+            <option value="member">Members</option>
+            <option value="trainer">Trainers</option>
+            <option value="admin">Admins</option>
+          </select>
+        </div>
+        <div class="col-md-2 d-grid">
+          <button id="btnSearch" class="btn btn-dark">
+            <i class="bi bi-search"></i> Search
+          </button>
+        </div>
+        <div class="col-md-2 d-grid">
+          <button id="btnReset" class="btn btn-outline-dark">
+            <i class="bi bi-arrow-counterclockwise"></i> Reset
+          </button>
+        </div>
+      </div>
+      <div class="small muted mt-2">
+        💡 Tip: Change role/plan and click Save. Use Block/Activate for status.
+      </div>
     </div>
 
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    
-    <!-- DataTables JS -->
-    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
-    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap5.min.js"></script>
-    
-    <!-- Custom JS -->
-    <script src="../../script.js"></script>
-    
-    <script>
-        // Sidebar Toggle
-        document.getElementById('sidebarToggle').addEventListener('click', function() {
-            document.querySelector('.dashboard-sidebar').classList.toggle('active');
-            document.getElementById('sidebarOverlay').classList.toggle('active');
-        });
-        
-        document.getElementById('sidebarOverlay').addEventListener('click', function() {
-            document.querySelector('.dashboard-sidebar').classList.remove('active');
-            this.classList.remove('active');
-        });
-        
-        // Initialize DataTable
-        document.addEventListener('DOMContentLoaded', function() {
-            $('#usersTable').DataTable({
-                pageLength: 10,
-                responsive: true,
-                order: [[4, 'desc']]
-            });
-        });
-        
-        // View User Details
-        function viewUser(userId) {
-            // In real app, fetch from API
-            const userDetails = {
-                1: {
-                    name: 'John Doe',
-                    role: 'Member',
-                    status: 'Active',
-                    plan: 'Premium',
-                    userId: 'USR-001',
-                    email: 'john.doe@example.com',
-                    phone: '+94 77 123 4567',
-                    joined: 'October 15, 2024',
-                    lastLogin: 'Today, 10:30 AM',
-                    workouts: '24 completed',
-                    subscription: 'Premium (Expires: Nov 15, 2024)',
-                    payment: 'Visa **** 1234',
-                    goals: 'Weight Loss, Muscle Gain',
-                    workoutTime: 'Morning (6 AM - 9 AM)'
-                },
-                2: {
-                    name: 'Sarah Smith',
-                    role: 'Trainer',
-                    status: 'Active',
-                    plan: 'Professional',
-                    userId: 'USR-002',
-                    email: 'sarah.smith@example.com',
-                    phone: '+94 77 987 6543',
-                    joined: 'October 10, 2024',
-                    lastLogin: 'Yesterday, 3:45 PM',
-                    workouts: 'N/A',
-                    subscription: 'Trainer Pro',
-                    payment: 'Bank Transfer',
-                    goals: 'N/A',
-                    workoutTime: 'Flexible'
-                }
-            };
-            
-            const user = userDetails[userId];
-            if (user) {
-                document.getElementById('viewUserName').textContent = user.name;
-                document.getElementById('viewUserRole').textContent = user.role;
-                document.getElementById('viewUserStatus').textContent = user.status;
-                document.getElementById('viewUserPlan').textContent = user.plan;
-                document.getElementById('viewUserId').textContent = user.userId;
-                document.getElementById('viewUserEmail').textContent = user.email;
-                document.getElementById('viewUserPhone').textContent = user.phone;
-                document.getElementById('viewUserJoined').textContent = user.joined;
-                document.getElementById('viewUserLastLogin').textContent = user.lastLogin;
-                document.getElementById('viewUserWorkouts').textContent = user.workouts;
-                document.getElementById('viewUserSubscription').textContent = user.subscription;
-                document.getElementById('viewUserPayment').textContent = user.payment;
-                document.getElementById('viewUserGoals').textContent = user.goals;
-                document.getElementById('viewUserWorkoutTime').textContent = user.workoutTime;
-            }
-        }
-        
-        // Edit User
-        function editUser(userId) {
-            alert(`Edit user ${userId}\n\nIn real system, this would open edit form with user data.`);
-        }
-        
-        // Delete User
-        function deleteUser(userId) {
-            if (confirm(`Are you sure you want to delete user ${userId}?`)) {
-                alert(`User ${userId} deleted (simulated).\n\nIn real system, this would call API to delete user.`);
-            }
-        }
-        
-        // Check admin authentication
-        const user = JSON.parse(localStorage.getItem('smartfit_user') || '{}');
-        if (!user.loggedIn || user.role !== 'admin') {
-            alert('Access denied. Admin login required.');
-            window.location.href = '../../login.html';
-        }
-    </script>
+    <!-- Table Card -->
+    <div class="card card-soft p-3">
+      <div class="d-flex justify-content-between align-items-center mb-2">
+        <div class="fw-semibold">
+          <i class="bi bi-list-ul"></i> Users
+        </div>
+        <div class="small muted" id="lblCount">—</div>
+      </div>
+
+      <div class="table-responsive">
+        <table class="table align-middle">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th><i class="bi bi-person"></i> Name</th>
+              <th><i class="bi bi-envelope"></i> Email</th>
+              <th><i class="bi bi-telephone"></i> Phone</th>
+              <th>Role</th>
+              <th>Plan</th>
+              <th>Status</th>
+              <th><i class="bi bi-calendar3"></i> Created</th>
+              <th style="width:260px;">Action</th>
+            </tr>
+          </thead>
+          <tbody id="tbUsers">
+            <tr><td colspan="9" class="text-center muted py-4">Loading…</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div id="msg" class="mt-2"></div>
+    </div>
+  </main>
+</div>
+
+<!-- 🔹 JS (unchanged logic) -->
+<script>
+  const BASE = "../../";
+
+  async function guardAdmin() {
+    const r = await fetch(BASE + "backend/check_auth.php", { credentials: "include" });
+    if (r.status === 401) { location.href = BASE + "login.html"; return false; }
+    const data = await r.json();
+    if ((data.role || "") !== "admin") {
+      if (data.role === "trainer") location.href = BASE + "dashboard/trainer/dashboard.html";
+      else location.href = BASE + "dashboard/member/dashboard.html";
+      return false;
+    }
+    return true;
+  }
+
+  async function logout() {
+    await fetch(BASE + "backend/logout.php", { credentials: "include" }).catch(()=>{});
+    location.href = BASE + "login.html";
+  }
+
+  function esc(s){ return String(s ?? "").replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m])); }
+
+  function toast(text, ok=true){
+    const el = document.getElementById("msg");
+    el.innerHTML = `<div class="alert ${ok?'alert-success':'alert-danger'} py-2 mb-0">${esc(text)}</div>`;
+    setTimeout(()=>{ el.innerHTML = ""; }, 2500);
+  }
+
+  function statusBadge(status){
+    const s = (status || "active").toLowerCase();
+    if (s === "blocked") return `<span class="badge badge-soft text-bg-danger"><i class="bi bi-slash-circle"></i> Blocked</span>`;
+    return `<span class="badge badge-soft text-bg-success"><i class="bi bi-check-circle"></i> Active</span>`;
+  }
+
+  function toggleText(status){
+    const s = (status || "active").toLowerCase();
+    return (s === "blocked") ? "Activate" : "Block";
+  }
+
+  function toggleNext(status){
+    const s = (status || "active").toLowerCase();
+    return (s === "blocked") ? "active" : "blocked";
+  }
+
+  async function loadUsers() {
+    const q = document.getElementById("txtQ").value.trim();
+    const role = document.getElementById("selRole").value;
+
+    const tb = document.getElementById("tbUsers");
+    tb.innerHTML = `<tr><td colspan="9" class="text-center muted py-4">Loading…</td></tr>`;
+
+    const params = new URLSearchParams();
+    if (q) params.set("q", q);
+    if (role) params.set("role", role);
+
+    const url = BASE + "backend/admin_get_users.php" + (params.toString() ? ("?" + params.toString()) : "");
+    const r = await fetch(url, { credentials: "include" });
+    const data = await r.json().catch(()=>({ok:false}));
+
+    if (!data.ok) {
+      tb.innerHTML = `<tr><td colspan="9" class="text-center text-danger py-4">Failed to load</td></tr>`;
+      return;
+    }
+
+    const users = data.users || [];
+    document.getElementById("lblCount").textContent = `${users.length} user(s)`;
+
+    if (!users.length) {
+      tb.innerHTML = `<tr><td colspan="9" class="text-center muted py-4">No users found</td></tr>`;
+      return;
+    }
+
+    tb.innerHTML = users.map(u => {
+      const st = (u.status || "active");
+      return `
+      <tr data-id="${u.id}" data-status="${esc(st)}">
+        <td>${u.id}</td>
+        <td>${esc(u.first_name)} ${esc(u.last_name)}</td>
+        <td>${esc(u.email)}</td>
+        <td>${esc(u.phone)}</td>
+
+        <td>
+          <select class="form-select form-select-sm selRole">
+            <option value="member" ${u.role==='member'?'selected':''}>member</option>
+            <option value="trainer" ${u.role==='trainer'?'selected':''}>trainer</option>
+            <option value="admin" ${u.role==='admin'?'selected':''}>admin</option>
+          </select>
+        </td>
+
+        <td>
+          <select class="form-select form-select-sm selPlan">
+            <option value="basic" ${u.plan==='basic'?'selected':''}>basic</option>
+            <option value="premium" ${u.plan==='premium'?'selected':''}>premium</option>
+            <option value="pro" ${u.plan==='pro'?'selected':''}>pro</option>
+          </select>
+        </td>
+
+        <td class="tdStatus">${statusBadge(st)}</td>
+        <td class="small muted">${esc(u.created_at)}</td>
+
+        <td class="d-flex gap-2">
+          <button class="btn btn-sm btn-dark btnSave">
+            <i class="bi bi-save"></i> Save
+          </button>
+          <button class="btn btn-sm btn-outline-danger btnToggle" data-next="${toggleNext(st)}">
+            <i class="bi bi-slash-circle"></i> ${toggleText(st)}
+          </button>
+        </td>
+      </tr>`;
+    }).join("");
+  }
+
+  async function saveRow(btn) {
+    const tr = btn.closest("tr");
+    const user_id = Number(tr.dataset.id);
+    const role = tr.querySelector(".selRole").value;
+    const plan = tr.querySelector(".selPlan").value;
+
+    btn.disabled = true;
+    btn.innerHTML = `<i class="bi bi-hourglass-split"></i> Saving…`;
+
+    const r = await fetch(BASE + "backend/admin_update_user.php", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ user_id, role, plan })
+    });
+
+    btn.disabled = false;
+    btn.innerHTML = `<i class="bi bi-save"></i> Save`;
+
+    const data = await r.json().catch(()=>({ok:false}));
+    if (data.ok) toast("Updated successfully ✅", true);
+    else toast(data.message || "Update failed", false);
+  }
+
+  async function toggleStatus(btn) {
+    const tr = btn.closest("tr");
+    const id = Number(tr.dataset.id);
+    const next = btn.dataset.next;
+
+    btn.disabled = true;
+    btn.innerHTML = `<i class="bi bi-hourglass-split"></i> Working…`;
+
+    const r = await fetch(BASE + "backend/admin_update_user_status.php", {
+      method: "POST",
+      credentials: "include",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ id, status: next })
+    });
+
+    const data = await r.json().catch(()=>({ok:false}));
+
+    btn.disabled = false;
+
+    if (!data.ok) {
+      toast(data.message || "Status update failed", false);
+      return;
+    }
+
+    tr.dataset.status = next;
+    tr.querySelector(".tdStatus").innerHTML = statusBadge(next);
+    btn.dataset.next = toggleNext(next);
+    btn.classList.toggle("btn-outline-danger", next === "active");
+    btn.classList.toggle("btn-outline-success", next === "blocked");
+    btn.innerHTML = `<i class="bi bi-slash-circle"></i> ${toggleText(next)}`;
+
+    toast(`User status changed to ${next} ✅`, true);
+  }
+
+  document.getElementById("btnLogout").addEventListener("click", logout);
+  document.getElementById("btnSearch").addEventListener("click", loadUsers);
+  document.getElementById("btnReset").addEventListener("click", () => {
+    document.getElementById("txtQ").value = "";
+    document.getElementById("selRole").value = "all";
+    loadUsers();
+  });
+
+  document.addEventListener("click", (e) => {
+    if (e.target.closest(".btnSave")) saveRow(e.target.closest(".btnSave"));
+    if (e.target.closest(".btnToggle")) toggleStatus(e.target.closest(".btnToggle"));
+  });
+
+  (async () => {
+    const ok = await guardAdmin();
+    if (ok) loadUsers();
+  })();
+</script>
+
 </body>
 </html>

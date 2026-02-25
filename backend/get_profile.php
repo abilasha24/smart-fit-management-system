@@ -12,17 +12,36 @@ if ($user_id <= 0 || $role !== "member") {
   exit;
 }
 
-$stmt = $conn->prepare("SELECT username, email FROM users WHERE id=? LIMIT 1");
+/**
+ * ✅ users table-ல் username column இல்லை.
+ * ✅ so display "username" as CONCAT(first_name, last_name)
+ */
+$sql = "SELECT CONCAT(first_name, ' ', last_name) AS username, email
+        FROM users
+        WHERE id = ?
+        LIMIT 1";
+
+$stmt = $conn->prepare($sql);
 if(!$stmt){
   http_response_code(500);
-  echo json_encode(["ok"=>false, "message"=>"Prepare failed"]);
+  echo json_encode(["ok"=>false, "message"=>"Prepare failed", "error"=>$conn->error]);
   exit;
 }
 
 $stmt->bind_param("i", $user_id);
 $stmt->execute();
+
+/* get_result() works only if mysqlnd is enabled.
+   If your server doesn't support it, switch to bind_result method.
+*/
 $res = $stmt->get_result();
-$user = $res->fetch_assoc();
+$user = $res ? $res->fetch_assoc() : null;
+
+if(!$user){
+  http_response_code(404);
+  echo json_encode(["ok"=>false, "message"=>"User not found"]);
+  exit;
+}
 
 echo json_encode(["ok"=>true, "user"=>$user]);
 exit;

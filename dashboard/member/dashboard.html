@@ -20,8 +20,6 @@
     .stat-card { border-radius:18px; box-shadow:0 10px 25px rgba(0,0,0,.06); }
     .big { font-size:1.7rem; font-weight:800; }
     .quick a { text-decoration:none; }
-
-    /* custom orange */
     .bg-orange { background:#f59e0b !important; }
   </style>
 </head>
@@ -41,10 +39,9 @@
       <a href="workouts.html">💪 Workouts</a>
       <a href="myworkout.html">🏋️ My Workouts</a>
       <a href="progress.html">📈 Progress</a>
-
-      <!-- ✅ Meal Plans -->
       <a href="meal_plans.html">🥗 Meal Plans</a>
-
+      <a href="nutrition.html">🍎 Nutrition</a>
+      <a href="schedule.html">📅 Schedule</a>
       <a href="profile.html">👤 Profile</a>
       <a href="subscription.html">💳 Subscription</a>
       <a href="notifications.html">🔔 Notifications</a>
@@ -159,7 +156,29 @@
         </div>
       </div>
 
-      <!-- ✅ LATEST MEAL PLAN (NEW) -->
+      <!-- ✅ AI RECOMMENDATION (NEW) -->
+      <div class="card shadow-sm mb-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="fw-bold mb-0">🤖 Smart AI Recommendation</h5>
+            <button class="btn btn-outline-dark btn-sm" id="btnReloadAI">Reload</button>
+          </div>
+
+          <div class="text-muted mt-2" id="aiMeta">Loading...</div>
+
+          <div class="mt-2">
+            <div class="fw-semibold" id="aiCategory"></div>
+            <div class="small text-muted" id="aiTip"></div>
+          </div>
+
+          <hr class="my-3"/>
+
+          <div class="fw-semibold mb-2">Recommended Workouts</div>
+          <div id="aiWorkouts" class="row g-2"></div>
+        </div>
+      </div>
+
+      <!-- ✅ LATEST MEAL PLAN -->
       <div class="card shadow-sm mb-3">
         <div class="card-body">
           <h5 class="fw-bold mb-2">🥗 Latest Meal Plan</h5>
@@ -184,6 +203,33 @@
         </div>
       </div>
 
+      <!-- ✅ MY ASSIGNED WORKOUTS (NEW) -->
+      <div class="card shadow-sm mt-3">
+        <div class="card-body">
+          <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+            <h5 class="fw-bold mb-0">🏋️ My Assigned Workouts</h5>
+            <button class="btn btn-outline-dark btn-sm" id="btnReloadAssigned">Reload</button>
+          </div>
+
+          <div class="table-responsive mt-3">
+            <table class="table table-sm align-middle mb-0">
+              <thead>
+                <tr>
+                  <th>Workout</th>
+                  <th>Level</th>
+                  <th>Status</th>
+                  <th>Assigned</th>
+                  <th style="width:280px;">Action</th>
+                </tr>
+              </thead>
+              <tbody id="assignedRows">
+                <tr><td colspan="5">Loading...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+
     </div><!-- /content -->
   </div>
 </div>
@@ -191,15 +237,18 @@
 <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 
 <script>
-  // ✅ absolute project base (your project runs under /smart_fit/)
-  const BASE_WEB = "/smart_fit/";
+  // ✅ IMPORTANT: your project base
+  const BASE_WEB = "/SMART_FIT/";
+
   const API = {
     whoami: BASE_WEB + "backend/whoami.php",
     stats: BASE_WEB + "backend/get_member_stats.php",
     bmiLatest: BASE_WEB + "backend/get_latest_bmi.php",
     mealPlans: BASE_WEB + "backend/member_meal_plans_list.php",
-    // optional subscription endpoint (if exists) — if not, we fallback
     subscription: BASE_WEB + "backend/get_member_subscription.php",
+    assignedWorkouts: BASE_WEB + "backend/member_assigned_workouts.php",
+    updateWorkout: BASE_WEB + "backend/member_update_workout_status.php",
+    aiRec: BASE_WEB + "backend/member_ai_recommendation.php",   // ✅ NEW
     logout: BASE_WEB + "backend/logout.php"
   };
 
@@ -212,6 +261,15 @@
     document.getElementById("minutes").textContent = minutes ?? 0;
     document.getElementById("calories").textContent = calories ?? 0;
     document.getElementById("unread").textContent = unread ?? 0;
+  }
+
+  function escapeHtml(str){
+    return String(str ?? "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
   }
 
   function bmiBadgeClass(category){
@@ -230,25 +288,26 @@
     return { show:false };
   }
 
+  // ✅ FIXED authGuard: uses logged_in from your whoami.php
   async function authGuard(){
     try{
       const r = await fetch(API.whoami, { credentials:"include" });
-      if(r.status === 401){
-        location.href = BASE_WEB + "login.html";
-        return null;
-      }
       const me = await r.json().catch(()=>null);
+
       if(!me || !me.logged_in){
         location.href = BASE_WEB + "login.html";
         return null;
       }
-      if(me.role && me.role !== "member"){
-        // role redirect (optional safety)
-        if(me.role === "trainer") location.href = BASE_WEB + "dashboard/trainer/dashboard.html";
-        if(me.role === "admin")   location.href = BASE_WEB + "dashboard/admin/dashboard.html";
+
+      // role safety
+      const role = (me.role || "member").toLowerCase();
+      if(role !== "member"){
+        if(role === "trainer") location.href = BASE_WEB + "dashboard/trainer/dashboard.html";
+        if(role === "admin")   location.href = BASE_WEB + "dashboard/admin/dashboard.html";
         return null;
       }
-      document.getElementById("navUsername").textContent = me.username || me.name || "Member";
+
+      document.getElementById("navUsername").textContent = me.name || "Member";
       return me;
     }catch(e){
       showMsg("Server not reachable. Check Apache/XAMPP.");
@@ -266,7 +325,6 @@
         return;
       }
 
-      // ✅ flexible mapping (works even if keys differ)
       const completed = d.completed ?? d.stats?.completed ?? 0;
       const started   = d.started ?? d.stats?.started ?? 0;
       const minutes   = d.minutes ?? d.stats?.minutes ?? d.total_minutes ?? 0;
@@ -275,18 +333,15 @@
 
       setNumbers(completed, started, minutes, calories, unread);
 
-      // Subscription summary fallback from stats if present
       const subBox = document.getElementById("subBox");
       if(d.subscription){
-        // if backend already provides a ready subscription string/object
         if(typeof d.subscription === "string") subBox.textContent = d.subscription;
         else{
           const plan = d.subscription.plan || d.subscription.name || "Active";
           const exp  = d.subscription.expires_at || d.subscription.ends_at || "";
-          subBox.innerHTML = `<div><b>${plan}</b></div>` + (exp ? `<div class="text-muted small">Valid till: ${exp}</div>` : "");
+          subBox.innerHTML = `<div><b>${escapeHtml(plan)}</b></div>` + (exp ? `<div class="text-muted small">Valid till: ${escapeHtml(exp)}</div>` : "");
         }
       }else{
-        // keep until loadSubscription tries
         subBox.textContent = "Active plan details loading...";
       }
 
@@ -297,22 +352,21 @@
   }
 
   async function loadSubscription(){
-    // optional endpoint; if it doesn't exist, keep fallback
     const subBox = document.getElementById("subBox");
     try{
       const r = await fetch(API.subscription, { credentials:"include" });
       if(!r.ok) throw new Error("no sub endpoint");
       const d = await r.json().catch(()=>({ok:false}));
       if(!d.ok) throw new Error("bad sub");
-      // expected: {ok:true, plan, status, expires_at}
+
       const plan = d.plan || d.name || "Active";
       const status = d.status || "";
       const exp = d.expires_at || d.ends_at || "";
+
       subBox.innerHTML =
-        `<div><b>${plan}</b> ${status ? `<span class="badge bg-success ms-2">${status}</span>` : ""}</div>` +
-        (exp ? `<div class="text-muted small mt-1">Valid till: ${exp}</div>` : "");
+        `<div><b>${escapeHtml(plan)}</b> ${status ? `<span class="badge bg-success ms-2">${escapeHtml(status)}</span>` : ""}</div>` +
+        (exp ? `<div class="text-muted small mt-1">Valid till: ${escapeHtml(exp)}</div>` : "");
     }catch(e){
-      // fallback message (no endpoint)
       if(subBox.textContent.includes("Loading") || subBox.textContent.includes("Active plan details")){
         subBox.textContent = "No subscription details available (open Subscription page).";
       }
@@ -390,12 +444,132 @@
     }
   }
 
-  function escapeHtml(str){
-    return String(str ?? "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;");
+  // ✅ NEW: AI Recommendation
+  async function loadAIRecommendation(){
+    const meta = document.getElementById("aiMeta");
+    const cat  = document.getElementById("aiCategory");
+    const tip  = document.getElementById("aiTip");
+    const box  = document.getElementById("aiWorkouts");
+
+    meta.className = "text-muted mt-2";
+    meta.textContent = "Loading...";
+    cat.textContent = "";
+    tip.textContent = "";
+    box.innerHTML = "";
+
+    try{
+      const r = await fetch(API.aiRec, { credentials:"include" });
+      const d = await r.json().catch(()=>({ok:false}));
+
+      if(!d.ok){
+        meta.className = "text-danger mt-2";
+        meta.textContent = d.message || "AI recommendation unavailable";
+        return;
+      }
+
+      const bmiText = (d.bmi === null || d.bmi === undefined) ? "BMI: Not available" : ("BMI: " + Number(d.bmi).toFixed(1));
+      meta.textContent = `${bmiText} • Plan: ${d.plan || "-"}`;
+
+      cat.textContent = `✅ Recommended Focus: ${d.category || "Balanced Fitness"}`;
+      tip.textContent = d.tip || "";
+
+      const items = Array.isArray(d.workouts) ? d.workouts : [];
+      if(items.length === 0){
+        box.innerHTML = `<div class="text-muted">No recommended workouts found.</div>`;
+        return;
+      }
+
+      box.innerHTML = items.map(w => `
+        <div class="col-md-4">
+          <div class="card h-100 border-0 shadow-sm">
+            <div class="card-body">
+              <div class="badge bg-secondary mb-2 text-capitalize">${escapeHtml(w.level || "")}</div>
+              <h6 class="mb-1">${escapeHtml(w.title || "Workout")}</h6>
+              <div class="small text-muted">${escapeHtml(w.duration_min || 0)} min • ${escapeHtml(w.calories || 0)} cal</div>
+              ${w.youtube_url ? `<a class="btn btn-sm btn-outline-primary mt-2" target="_blank" href="${escapeHtml(w.youtube_url)}">Watch</a>` : ``}
+            </div>
+          </div>
+        </div>
+      `).join("");
+
+    }catch(e){
+      meta.className = "text-danger mt-2";
+      meta.textContent = "Error loading AI recommendation";
+    }
   }
+
+  // ✅ Assigned workouts
+  async function loadAssignedWorkouts(){
+    const rows = document.getElementById("assignedRows");
+    rows.innerHTML = `<tr><td colspan="5">Loading...</td></tr>`;
+
+    try{
+      const r = await fetch(API.assignedWorkouts, { credentials:"include" });
+      const d = await r.json().catch(()=>({ok:false}));
+
+      if(!d.ok || !d.items || !d.items.length){
+        rows.innerHTML = `<tr><td colspan="5">No assigned workouts</td></tr>`;
+        return;
+      }
+
+      rows.innerHTML = d.items.map(it=>{
+        const status = String(it.status || "assigned").toLowerCase();
+        const canStart = (status === "assigned");
+        const canComplete = (status === "started");
+
+        const yt = it.youtube_url
+          ? `<a class="btn btn-sm btn-outline-danger" target="_blank" href="${escapeHtml(it.youtube_url)}">YouTube</a>`
+          : "";
+
+        return `
+          <tr>
+            <td class="fw-semibold">${escapeHtml(it.title)}</td>
+            <td>${escapeHtml(it.level || "")}</td>
+            <td><span class="badge bg-light text-dark">${escapeHtml(it.status || "assigned")}</span></td>
+            <td>${escapeHtml(it.assigned_at || "")}</td>
+            <td class="d-flex gap-2 flex-wrap">
+              ${yt}
+              <button class="btn btn-sm btn-success" ${canStart ? "" : "disabled"}
+                onclick="updateWorkoutStatus(${Number(it.user_workout_id)}, 'started')">Start</button>
+              <button class="btn btn-sm btn-primary" ${canComplete ? "" : "disabled"}
+                onclick="updateWorkoutStatus(${Number(it.user_workout_id)}, 'completed')">Complete</button>
+            </td>
+          </tr>
+        `;
+      }).join("");
+
+    }catch(e){
+      rows.innerHTML = `<tr><td colspan="5" class="text-danger">Failed to load</td></tr>`;
+    }
+  }
+
+  async function updateWorkoutStatus(id, status){
+    try{
+      const r = await fetch(API.updateWorkout, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        credentials:"include",
+        body: JSON.stringify({ user_workout_id:id, status })
+      });
+
+      const d = await r.json().catch(()=>({ok:false}));
+      if(!d.ok){
+        alert(d.message || "Update failed");
+        return;
+      }
+
+      await loadAssignedWorkouts();
+      await loadStats();
+    }catch(e){
+      alert("Server error");
+    }
+  }
+  window.updateWorkoutStatus = updateWorkoutStatus;
+
+  document.getElementById("btnReloadAssigned").addEventListener("click", loadAssignedWorkouts);
+
+  // ✅ NEW: Reload AI button
+  document.getElementById("btnReloadAI").addEventListener("click", loadAIRecommendation);
 
   // Logout
   document.getElementById("btnLogout").addEventListener("click", async (e)=>{
@@ -410,9 +584,11 @@
     if(!me) return;
 
     await loadStats();
-    await loadSubscription(); // optional
+    await loadSubscription();
     await loadLatestBMI();
+    await loadAIRecommendation();  // ✅ NEW
     await loadLatestMeal();
+    await loadAssignedWorkouts();
   })();
 </script>
 

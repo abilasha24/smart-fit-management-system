@@ -19,26 +19,26 @@ if ($_SERVER["REQUEST_METHOD"] !== "POST") {
 }
 
 $data = json_decode(file_get_contents("php://input"), true);
-$username = trim($data["username"] ?? "");
+$name = trim($data["username"] ?? ""); // front-end field remains "username"
 
-if ($username === "" || strlen($username) < 3) {
+if ($name === "" || mb_strlen($name) < 3) {
   http_response_code(400);
-  echo json_encode(["ok"=>false, "message"=>"Username must be at least 3 characters"]);
+  echo json_encode(["ok"=>false, "message"=>"Name must be at least 3 characters"]);
   exit;
 }
 
-// Duplicate check
-$chk = $conn->prepare("SELECT id FROM users WHERE username=? AND id<>?");
-$chk->bind_param("si", $username, $user_id);
-$chk->execute();
-$chkRes = $chk->get_result();
-if ($chkRes && $chkRes->num_rows > 0) {
-  echo json_encode(["ok"=>false, "message"=>"Username already taken"]);
+/**
+ * ✅ users table-ல் username column இல்லை.
+ * ✅ simplest update: first_name only
+ */
+$stmt = $conn->prepare("UPDATE users SET first_name=? WHERE id=?");
+if(!$stmt){
+  http_response_code(500);
+  echo json_encode(["ok"=>false, "message"=>"Prepare failed", "error"=>$conn->error]);
   exit;
 }
 
-$stmt = $conn->prepare("UPDATE users SET username=? WHERE id=?");
-$stmt->bind_param("si", $username, $user_id);
+$stmt->bind_param("si", $name, $user_id);
 
 if (!$stmt->execute()) {
   http_response_code(500);
@@ -46,7 +46,8 @@ if (!$stmt->execute()) {
   exit;
 }
 
-$_SESSION["username"] = $username;
+/* optional: update session display name */
+$_SESSION["name"] = $name;
 
 echo json_encode(["ok"=>true, "message"=>"Profile updated"]);
 exit;

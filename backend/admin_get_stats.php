@@ -1,36 +1,67 @@
 <?php
-// backend/admin_get_stats.php
-session_start();
 header('Content-Type: application/json');
+session_start();
 
-// ✅ Only admin
-if (empty($_SESSION['logged_in']) || ($_SESSION['role'] ?? '') !== 'admin') {
+if (!isset($_SESSION['user_id']) || ($_SESSION['role'] ?? '') !== 'admin') {
   http_response_code(403);
-  echo json_encode(["ok" => false, "message" => "Forbidden"]);
+  echo json_encode(["ok"=>false, "message"=>"Forbidden"]);
   exit;
 }
 
-// ✅ DB connect (change this require if your file name differs)
-require_once __DIR__ . '/db.php'; 
-// Expect: $conn = new mysqli(...)
+require_once __DIR__ . "/db.php";
 
-function countQ($conn, $sql) {
+function q1($conn, $sql) {
   $res = $conn->query($sql);
   if (!$res) return 0;
   $row = $res->fetch_row();
-  return (int)($row[0] ?? 0);
+  return $row ? (float)$row[0] : 0;
 }
 
-$stats = [
-  "total_users"     => countQ($conn, "SELECT COUNT(*) FROM users"),
-  "total_members"   => countQ($conn, "SELECT COUNT(*) FROM users WHERE role='member'"),
-  "total_trainers"  => countQ($conn, "SELECT COUNT(*) FROM users WHERE role='trainer'"),
-  "total_admins"    => countQ($conn, "SELECT COUNT(*) FROM users WHERE role='admin'"),
+function q1i($conn, $sql) {
+  $res = $conn->query($sql);
+  if (!$res) return 0;
+  $row = $res->fetch_row();
+  return $row ? (int)$row[0] : 0;
+}
 
-  "workouts_count"  => countQ($conn, "SELECT COUNT(*) FROM workouts"),
-  "completions_count" => countQ($conn, "SELECT COUNT(*) FROM user_workouts WHERE status='completed'"),
+$total_users     = q1i($conn, "SELECT COUNT(*) FROM users");
+$total_members   = q1i($conn, "SELECT COUNT(*) FROM users WHERE role='member'");
+$total_trainers  = q1i($conn, "SELECT COUNT(*) FROM users WHERE role='trainer'");
+$total_admins    = q1i($conn, "SELECT COUNT(*) FROM users WHERE role='admin'");
+$blocked_users   = q1i($conn, "SELECT COUNT(*) FROM users WHERE status='blocked'");
 
-  "feedback_count"  => countQ($conn, "SELECT COUNT(*) FROM feedback"),
-];
+$workouts_count  = q1i($conn, "SELECT COUNT(*) FROM workouts");
+$feedback_count  = q1i($conn, "SELECT COUNT(*) FROM feedback");
 
-echo json_encode(["ok" => true, "stats" => $stats]);
+// ✅ completions (status='completed')
+$completions_count = q1i($conn, "SELECT COUNT(*) FROM user_workouts WHERE status='completed'");
+
+// ✅ revenue
+$total_revenue = q1($conn, "SELECT IFNULL(SUM(amount),0) FROM payments");
+$paid_txn      = q1i($conn, "SELECT COUNT(*) FROM payments WHERE amount > 0");
+
+// ✅ this month revenue
+$this_month_revenue = q1($conn, "
+  SELECT IFNULL(SUM(amount),0)
+  FROM payments
+  WHERE YEAR(created_at)=YEAR(CURDATE()) AND MONTH(created_at)=MONTH(CURDATE())
+");
+
+echo json_encode([
+  "ok" => true,
+  "stats" => [
+    "total_users" => $total_users,
+    "workouts_count" => $workouts_count,
+    "completions_count" => $completions_count,
+    "feedback_count" => $feedback_count,
+
+    "total_members" => $total_members,
+    "total_trainers" => $total_trainers,
+    "total_admins" => $total_admins,
+
+    "total_revenue" => $total_revenue,
+    "this_month_revenue" => $this_month_revenue,
+    "paid_transactions" => $paid_txn,
+    "blocked_users" => $blocked_users
+  ]
+]);

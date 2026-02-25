@@ -1,0 +1,355 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>My Schedule | Smart Fit</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+  <style>
+    body { background:#f6f7fb; }
+    .sidebar { min-height:100vh; background:#111827; color:#fff; }
+    .sidebar a{
+      color:#c7c7c7; text-decoration:none; display:block;
+      padding:12px 18px; border-radius:8px; margin-bottom:6px;
+    }
+    .sidebar a.active, .sidebar a:hover{ background:#1f2937; color:#fff; }
+    .content { padding:30px; }
+    .card { border-radius:16px; }
+    .btn-pill{ border-radius:999px; }
+    .mini { font-size: 12px; }
+  </style>
+</head>
+
+<body>
+<div class="container-fluid">
+  <div class="row">
+
+    <!-- SIDEBAR -->
+    <div class="col-md-3 col-lg-2 sidebar p-3">
+      <h4 class="fw-bold mb-2">SMART FIT</h4>
+      <div class="small text-white-50 mb-4">
+        Hi, <span id="navUsername" class="text-white fw-semibold">Member</span>
+      </div>
+
+      <a href="dashboard.html">🏠 Dashboard</a>
+      <a href="workouts.html">💪 Workouts</a>
+      <a href="myworkout.html">🏋️ My Workouts</a>
+      <a href="progress.html">📈 Progress</a>
+      <a href="meal_plans.html">🥗 Meal Plans</a>
+      <a href="nutrition.html">🍎 Nutrition</a>
+      <a href="schedule.html" class="active">📅 Schedule</a>
+      <a href="profile.html">👤 Profile</a>
+      <a href="subscription.html">💳 Subscription</a>
+      <a href="notifications.html">🔔 Notifications</a>
+      <a href="feedback.html">📝 Feedback</a>
+      <a href="bmi.html">📊 BMI</a>
+
+      <a href="../../index.html">🌐 Back to Website</a>
+      <a href="#" id="btnLogout" class="text-danger mt-3 d-block">🚪 Logout</a>
+    </div>
+
+    <!-- MAIN -->
+    <div class="col-md-9 col-lg-10 content">
+
+      <div class="d-flex align-items-start justify-content-between mb-3">
+        <div>
+          <h2 class="fw-bold mb-0">📅 My Schedule</h2>
+          <div class="text-muted">Your personal reminders & trainer check-ins (DB based)</div>
+        </div>
+        <span class="badge text-bg-dark btn-pill">Ready</span>
+      </div>
+
+      <div class="row g-3">
+        <!-- Member Add -->
+        <div class="col-lg-6">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div class="fw-bold mb-2"><i class="bi bi-plus-circle me-2"></i>Add Reminder</div>
+
+              <label class="form-label small text-muted mb-1">Title</label>
+              <input id="title" class="form-control mb-2" placeholder="e.g., Water reminder">
+
+              <div class="row g-2">
+                <div class="col-md-6">
+                  <label class="form-label small text-muted mb-1">Date</label>
+                  <input id="date" type="date" class="form-control">
+                </div>
+                <div class="col-md-6">
+                  <label class="form-label small text-muted mb-1">Time (optional)</label>
+                  <input id="time" type="time" class="form-control">
+                </div>
+              </div>
+
+              <label class="form-label small text-muted mt-2 mb-1">Notes</label>
+              <textarea id="notes" class="form-control" rows="3" placeholder="Steps / Sleep / workout plan..."></textarea>
+
+              <div class="d-flex gap-2 mt-3">
+                <button class="btn btn-dark btn-pill" id="btnAdd"><i class="bi bi-check2-circle me-1"></i>Add</button>
+                <button class="btn btn-outline-secondary btn-pill" id="btnClear"><i class="bi bi-x-circle me-1"></i>Clear</button>
+                <button class="btn btn-outline-dark btn-pill ms-auto" id="btnReload"><i class="bi bi-arrow-repeat me-1"></i>Reload</button>
+              </div>
+
+              <div id="msg" class="small mt-2"></div>
+              <div class="small text-muted mt-2">Note: Trainer-created schedules will also appear here.</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- List -->
+        <div class="col-lg-6">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <div class="d-flex justify-content-between align-items-center mb-2">
+                <div class="fw-bold"><i class="bi bi-list-task me-2"></i>Upcoming</div>
+                <span class="badge text-bg-light border">DB</span>
+              </div>
+              <div id="list" class="vstack gap-2">
+                <div class="text-muted">Loading...</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div><!-- /content -->
+  </div>
+</div>
+
+<script>
+const API = {
+  whoami: "../../backend/whoami.php",
+  add: "../../backend/schedule_add.php",
+  list: "../../backend/schedule_list.php",
+  del: "../../backend/schedule_delete.php",
+  done: "../../backend/schedule_mark_done.php",
+  logout: "../../backend/logout.php"
+};
+
+function esc(s){
+  return String(s ?? "")
+    .replaceAll("&","&amp;")
+    .replaceAll("<","&lt;")
+    .replaceAll(">","&gt;")
+    .replaceAll('"',"&quot;")
+    .replaceAll("'","&#039;");
+}
+
+function showMsg(t, ok=false){
+  const el = document.getElementById("msg");
+  el.className = ok ? "text-success" : "text-danger";
+  el.textContent = t || "";
+}
+
+async function authGuard(){
+  try{
+    const res = await fetch(API.whoami, { credentials:"same-origin" });
+    const me = await res.json();
+    if(!me.logged_in || (me.role||"").toLowerCase() !== "member"){
+      window.location.href = "../../login.html";
+      return null;
+    }
+    const name = (me.name || me.username || "Member").trim();
+    document.getElementById("navUsername").textContent = name;
+    return me;
+  }catch{
+    window.location.href = "../../login.html";
+    return null;
+  }
+}
+
+function clearForm(){
+  ["title","date","time","notes"].forEach(id=>document.getElementById(id).value="");
+  showMsg("");
+}
+
+function badgeRole(created_by_role){
+  return created_by_role === "trainer"
+    ? `<span class="badge text-bg-primary">Trainer</span>`
+    : `<span class="badge text-bg-secondary">Me</span>`;
+}
+
+function badgeStatus(status){
+  const s = (status || "pending").toLowerCase();
+  if(s === "done") return `<span class="badge text-bg-success">Done</span>`;
+  return `<span class="badge text-bg-warning text-dark">Pending</span>`;
+}
+
+async function markDone(id){
+  const r = await fetch(API.done, {
+    method:"POST",
+    credentials:"same-origin",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ id })
+  });
+  const out = await r.json();
+  if(!out.ok) throw new Error(out.message || "Mark done failed");
+}
+
+async function deleteReminder(id){
+  const r = await fetch(API.del, {
+    method:"POST",
+    credentials:"same-origin",
+    headers:{ "Content-Type":"application/json" },
+    body: JSON.stringify({ id })
+  });
+  const out = await r.json();
+  if(!out.ok) throw new Error(out.message || "Delete failed");
+}
+
+async function loadList(){
+  const list = document.getElementById("list");
+  list.innerHTML = `<div class="text-muted">Loading...</div>`;
+
+  try{
+    const res = await fetch(API.list, { credentials:"same-origin" });
+    const data = await res.json();
+    if(!data.ok) throw new Error(data.message || "Failed");
+
+    if(!data.items || data.items.length === 0){
+      list.innerHTML = `<div class="text-muted">No schedule items</div>`;
+      return;
+    }
+
+    list.innerHTML = "";
+
+    data.items.forEach(it=>{
+      const when = `${it.schedule_date}${it.schedule_time ? " • "+it.schedule_time : ""}`;
+      const roleBadge = badgeRole(it.created_by_role);
+      const statusBadge = badgeStatus(it.status);
+      const isDone = String(it.status || "pending").toLowerCase() === "done";
+
+      // Done time
+      const doneText = (isDone && it.completed_at)
+        ? `<div class="mini text-success mt-2"><i class="bi bi-check-circle me-1"></i>Completed: ${esc(it.completed_at)}</div>`
+        : ``;
+
+      // Actions:
+      // - Member-created: can delete
+      // - Trainer-created: cannot delete (lock)
+      // - Any pending item: can mark done
+      const btnDelete = (it.created_by_role === "member")
+        ? `<button class="btn btn-sm btn-outline-danger btn-pill" data-del="${it.id}" title="Delete reminder"><i class="bi bi-trash3"></i></button>`
+        : `<button class="btn btn-sm btn-outline-secondary btn-pill" disabled title="Trainer schedule cannot be deleted by member"><i class="bi bi-lock"></i></button>`;
+
+      const btnDone = (!isDone)
+        ? `<button class="btn btn-sm btn-outline-success btn-pill ms-2" data-done="${it.id}" title="Mark as done"><i class="bi bi-check2"></i></button>`
+        : `<button class="btn btn-sm btn-outline-success btn-pill ms-2" disabled title="Already completed"><i class="bi bi-check2-all"></i></button>`;
+
+      list.innerHTML += `
+        <div class="card shadow-sm">
+          <div class="card-body">
+            <div class="d-flex justify-content-between align-items-start">
+              <div class="me-2">
+                <div class="fw-bold">
+                  ${esc(it.title)}
+                  <span class="ms-2">${roleBadge}</span>
+                  <span class="ms-2">${statusBadge}</span>
+                </div>
+
+                <div class="text-muted small mt-1">${esc(when)}</div>
+
+                ${it.notes ? `<div class="small mt-2" style="white-space:pre-line">${esc(it.notes)}</div>` : ``}
+                ${doneText}
+              </div>
+
+              <div class="d-flex align-items-start">
+                ${btnDelete}
+                ${btnDone}
+              </div>
+            </div>
+          </div>
+        </div>
+      `;
+    });
+
+    // Delete handlers
+    list.querySelectorAll("[data-del]").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const id = parseInt(btn.getAttribute("data-del"),10);
+        if(!confirm("Delete this reminder?")) return;
+
+        btn.disabled = true;
+        try{
+          await deleteReminder(id);
+          await loadList();
+        }catch(e){
+          alert(e.message || "Delete failed");
+          btn.disabled = false;
+        }
+      });
+    });
+
+    // Done handlers
+    list.querySelectorAll("[data-done]").forEach(btn=>{
+      btn.addEventListener("click", async ()=>{
+        const id = parseInt(btn.getAttribute("data-done"),10);
+        if(!confirm("Mark this schedule as done?")) return;
+
+        btn.disabled = true;
+        try{
+          await markDone(id);
+          await loadList();
+        }catch(e){
+          alert(e.message || "Mark done failed");
+          btn.disabled = false;
+        }
+      });
+    });
+
+  }catch(e){
+    list.innerHTML = `<div class="text-danger">Error: ${esc(e.message)}</div>`;
+  }
+}
+
+document.getElementById("btnAdd").addEventListener("click", async ()=>{
+  showMsg("");
+
+  const btn = document.getElementById("btnAdd");
+  btn.disabled = true;
+
+  const payload = {
+    title: document.getElementById("title").value.trim(),
+    date:  document.getElementById("date").value,
+    time:  document.getElementById("time").value,
+    notes: document.getElementById("notes").value.trim(),
+  };
+
+  try{
+    const r = await fetch(API.add,{
+      method:"POST",
+      credentials:"same-origin",
+      headers:{ "Content-Type":"application/json" },
+      body: JSON.stringify(payload)
+    });
+    const out = await r.json();
+    if(!out.ok) throw new Error(out.message || "Add failed");
+
+    showMsg("Added ✅", true);
+    clearForm();
+    await loadList();
+  }catch(e){
+    showMsg(e.message || "Failed");
+  }finally{
+    btn.disabled = false;
+  }
+});
+
+document.getElementById("btnClear").addEventListener("click", clearForm);
+document.getElementById("btnReload").addEventListener("click", loadList);
+
+/* Logout */
+document.getElementById("btnLogout").addEventListener("click", async (e)=>{
+  e.preventDefault();
+  try{ await fetch(API.logout, { method:"POST", credentials:"same-origin" }); }catch{}
+  window.location.href = "../../login.html";
+});
+
+(async function(){
+  const me = await authGuard();
+  if(me) await loadList();
+})();
+</script>
+</body>
+</html>

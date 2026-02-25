@@ -3,92 +3,17 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Meal Plans | Trainer</title>
+  <title>Meal Plans | Trainer | Smart Fit</title>
 
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+  <!-- ✅ Use SAME layout CSS for ALL trainer pages -->
+  <link rel="stylesheet" href="trainer_layout.css">
+
   <style>
-    :root{
-      --bg:#f6f7fb;
-      --sidebar:#0b1220; --sidebar2:#0f172a;
-      --text:#0f172a; --muted:#6b7280;
-      --card:#ffffff; --line:#e5e7eb;
-      --shadow2: 0 10px 22px rgba(15,23,42,.06);
-    }
-    body{ background:var(--bg); color:var(--text); }
-    .app{ min-height:100vh; }
-
-    /* Sidebar */
-    .sidebar{
-      width:270px; min-height:100vh; position:sticky; top:0;
-      background:linear-gradient(180deg,var(--sidebar),var(--sidebar2));
-      color:#fff; padding:18px 16px;
-      box-shadow:10px 0 30px rgba(0,0,0,.08);
-      display:flex; flex-direction:column;
-    }
-    .brand{ font-weight:800; font-size:26px; margin-bottom:8px; letter-spacing:.5px; }
-    .hello{ color:#cbd5e1; font-size:14px; margin-bottom:16px; }
-
-    .nav-item{
-      display:flex; align-items:center; gap:12px;
-      padding:12px 14px; border-radius:14px;
-      color:#e5e7eb; text-decoration:none;
-      margin-bottom:10px; transition:.15s ease;
-      position:relative;
-    }
-    .nav-item:hover{ background:rgba(255,255,255,.06); color:#fff; }
-    .nav-item.active{
-      background:rgba(255,255,255,.10);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
-      color:#fff;
-    }
-    .nav-item.active::before{
-      content:"";
-      position:absolute;
-      left:-6px; top:10px;
-      width:4px; height:calc(100% - 20px);
-      border-radius:99px;
-      background:rgba(59,130,246,.95);
-      box-shadow:0 0 18px rgba(59,130,246,.55);
-    }
-    .nav-ico{
-      width:40px;height:40px;border-radius:14px;
-      display:grid;place-items:center;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.06);
-      flex:0 0 40px;
-    }
-    .nav-ico i{ font-size:18px; line-height:1; }
-
-    .ico-sky{ background:#e0f2fe; border-color:#7dd3fc; color:#0284c7; }
-    .ico-indigo{ background:#e0e7ff; border-color:#a5b4fc; color:#4338ca; }
-    .ico-amber{ background:#fef3c7; border-color:#fcd34d; color:#d97706; }
-    .ico-cyan{ background:#cffafe; border-color:#67e8f9; color:#0891b2; }
-    .ico-green{ background:#dcfce7; border-color:#86efac; color:#16a34a; }
-    .ico-rose{ background:#ffe4e6; border-color:#fda4af; color:#e11d48; }
-    .ico-slate{ background:#e2e8f0; border-color:#cbd5e1; color:#334155; }
-
-    .nav-item.active .nav-ico{ box-shadow:0 0 0 2px rgba(255,255,255,.12); }
-    .nav-sep{ border-color:rgba(255,255,255,.12)!important; margin:14px 0; }
-    .logout{ color:#fca5a5; }
-    .logout:hover{ background:rgba(239,68,68,.12); color:#fecaca; }
-    .sidebar-footer{ margin-top:auto; padding:12px 10px 6px; color:rgba(226,232,240,.75); font-size:12px; }
-    .sidebar-footer .mini{ opacity:.8; font-size:11px; }
-
-    /* Main */
-    .main{ padding:26px 28px; }
-    .subtitle{ color:var(--muted); }
-
-    .card-soft{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:18px;
-      box-shadow:var(--shadow2);
-    }
-    .btn-pill{ border-radius:999px; }
-    .badge-pill{ border-radius:999px; padding:.35rem .6rem; }
-
+    /* Page-only small styles */
+    .page-badge{ border-radius:999px; padding:.35rem .6rem; }
     @media (max-width: 768px){
       .sidebar{ display:none; }
       .main{ padding:18px 14px; }
@@ -96,24 +21,76 @@
   </style>
 </head>
 
-<body>
+<body data-active="meal">
 <div class="app d-flex">
+
+  <!-- ✅ STANDARD SIDEBAR (same style as dashboard) -->
   <aside class="sidebar">
     <div class="brand">SMART FIT</div>
     <div class="hello">Hi, <span id="trainerName">trainer</span></div>
 
-    <a class="nav-item" href="dashboard.html"><span class="nav-ico ico-sky"><i class="bi bi-speedometer2"></i></span><span>Dashboard</span></a>
-    <a class="nav-item" href="members.html"><span class="nav-ico ico-indigo"><i class="bi bi-people"></i></span><span>Members & Assign</span></a>
-    <a class="nav-item" href="manage_workouts.html"><span class="nav-ico ico-amber"><i class="bi bi-activity"></i></span><span>Workouts</span></a>
-    <a class="nav-item" href="member_progress.html"><span class="nav-ico ico-cyan"><i class="bi bi-graph-up-arrow"></i></span><span>Progress</span></a>
-    <a class="nav-item active" href="meal_plans.html"><span class="nav-ico ico-green"><i class="bi bi-egg-fried"></i></span><span>Meal Plans</span></a>
-    <a class="nav-item" href="profile.html"><span class="nav-ico ico-slate"><i class="bi bi-person"></i></span><span>Profile</span></a>
-    <a class="nav-item" href="nutrition.html"><span class="nav-ico ico-rose"><i class="bi bi-apple"></i></span><span>Nutrition</span></a>
-    <a class="nav-item" href="schedule.html"><span class="nav-ico ico-sky"><i class="bi bi-calendar2-week"></i></span><span>Schedule</span></a>
-    <a class="nav-item" href="../../index.html"><span class="nav-ico ico-slate"><i class="bi bi-globe"></i></span><span>Back to Website</span></a>
+    <a class="nav-item" data-key="dashboard" href="dashboard.html">
+      <span class="nav-ico chip-sky"><i class="bi bi-speedometer2"></i></span>
+      <span class="nav-label">Dashboard</span>
+    </a>
+
+    <a class="nav-item" data-key="members" href="members.html">
+      <span class="nav-ico chip-violet"><i class="bi bi-people"></i></span>
+      <span class="nav-label">Members & Assign</span>
+    </a>
+
+    <a class="nav-item" data-key="workouts" href="manage_workouts.html">
+      <span class="nav-ico chip-amber"><i class="bi bi-activity"></i></span>
+      <span class="nav-label">Workouts</span>
+    </a>
+
+    <a class="nav-item" data-key="progress" href="member_progress.html">
+      <span class="nav-ico chip-cyan"><i class="bi bi-graph-up-arrow"></i></span>
+      <span class="nav-label">Progress</span>
+    </a>
+
+    <a class="nav-item" data-key="meal" href="meal_plans.html">
+      <span class="nav-ico chip-green"><i class="bi bi-egg-fried"></i></span>
+      <span class="nav-label">Meal Plans</span>
+    </a>
+
+    <a class="nav-item" data-key="nutrition" href="nutrition.html">
+      <span class="nav-ico chip-rose"><i class="bi bi-apple"></i></span>
+      <span class="nav-label">Nutrition</span>
+    </a>
+
+    <a class="nav-item" data-key="schedule" href="schedule.html">
+      <span class="nav-ico chip-indigo"><i class="bi bi-calendar2-week"></i></span>
+      <span class="nav-label">Schedule</span>
+    </a>
+
+    <a class="nav-item" data-key="profile" href="profile.html">
+      <span class="nav-ico chip-slate"><i class="bi bi-person"></i></span>
+      <span class="nav-label">Profile</span>
+    </a>
+
+    <!-- ✅ Notifications with badge -->
+    <a class="nav-item" data-key="notifications" href="notifications.html">
+      <span class="nav-ico chip-amber">
+        <i class="bi bi-bell"></i>
+        <span id="notifBadge">0</span>
+      </span>
+      <span class="nav-label">Notifications</span>
+    </a>
+
+    <a class="nav-item" data-key="back" href="../../index.html">
+      <span class="nav-ico chip-slate"><i class="bi bi-globe"></i></span>
+      <span class="nav-label">Back to Website</span>
+    </a>
 
     <hr class="nav-sep">
-    <a class="nav-item logout" href="#" id="btnLogout"><span class="nav-ico ico-rose"><i class="bi bi-box-arrow-right"></i></span><span>Logout</span></a>
+
+    <a class="nav-item logout" href="#" id="btnLogout">
+      <span class="nav-ico" style="background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.18)">
+        <i class="bi bi-box-arrow-right"></i>
+      </span>
+      <span class="nav-label">Logout</span>
+    </a>
 
     <div class="sidebar-footer">
       <div class="fw-bold">Trainer Panel</div>
@@ -121,11 +98,13 @@
     </div>
   </aside>
 
+  <!-- MAIN -->
   <main class="main flex-grow-1">
+
     <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
       <div>
         <h3 class="mb-1 d-flex align-items-center gap-2">
-          <span class="badge text-bg-success badge-pill"><i class="bi bi-egg-fried"></i></span>
+          <span class="chip chip-green"><i class="bi bi-egg-fried"></i></span>
           Meal Plans Management
         </h3>
         <div class="subtitle">Create plans that members can follow</div>
@@ -138,10 +117,12 @@
         <button class="btn btn-dark btn-pill" id="btnAddTop">
           <i class="bi bi-plus-circle me-2"></i>Add Plan
         </button>
+        <span class="badge text-bg-dark page-badge" id="rolePill">Role: Trainer</span>
       </div>
     </div>
 
     <div class="row g-3 mt-3">
+      <!-- Create -->
       <div class="col-lg-6">
         <div class="card-soft p-3" id="newPlanBox">
           <div class="fw-bold mb-2"><i class="bi bi-plus-circle me-2"></i>New Plan</div>
@@ -166,23 +147,27 @@
         </div>
       </div>
 
+      <!-- List -->
       <div class="col-lg-6">
         <div class="card-soft p-3">
           <div class="fw-bold mb-2"><i class="bi bi-journal-text me-2"></i>My Meal Plans</div>
           <div class="subtitle mb-2" style="font-size:13px;">Latest plans created by trainer</div>
-
           <div id="list" class="subtitle">Loading...</div>
         </div>
       </div>
     </div>
+
   </main>
 </div>
 
-<script>
-  const BASE = "../../";
-  const API  = BASE + "backend/";
+<!-- ✅ Use SAME layout JS for ALL trainer pages -->
+<script src="trainer_layout.js"></script>
 
-  // DOM refs
+<script>
+(() => {
+  const BASE2 = "../../";
+  const API2  = BASE2 + "backend/";
+
   const title = document.getElementById("title");
   const content = document.getElementById("content");
   const list = document.getElementById("list");
@@ -193,33 +178,13 @@
   const btnAddTop = document.getElementById("btnAddTop");
   const newPlanBox = document.getElementById("newPlanBox");
 
-  async function guardTrainer(){
-    const r = await fetch(API+"check_auth.php",{credentials:"include"});
-    if(r.status===401) return location.href=BASE+"login.html";
-    const data = await r.json().catch(()=>({}));
-    if((data.role||"")!=="trainer"){
-      if(data.role==="admin") location.href=BASE+"dashboard/admin/dashboard.html";
-      else location.href=BASE+"dashboard/member/dashboard.html";
-      return;
-    }
-    if(data.username) document.getElementById("trainerName").textContent = data.username;
-  }
-
-  async function logout(){
-    await fetch(API+"logout.php",{method:"POST",credentials:"include"}).catch(()=>{});
-    location.href=BASE+"login.html";
-  }
-
-  document.getElementById("btnLogout").addEventListener("click",(e)=>{
-    e.preventDefault();
-    logout();
-  });
-
   function esc(s){
     return String(s??"")
       .replaceAll("&","&amp;")
       .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;");
+      .replaceAll(">","&gt;")
+      .replaceAll('"',"&quot;")
+      .replaceAll("'","&#039;");
   }
 
   function showErr(msg){
@@ -238,7 +203,7 @@
   }
 
   async function loadPlans(){
-    const r = await fetch(API+"trainer_meal_plans_list.php",{credentials:"include"}).catch(()=>null);
+    const r = await fetch(API2+"trainer_meal_plans_list.php", { credentials:"include", cache:"no-store" }).catch(()=>null);
     if(!r){ list.innerHTML = `<div class="text-danger">API not reachable</div>`; return; }
 
     const d = await r.json().catch(()=>({ok:false}));
@@ -247,9 +212,7 @@
       return;
     }
 
-    // ✅ API returns "plans"
     const items = d.plans || d.items || [];
-
     if(!items.length){
       list.innerHTML = `<div class="subtitle">No plans yet</div>`;
       return;
@@ -267,14 +230,11 @@
   async function savePlan(){
     clearMsgs();
 
-    const payload = {
-      title: title.value.trim(),
-      content: content.value.trim()
-    };
+    const payload = { title: title.value.trim(), content: content.value.trim() };
     if(!payload.title) return showErr("Title required");
     if(!payload.content) return showErr("Content required");
 
-    const r = await fetch(API+"trainer_meal_plan_save.php",{
+    const r = await fetch(API2+"trainer_meal_plan_save.php",{
       method:"POST",
       credentials:"include",
       headers: {"Content-Type":"application/json"},
@@ -290,13 +250,12 @@
     loadPlans();
   }
 
-  // ✅ Auto-fill from Nutrition Hub (localStorage draft)
   function applyDraftMealPlan(){
     const raw = localStorage.getItem("sf_mealplan_draft");
     if(!raw) return;
 
-    let draft = null;
-    try { draft = JSON.parse(raw); } catch(e){ return; }
+    let draft=null;
+    try{ draft = JSON.parse(raw); }catch{ return; }
     if(!draft || !draft.title || !draft.content) return;
 
     title.value = draft.title;
@@ -305,7 +264,6 @@
     showOk("Template loaded from Nutrition Hub. You can edit and Save.");
     localStorage.removeItem("sf_mealplan_draft");
 
-    // scroll to form + highlight
     newPlanBox.scrollIntoView({behavior:"smooth", block:"start"});
     newPlanBox.style.boxShadow = "0 18px 40px rgba(34,197,94,.18)";
     setTimeout(()=> newPlanBox.style.boxShadow = "", 1200);
@@ -321,11 +279,13 @@
     newPlanBox.scrollIntoView({behavior:"smooth", block:"start"});
   });
 
-  (async()=>{
-    await guardTrainer();
+  window.addEventListener("DOMContentLoaded", () => {
     loadPlans();
     applyDraftMealPlan();
-  })();
+  });
+
+})();
 </script>
+
 </body>
 </html>

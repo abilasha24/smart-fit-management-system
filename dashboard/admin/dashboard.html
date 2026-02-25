@@ -4,15 +4,52 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>Admin Dashboard | Smart Fit</title>
+
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
   <style>
     body { background:#f6f7fb; }
+
     .sidebar { width: 260px; min-height: 100vh; background:#111827; color:#fff; }
     .sidebar a { color:#cbd5e1; text-decoration:none; display:block; padding:10px 14px; border-radius:10px; }
     .sidebar a:hover, .sidebar a.active { background:#1f2937; color:#fff; }
-    .brand { font-weight:700; letter-spacing:0.5px; }
+
+    .brand { font-weight:700; letter-spacing:0.5px; display:flex; align-items:center; gap:10px; }
+    .brand-mark{
+      width:34px; height:34px; border-radius:12px;
+      background:linear-gradient(135deg,#16a34a,#22c55e);
+      display:inline-flex; align-items:center; justify-content:center;
+      box-shadow:0 6px 18px rgba(34,197,94,.25);
+      flex:0 0 auto;
+    }
+    .brand-mark i{color:#fff;font-size:18px}
+
+    .nav-ico{width:22px; display:inline-flex; justify-content:center; margin-right:10px; opacity:.9}
+
     .card-soft { border:0; border-radius:16px; box-shadow:0 6px 18px rgba(17,24,39,.08); }
     .muted { color:#6b7280; }
+
+    .page-title{display:flex; align-items:center; gap:10px}
+    .page-title i{color:#111827}
+
+    .card-ico{
+      width:44px; height:44px; border-radius:14px;
+      background:#f3f4f6;
+      display:flex; align-items:center; justify-content:center;
+      border:1px solid rgba(17,24,39,.06);
+    }
+    .card-ico i{font-size:20px;color:#111827}
+
+    .btn i{margin-right:8px}
+
+    .quick-chip{
+      display:inline-flex; align-items:center; gap:8px;
+      padding:8px 12px; border-radius:12px;
+      background:#f3f4f6; border:1px solid rgba(17,24,39,.06);
+      color:#111827; text-decoration:none;
+    }
+    .quick-chip:hover{background:#eceff3}
   </style>
 </head>
 <body>
@@ -20,80 +57,171 @@
 <div class="d-flex">
   <!-- Sidebar -->
   <aside class="sidebar p-3">
-    <div class="brand fs-5 mb-3">SMART FIT • Admin</div>
+    <div class="brand fs-5 mb-3">
+      <span class="brand-mark"><i class="bi bi-heart-pulse-fill"></i></span>
+      <span>SMART FIT • Admin</span>
+    </div>
     <div class="small text-white-50 mb-3">Control Center</div>
 
-    <a class="active" href="dashboard.html">Dashboard</a>
-    <a href="workouts.html">Manage Workouts</a>
-    <a href="users.html">Manage Users</a>
-    <a href="plans.html">Plans & Payments</a>
-    <a href="feedback.html">Feedback</a>
-    <a href="../../index.html">← Back to Home</a>
+    <a class="active" href="dashboard.html"><span class="nav-ico"><i class="bi bi-speedometer2"></i></span>Dashboard</a>
+    <a href="users.html"><span class="nav-ico"><i class="bi bi-people"></i></span>Manage Users</a>
+    <a href="trainers.html"><span class="nav-ico"><i class="bi bi-person-badge"></i></span>Manage Trainers</a>
+    <a href="workouts.html"><span class="nav-ico"><i class="bi bi-activity"></i></span>Manage Workouts</a>
+    <a href="payments.html"><span class="nav-ico"><i class="bi bi-cash-coin"></i></span>Payments</a>
+    <a href="feedback.html"><span class="nav-ico"><i class="bi bi-chat-left-text"></i></span>Feedback</a>
+    <a href="../../index.html"><span class="nav-ico"><i class="bi bi-arrow-left"></i></span>Back to Home</a>
 
     <hr class="border-secondary my-3"/>
-    <button id="btnLogout" class="btn btn-outline-light w-100">Logout</button>
+    <button id="btnLogout" class="btn btn-outline-light w-100">
+      <i class="bi bi-box-arrow-right"></i> Logout
+    </button>
   </aside>
 
   <!-- Main -->
   <main class="flex-grow-1 p-4">
     <div class="d-flex flex-wrap justify-content-between align-items-center gap-2 mb-3">
       <div>
-        <h3 class="mb-0">Dashboard</h3>
-        <div class="muted">Welcome, <span id="hiName">...</span></div>
+        <h3 class="mb-0 page-title"><i class="bi bi-speedometer2"></i> Dashboard</h3>
+        <div class="muted">
+          <i class="bi bi-hand-thumbs-up"></i>
+          Welcome, <span id="hiName">...</span>
+        </div>
       </div>
       <div class="text-end">
-        <div class="small muted">Role: <span id="roleText">admin</span></div>
+        <div class="small muted"><i class="bi bi-shield-check"></i> Role: <span id="roleText">admin</span></div>
       </div>
     </div>
 
-    <!-- Stats -->
+    <!-- Stats Row 1 -->
     <div class="row g-3">
       <div class="col-md-3">
         <div class="card card-soft p-3">
-          <div class="muted small">Total Users</div>
-          <div class="fs-3 fw-bold" id="sTotalUsers">—</div>
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="muted small"><i class="bi bi-people"></i> Total Users</div>
+              <div class="fs-3 fw-bold" id="sTotalUsers">—</div>
+            </div>
+            <div class="card-ico"><i class="bi bi-people"></i></div>
+          </div>
         </div>
       </div>
+
       <div class="col-md-3">
         <div class="card card-soft p-3">
-          <div class="muted small">Workouts</div>
-          <div class="fs-3 fw-bold" id="sWorkouts">—</div>
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="muted small"><i class="bi bi-activity"></i> Workouts</div>
+              <div class="fs-3 fw-bold" id="sWorkouts">—</div>
+            </div>
+            <div class="card-ico"><i class="bi bi-activity"></i></div>
+          </div>
         </div>
       </div>
+
       <div class="col-md-3">
         <div class="card card-soft p-3">
-          <div class="muted small">Completions</div>
-          <div class="fs-3 fw-bold" id="sCompletions">—</div>
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="muted small"><i class="bi bi-check2-circle"></i> Completions</div>
+              <div class="fs-3 fw-bold" id="sCompletions">—</div>
+            </div>
+            <div class="card-ico"><i class="bi bi-check2-circle"></i></div>
+          </div>
         </div>
       </div>
+
       <div class="col-md-3">
         <div class="card card-soft p-3">
-          <div class="muted small">Feedback</div>
-          <div class="fs-3 fw-bold" id="sFeedback">—</div>
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="muted small"><i class="bi bi-chat-left-text"></i> Feedback</div>
+              <div class="fs-3 fw-bold" id="sFeedback">—</div>
+            </div>
+            <div class="card-ico"><i class="bi bi-chat-left-text"></i></div>
+          </div>
         </div>
       </div>
     </div>
 
+    <!-- Stats Row 2 -->
+    <div class="row g-3 mt-1">
+      <div class="col-md-3">
+        <div class="card card-soft p-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="muted small"><i class="bi bi-cash-coin"></i> Total Revenue</div>
+              <div class="fs-3 fw-bold" id="sTotalRevenue">—</div>
+            </div>
+            <div class="card-ico"><i class="bi bi-cash-coin"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card card-soft p-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="muted small"><i class="bi bi-calendar2-week"></i> This Month</div>
+              <div class="fs-3 fw-bold" id="sMonthRevenue">—</div>
+            </div>
+            <div class="card-ico"><i class="bi bi-calendar2-week"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card card-soft p-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="muted small"><i class="bi bi-receipt"></i> Paid Transactions</div>
+              <div class="fs-3 fw-bold" id="sPaidTxn">—</div>
+            </div>
+            <div class="card-ico"><i class="bi bi-receipt"></i></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="col-md-3">
+        <div class="card card-soft p-3">
+          <div class="d-flex justify-content-between align-items-center">
+            <div>
+              <div class="muted small"><i class="bi bi-shield-lock"></i> Blocked Users</div>
+              <div class="fs-3 fw-bold" id="sBlockedUsers">—</div>
+            </div>
+            <div class="card-ico"><i class="bi bi-shield-lock"></i></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bottom Row -->
     <div class="row g-3 mt-1">
       <div class="col-lg-6">
         <div class="card card-soft p-3">
-          <div class="fw-semibold mb-2">Users by Role</div>
+          <div class="fw-semibold mb-2"><i class="bi bi-diagram-3"></i> Users by Role</div>
           <div class="d-flex flex-wrap gap-2">
-            <span class="badge text-bg-primary">Members: <span id="sMembers">—</span></span>
-            <span class="badge text-bg-warning">Trainers: <span id="sTrainers">—</span></span>
-            <span class="badge text-bg-dark">Admins: <span id="sAdmins">—</span></span>
+            <span class="badge text-bg-primary"><i class="bi bi-person"></i> Members: <span id="sMembers">—</span></span>
+            <span class="badge text-bg-warning"><i class="bi bi-person-badge"></i> Trainers: <span id="sTrainers">—</span></span>
+            <span class="badge text-bg-dark"><i class="bi bi-shield-check"></i> Admins: <span id="sAdmins">—</span></span>
           </div>
-          <div class="small muted mt-2">Tip: Next step is “Manage Workouts” CRUD.</div>
         </div>
       </div>
 
       <div class="col-lg-6">
         <div class="card card-soft p-3">
-          <div class="fw-semibold mb-2">Quick Actions</div>
+          <div class="fw-semibold mb-2"><i class="bi bi-lightning-charge"></i> Quick Actions</div>
           <div class="d-flex gap-2 flex-wrap">
-            <a class="btn btn-dark" href="workouts.html">Add / Edit Workouts</a>
-            <a class="btn btn-outline-dark" href="users.html">Manage Users</a>
-            <a class="btn btn-outline-dark" href="feedback.html">View Feedback</a>
+            <a class="btn btn-dark" href="users.html"><i class="bi bi-people"></i>Manage Users</a>
+            <a class="btn btn-outline-dark" href="payments.html"><i class="bi bi-cash-coin"></i>Payments</a>
+            <a class="btn btn-outline-dark" href="feedback.html"><i class="bi bi-chat-left-text"></i>Feedback</a>
+            <a class="btn btn-outline-dark" href="workouts.html"><i class="bi bi-activity"></i>Workouts</a>
+          </div>
+
+          <!-- Optional: small chips (looks premium) -->
+          <div class="mt-3 d-flex flex-wrap gap-2">
+            <a class="quick-chip" href="trainers.html"><i class="bi bi-person-badge"></i> Trainers</a>
+            <a class="quick-chip" href="plans.html"><i class="bi bi-sliders"></i> Roles & Plans</a>
+            <a class="quick-chip" href="payments.html"><i class="bi bi-graph-up"></i> Revenue</a>
           </div>
         </div>
       </div>
@@ -107,44 +235,60 @@
 
   async function guardAdmin() {
     const r = await fetch(BASE + "backend/check_auth.php", { credentials: "include" });
+
     if (r.status === 401) {
       location.href = BASE + "login.html";
-      return;
+      return false;
     }
+
     const data = await r.json();
 
-    // if role not admin -> redirect to correct dashboard
     if ((data.role || "") !== "admin") {
       if (data.role === "trainer") location.href = BASE + "dashboard/trainer/dashboard.html";
       else location.href = BASE + "dashboard/member/dashboard.html";
-      return;
+      return false;
     }
 
     document.getElementById("roleText").textContent = data.role || "admin";
 
-    // show name (we can try read from session via whoami-like endpoint if you have it,
-    // but for now keep simple: display "Admin")
-    document.getElementById("hiName").textContent = "Admin";
+    const hi =
+      data.first_name ||
+      data.full_name ||
+      data.name ||
+      "Admin";
+
+    document.getElementById("hiName").textContent = hi;
+    return true;
   }
 
   async function loadStats() {
     const r = await fetch(BASE + "backend/admin_get_stats.php", { credentials: "include" });
-    const data = await r.json();
+    const data = await r.json().catch(()=>({ok:false}));
+
     if (!data.ok) return;
 
-    const s = data.stats;
-    document.getElementById("sTotalUsers").textContent = s.total_users;
-    document.getElementById("sWorkouts").textContent = s.workouts_count;
-    document.getElementById("sCompletions").textContent = s.completions_count;
-    document.getElementById("sFeedback").textContent = s.feedback_count;
+    const s = data.stats || {};
 
-    document.getElementById("sMembers").textContent = s.total_members;
-    document.getElementById("sTrainers").textContent = s.total_trainers;
-    document.getElementById("sAdmins").textContent = s.total_admins;
+    document.getElementById("sTotalUsers").textContent = s.total_users ?? 0;
+    document.getElementById("sWorkouts").textContent = s.workouts_count ?? 0;
+    document.getElementById("sCompletions").textContent = s.completions_count ?? 0;
+    document.getElementById("sFeedback").textContent = s.feedback_count ?? 0;
+
+    document.getElementById("sMembers").textContent = s.total_members ?? 0;
+    document.getElementById("sTrainers").textContent = s.total_trainers ?? 0;
+    document.getElementById("sAdmins").textContent = s.total_admins ?? 0;
+
+    document.getElementById("sTotalRevenue").textContent =
+      "LKR " + Number(s.total_revenue || 0).toFixed(2);
+
+    document.getElementById("sMonthRevenue").textContent =
+      "LKR " + Number(s.this_month_revenue || 0).toFixed(2);
+
+    document.getElementById("sPaidTxn").textContent = s.paid_transactions ?? 0;
+    document.getElementById("sBlockedUsers").textContent = s.blocked_users ?? 0;
   }
 
   async function logout() {
-    // if you already have backend/logout.php use it
     await fetch(BASE + "backend/logout.php", { credentials: "include" }).catch(()=>{});
     location.href = BASE + "login.html";
   }
@@ -152,8 +296,8 @@
   document.getElementById("btnLogout").addEventListener("click", logout);
 
   (async () => {
-    await guardAdmin();
-    await loadStats();
+    const ok = await guardAdmin();
+    if (ok) await loadStats();
   })();
 </script>
 

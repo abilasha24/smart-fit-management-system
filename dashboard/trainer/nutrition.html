@@ -8,106 +8,15 @@
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
 
+  <!-- ✅ Use SAME layout CSS for ALL trainer pages -->
+  <link rel="stylesheet" href="trainer_layout.css?v=6">
+
   <style>
-    :root{
-      --bg:#f6f7fb;
-      --sidebar:#0b1220; --sidebar2:#0f172a;
-      --text:#0f172a; --muted:#6b7280;
-      --card:#ffffff; --line:#e5e7eb;
-
-      --shadow: 0 12px 28px rgba(15,23,42,.08);
-      --shadow2: 0 10px 22px rgba(15,23,42,.06);
-      --r:18px;
-    }
-    body{ background:var(--bg); color:var(--text); }
-    .app{ min-height:100vh; }
-
-    /* Sidebar */
-    .sidebar{
-      width:270px; min-height:100vh; position:sticky; top:0;
-      background:linear-gradient(180deg,var(--sidebar),var(--sidebar2));
-      color:#fff; padding:18px 16px;
-      box-shadow:10px 0 30px rgba(0,0,0,.08);
-      display:flex; flex-direction:column;
-    }
-    .brand{ font-weight:800; font-size:26px; margin-bottom:8px; letter-spacing:.5px; }
-    .hello{ color:#cbd5e1; font-size:14px; margin-bottom:16px; }
-
-    .nav-item{
-      display:flex; align-items:center; gap:12px;
-      padding:12px 14px; border-radius:14px;
-      color:#e5e7eb; text-decoration:none;
-      margin-bottom:10px; transition:.15s ease;
-      position:relative;
-    }
-    .nav-item:hover{ background:rgba(255,255,255,.06); color:#fff; }
-    .nav-item.active{
-      background:rgba(255,255,255,.10);
-      box-shadow: inset 0 0 0 1px rgba(255,255,255,.08);
-      color:#fff;
-    }
-    .nav-item.active::before{
-      content:"";
-      position:absolute;
-      left:-6px; top:10px;
-      width:4px; height:calc(100% - 20px);
-      border-radius:99px;
-      background:rgba(59,130,246,.95);
-      box-shadow:0 0 18px rgba(59,130,246,.55);
-    }
-
-    .nav-ico{
-      width:40px;height:40px;border-radius:14px;
-      display:grid;place-items:center;
-      border:1px solid rgba(255,255,255,.10);
-      background:rgba(255,255,255,.06);
-      flex:0 0 40px;
-    }
-    .nav-ico i{ font-size:18px; line-height:1; }
-
-    .ico-sky{ background:#e0f2fe; border-color:#7dd3fc; color:#0284c7; }
-    .ico-indigo{ background:#e0e7ff; border-color:#a5b4fc; color:#4338ca; }
-    .ico-amber{ background:#fef3c7; border-color:#fcd34d; color:#d97706; }
-    .ico-cyan{ background:#cffafe; border-color:#67e8f9; color:#0891b2; }
-    .ico-green{ background:#dcfce7; border-color:#86efac; color:#16a34a; }
-    .ico-rose{ background:#ffe4e6; border-color:#fda4af; color:#e11d48; }
-    .ico-slate{ background:#e2e8f0; border-color:#cbd5e1; color:#334155; }
-
-    .nav-item.active .nav-ico{ box-shadow:0 0 0 2px rgba(255,255,255,.12); }
-
-    .nav-sep{ border-color:rgba(255,255,255,.12)!important; margin:14px 0; }
-    .logout{ color:#fca5a5; }
-    .logout:hover{ background:rgba(239,68,68,.12); color:#fecaca; }
-
-    .sidebar-footer{ margin-top:auto; padding:12px 10px 6px; color:rgba(226,232,240,.75); font-size:12px; }
-    .sidebar-footer .mini{ opacity:.8; font-size:11px; }
-
-    /* Main */
-    .main{ padding:26px 28px; }
-    .subtitle{ color:var(--muted); }
-    .small-help{ font-size:12px; color:var(--muted); }
-
-    .card-soft{
-      background:var(--card);
-      border:1px solid var(--line);
-      border-radius:var(--r);
-      box-shadow:var(--shadow2);
-      overflow:hidden;
-      transition: all .25s ease;
-    }
-    .card-soft:hover{
-      transform: translateY(-6px);
-      box-shadow: 0 18px 35px rgba(15,23,42,.15);
-    }
-
-    .badge-pill{ border-radius:999px; padding:.35rem .6rem; }
-    .btn-pill{ border-radius:999px; }
-
-    /* Hero */
+    /* Page-only extra styles (keep small) */
     .hero{
       border-radius:22px;
       border:1px solid rgba(255,255,255,.65);
-      box-shadow:var(--shadow);
+      box-shadow:0 12px 28px rgba(15,23,42,.08);
       background:
         radial-gradient(900px 300px at 10% 10%, rgba(56,189,248,.30), transparent 55%),
         radial-gradient(900px 300px at 85% 30%, rgba(34,197,94,.22), transparent 60%),
@@ -116,54 +25,17 @@
       color:#0b1220;
       position:relative;
       overflow:hidden;
-    }
-    .hero::before{
-      content:"";
-      position:absolute; inset:-2px;
-      background:
-        url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='840' height='320'%3E%3Cdefs%3E%3CradialGradient id='g' cx='50%25' cy='50%25' r='60%25'%3E%3Cstop offset='0%25' stop-color='white' stop-opacity='0.22'/%3E%3Cstop offset='100%25' stop-color='white' stop-opacity='0'/%3E%3C/radialGradient%3E%3C/defs%3E%3Ccircle cx='120' cy='90' r='120' fill='url(%23g)'/%3E%3Ccircle cx='720' cy='70' r='140' fill='url(%23g)'/%3E%3Ccircle cx='560' cy='280' r='160' fill='url(%23g)'/%3E%3C/svg%3E") center/cover no-repeat;
-      opacity:.9;
-      pointer-events:none;
-      mix-blend-mode:soft-light;
+      padding:10px;
     }
     .hero-inner{
-      position:relative;
       padding:18px 18px;
-      background:rgba(255,255,255,.78);
+      background:rgba(255,255,255,.82);
       border:1px solid rgba(255,255,255,.55);
       border-radius:22px;
       backdrop-filter: blur(8px);
     }
     .hero-title{ font-weight:900; letter-spacing:.2px; }
-
-    .chip{
-      width:44px;height:44px;border-radius:16px;display:grid;place-items:center;
-      border:1px solid rgba(15,23,42,.10);
-      background:rgba(255,255,255,.75);
-      color:#0f172a; font-size:20px;
-      box-shadow:0 8px 20px rgba(15,23,42,.08);
-    }
-
-    /* Accent */
-    .accent{
-      height:6px;
-      background:linear-gradient(90deg, rgba(59,130,246,.95), rgba(34,197,94,.85), rgba(244,63,94,.75));
-    }
-
-    /* Icons */
-    .mini-ico{
-      width:44px;height:44px;border-radius:16px;
-      display:grid;place-items:center;
-      border:1px solid var(--line);
-      background:#f8fafc;
-      font-size:20px;
-    }
-    .mini-ico.blue{ background:#eff6ff; border-color:#dbeafe; color:#2563eb; }
-    .mini-ico.green{ background:#ecfdf5; border-color:#bbf7d0; color:#16a34a; }
-    .mini-ico.amber{ background:#fffbeb; border-color:#fde68a; color:#b45309; }
-    .mini-ico.cyan{ background:#ecfeff; border-color:#a5f3fc; color:#0891b2; }
-    .mini-ico.rose{ background:#fff1f2; border-color:#fecdd3; color:#be123c; }
-    .mini-ico.violet{ background:#f5f3ff; border-color:#ddd6fe; color:#6d28d9; }
+    .small-help{ font-size:12px; color:var(--muted); }
 
     .tip-card{
       border:1px solid var(--line);
@@ -178,7 +50,6 @@
         radial-gradient(500px 220px at 90% 10%, rgba(34,197,94,.10), transparent 55%),
         #fff;
     }
-
     .macro{
       border:1px solid var(--line);
       border-radius:16px;
@@ -221,7 +92,7 @@
       color:#fff;
       padding:10px 12px;
       border-radius:14px;
-      box-shadow: var(--shadow);
+      box-shadow: 0 12px 28px rgba(15,23,42,.18);
       display:none;
       font-size:13px;
       opacity:.96;
@@ -234,24 +105,69 @@
   </style>
 </head>
 
-<body>
+<body data-active="nutrition">
 <div class="app d-flex">
   <aside class="sidebar">
     <div class="brand">SMART FIT</div>
     <div class="hello">Hi, <span id="trainerName">trainer</span></div>
 
-    <a class="nav-item" href="dashboard.html"><span class="nav-ico ico-sky"><i class="bi bi-speedometer2"></i></span><span>Dashboard</span></a>
-    <a class="nav-item" href="members.html"><span class="nav-ico ico-indigo"><i class="bi bi-people"></i></span><span>Members & Assign</span></a>
-    <a class="nav-item" href="manage_workouts.html"><span class="nav-ico ico-amber"><i class="bi bi-activity"></i></span><span>Workouts</span></a>
-    <a class="nav-item" href="member_progress.html"><span class="nav-ico ico-cyan"><i class="bi bi-graph-up-arrow"></i></span><span>Progress</span></a>
-    <a class="nav-item" href="meal_plans.html"><span class="nav-ico ico-green"><i class="bi bi-egg-fried"></i></span><span>Meal Plans</span></a>
-    <a class="nav-item" href="profile.html"><span class="nav-ico ico-slate"><i class="bi bi-person"></i></span><span>Profile</span></a>
-    <a class="nav-item active" href="nutrition.html"><span class="nav-ico ico-rose"><i class="bi bi-apple"></i></span><span>Nutrition</span></a>
-    <a class="nav-item" href="schedule.html"><span class="nav-ico ico-sky"><i class="bi bi-calendar2-week"></i></span><span>Schedule</span></a>
-    <a class="nav-item" href="../../index.html"><span class="nav-ico ico-slate"><i class="bi bi-globe"></i></span><span>Back to Website</span></a>
+    <a class="nav-item" data-key="dashboard" href="dashboard.html">
+      <span class="nav-ico"><i class="bi bi-speedometer2"></i></span>
+      <span class="nav-label">Dashboard</span>
+    </a>
+
+    <a class="nav-item" data-key="members" href="members.html">
+      <span class="nav-ico"><i class="bi bi-people"></i></span>
+      <span class="nav-label">Members & Assign</span>
+    </a>
+
+    <a class="nav-item" data-key="workouts" href="manage_workouts.html">
+      <span class="nav-ico"><i class="bi bi-activity"></i></span>
+      <span class="nav-label">Workouts</span>
+    </a>
+
+    <a class="nav-item" data-key="progress" href="member_progress.html">
+      <span class="nav-ico"><i class="bi bi-graph-up-arrow"></i></span>
+      <span class="nav-label">Progress</span>
+    </a>
+
+    <a class="nav-item" data-key="meal_plans" href="meal_plans.html">
+      <span class="nav-ico"><i class="bi bi-egg-fried"></i></span>
+      <span class="nav-label">Meal Plans</span>
+    </a>
+
+    <a class="nav-item active" data-key="nutrition" href="nutrition.html">
+      <span class="nav-ico"><i class="bi bi-apple"></i></span>
+      <span class="nav-label">Nutrition</span>
+    </a>
+
+    <a class="nav-item" data-key="schedule" href="schedule.html">
+      <span class="nav-ico"><i class="bi bi-calendar2-week"></i></span>
+      <span class="nav-label">Schedule</span>
+    </a>
+
+    <a class="nav-item" data-key="profile" href="profile.html">
+      <span class="nav-ico"><i class="bi bi-person"></i></span>
+      <span class="nav-label">Profile</span>
+    </a>
+
+    <!-- ✅ Notifications link with badge (same style everywhere) -->
+    <a class="nav-item" data-key="notifications" href="notifications.html">
+      <span class="nav-ico"><i class="bi bi-bell"></i></span>
+      <span class="nav-label">Notifications</span>
+      <span class="notif-badge" id="navNotifBadge">0</span>
+    </a>
+
+    <a class="nav-item" data-key="website" href="../../index.html">
+      <span class="nav-ico"><i class="bi bi-globe"></i></span>
+      <span class="nav-label">Back to Website</span>
+    </a>
 
     <hr class="nav-sep">
-    <a class="nav-item logout" href="#" id="btnLogout"><span class="nav-ico ico-rose"><i class="bi bi-box-arrow-right"></i></span><span>Logout</span></a>
+    <a class="nav-item logout" href="#" id="btnLogout">
+      <span class="nav-ico"><i class="bi bi-box-arrow-right"></i></span>
+      <span class="nav-label">Logout</span>
+    </a>
 
     <div class="sidebar-footer">
       <div class="fw-bold">Trainer Panel</div>
@@ -262,11 +178,11 @@
   <main class="main flex-grow-1">
 
     <!-- HERO -->
-    <div class="hero p-2">
+    <div class="hero">
       <div class="hero-inner">
         <div class="d-flex justify-content-between align-items-start flex-wrap gap-2">
           <div class="d-flex gap-3 align-items-start">
-            <div class="chip"><i class="bi bi-apple"></i></div>
+            <div class="chip chip-rose"><i class="bi bi-apple"></i></div>
             <div>
               <h3 class="mb-1 hero-title">Nutrition Hub</h3>
               <div class="subtitle">Copy templates or send them directly into Meal Plans</div>
@@ -310,7 +226,7 @@
           <div style="font-size:48px;">🥚🍗🐟</div>
           <h5 class="fw-bold mt-2">Protein Foods</h5>
           <div class="subtitle mb-2">Muscle support</div>
-          <div class="tip-card mt-2" style="background:#ecfdf5;">Eggs • Chicken • Fish • Dhal • Yogurt</div>
+          <div class="tip-card mt-2" style="background:#ecfdf5;">Eggs • Chicken • Fish • Dhal • Chickpeas • Curd</div>
           <div class="small-help mt-2">Spread across 3–5 meals daily.</div>
         </div>
       </div>
@@ -320,7 +236,7 @@
           <div style="font-size:48px;">💧🥥</div>
           <h5 class="fw-bold mt-2">Hydration Boost</h5>
           <div class="subtitle mb-2">Performance fuel</div>
-          <div class="tip-card mt-2" style="background:#eff6ff;">2–3 Liters Water Daily <br>+ Coconut water (optional)</div>
+          <div class="tip-card mt-2" style="background:#eff6ff;">2–3 Liters Water Daily <br>+ Electrolytes/Coconut water (optional)</div>
           <div class="small-help mt-2">Increase intake during cardio.</div>
         </div>
       </div>
@@ -340,14 +256,13 @@
             </a>
           </div>
 
-          <!-- Template 1 -->
+          <!-- ✅ Template 1 -->
           <div class="tip-card mt-3">
             <div class="d-flex justify-content-between gap-2 flex-wrap">
               <div>
-                <div class="fw-bold"><i class="bi bi-check2-circle me-2"></i>Weight Loss (Beginner)</div>
+                <div class="fw-bold"><i class="bi bi-check2-circle me-2"></i>Weight Loss Meal Plan (Beginner)</div>
                 <div class="subtitle">High-protein • low sugar • daily steps</div>
               </div>
-
               <div class="d-flex gap-2">
                 <button class="copy-btn" data-copy="tpl1"><i class="bi bi-clipboard me-1"></i>Copy</button>
                 <button class="copy-btn" data-use="tpl1" data-title="Weight Loss Meal Plan (Beginner)">
@@ -355,23 +270,22 @@
                 </button>
               </div>
             </div>
-
             <div class="mt-2" style="white-space:pre-wrap;" id="tpl1">Goal: Fat loss (small calorie deficit)
 Breakfast: Eggs + fruit
 Lunch: Rice (small) + dhal + chicken/fish + salad
-Snack: Yogurt / nuts
+Snack: Yogurt / nuts / fruit
 Dinner: Vegetables + protein
+Rules: No soft drinks • sweets only weekly
 Water: 2–3L • Walk: 8k steps • Sleep: 7–8h</div>
           </div>
 
-          <!-- Template 2 -->
+          <!-- ✅ Template 2 -->
           <div class="tip-card mt-2">
             <div class="d-flex justify-content-between gap-2 flex-wrap">
               <div>
-                <div class="fw-bold"><i class="bi bi-check2-circle me-2"></i>Muscle Gain (Beginner)</div>
+                <div class="fw-bold"><i class="bi bi-check2-circle me-2"></i>Muscle Gain Meal Plan (Beginner)</div>
                 <div class="subtitle">Slight surplus • strength training</div>
               </div>
-
               <div class="d-flex gap-2">
                 <button class="copy-btn" data-copy="tpl2"><i class="bi bi-clipboard me-1"></i>Copy</button>
                 <button class="copy-btn" data-use="tpl2" data-title="Muscle Gain Meal Plan (Beginner)">
@@ -379,37 +293,34 @@ Water: 2–3L • Walk: 8k steps • Sleep: 7–8h</div>
                 </button>
               </div>
             </div>
-
             <div class="mt-2" style="white-space:pre-wrap;" id="tpl2">Goal: Muscle gain (slight surplus)
 Breakfast: Oats + milk + banana + nuts
 Lunch: Rice + dhal + chicken/fish + veggies
 Snack: Peanut butter toast / curd / nuts
 Dinner: Protein + carbs + vegetables
+Post-workout: protein + carbs within 60 mins
 Water: 2–3L • Strength: 3–4 days/week</div>
           </div>
 
-          <!-- Template 3 -->
+          <!-- ✅ Template 3 -->
           <div class="tip-card mt-2">
             <div class="d-flex justify-content-between gap-2 flex-wrap">
               <div>
-                <div class="fw-bold"><i class="bi bi-check2-circle me-2"></i>Maintenance (Busy Worker)</div>
-                <div class="subtitle">Balanced plate • simple habits</div>
+                <div class="fw-bold"><i class="bi bi-check2-circle me-2"></i>Balanced Plate Rule</div>
+                <div class="subtitle">Portion control without counting calories</div>
               </div>
-
               <div class="d-flex gap-2">
                 <button class="copy-btn" data-copy="tpl3"><i class="bi bi-clipboard me-1"></i>Copy</button>
-                <button class="copy-btn" data-use="tpl3" data-title="Maintenance Meal Plan (Busy Worker)">
+                <button class="copy-btn" data-use="tpl3" data-title="Balanced Plate Rule">
                   <i class="bi bi-send me-1"></i>Use in Meal Plan
                 </button>
               </div>
             </div>
-
-            <div class="mt-2" style="white-space:pre-wrap;" id="tpl3">Goal: Maintain weight & energy
-Breakfast: Eggs/oats + fruit
-Lunch: 1/2 plate veggies + 1/4 protein + 1/4 carbs
-Snack: Fruit / yogurt / nuts
-Dinner: Light meal + protein
-Water: 2L • Steps: 6k–8k • Sleep: 7h</div>
+            <div class="mt-2" style="white-space:pre-wrap;" id="tpl3">Balanced plate:
+- 50% Veggies (salad/greens/gotukola)
+- 25% Protein (eggs/fish/chicken/dhal/chickpeas/curd)
+- 25% Carbs (red rice/oats/sweet potato)
+Tip: Use smaller plate for easier portion control.</div>
           </div>
 
           <div class="small-help mt-3">
@@ -422,36 +333,6 @@ Water: 2L • Steps: 6k–8k • Sleep: 7h</div>
         <div class="card-soft p-3">
           <div class="fw-bold mb-2"><i class="bi bi-lightbulb me-2"></i>Trainer Toolkit</div>
           <div class="subtitle mb-3">Professional quick rules + mini calculator</div>
-
-          <div class="tip-card mb-2" style="background:#f5f3ff;">
-            <div class="d-flex gap-2 align-items-start">
-              <div class="mini-ico violet" style="width:36px;height:36px;border-radius:14px;font-size:16px;"><i class="bi bi-person-check"></i></div>
-              <div>
-                <div class="fw-bold">Personalize</div>
-                <div class="subtitle">Use BMI + workout level to adjust calories.</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="tip-card mb-2" style="background:#ecfeff;">
-            <div class="d-flex gap-2 align-items-start">
-              <div class="mini-ico cyan" style="width:36px;height:36px;border-radius:14px;font-size:16px;"><i class="bi bi-calendar-check"></i></div>
-              <div>
-                <div class="fw-bold">Weekly check</div>
-                <div class="subtitle">Ask for updates + re-adjust every week.</div>
-              </div>
-            </div>
-          </div>
-
-          <div class="tip-card mb-2" style="background:#fff1f2;">
-            <div class="d-flex gap-2 align-items-start">
-              <div class="mini-ico rose" style="width:36px;height:36px;border-radius:14px;font-size:16px;"><i class="bi bi-shield-exclamation"></i></div>
-              <div>
-                <div class="fw-bold">Safety</div>
-                <div class="subtitle">Medical conditions → consult professional.</div>
-              </div>
-            </div>
-          </div>
 
           <div class="tip-card mt-3">
             <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
@@ -473,7 +354,7 @@ Water: 2L • Steps: 6k–8k • Sleep: 7h</div>
 
             <div class="macro mt-2" style="background:#f8fafc;">
               <div class="left">
-                <div class="mini-ico green"><i class="bi bi-bullseye"></i></div>
+                <div class="chip chip-green"><i class="bi bi-bullseye"></i></div>
                 <div>
                   <div class="label">Protein / day</div>
                   <div class="desc">Weight × 1.6</div>
@@ -499,28 +380,10 @@ Water: 2L • Steps: 6k–8k • Sleep: 7h</div>
 
 <div class="toast-mini" id="toastMini"><i class="bi bi-check2-circle me-2"></i>Copied!</div>
 
+<!-- ✅ Use SAME layout JS for ALL trainer pages -->
+<script src="trainer_layout.js"></script>
+
 <script>
-  const BASE = "../../";
-  const API  = BASE + "backend/";
-
-  async function guardTrainer(){
-    const r = await fetch(API+"check_auth.php",{credentials:"include"});
-    if(r.status===401) return location.href=BASE+"login.html";
-    const data = await r.json().catch(()=>({}));
-    if((data.role||"")!=="trainer"){
-      if(data.role==="admin") location.href=BASE+"dashboard/admin/dashboard.html";
-      else location.href=BASE+"dashboard/member/dashboard.html";
-      return;
-    }
-    if(data.username) document.getElementById("trainerName").textContent = data.username;
-  }
-
-  async function logout(){
-    await fetch(API+"logout.php",{method:"POST",credentials:"include"}).catch(()=>{});
-    location.href=BASE+"login.html";
-  }
-  document.getElementById("btnLogout").addEventListener("click",(e)=>{ e.preventDefault(); logout(); });
-
   // Toast
   const toastMini = document.getElementById("toastMini");
   function showToast(msg="Copied!"){
@@ -549,7 +412,7 @@ Water: 2L • Steps: 6k–8k • Sleep: 7h</div>
     });
   });
 
-  // ✅ Use template in Meal Plans (auto-fill via localStorage)
+  // Use template in Meal Plans (auto-fill via localStorage)
   document.querySelectorAll("[data-use]").forEach(btn=>{
     btn.addEventListener("click", ()=>{
       const tplId = btn.getAttribute("data-use");
@@ -572,8 +435,6 @@ Water: 2L • Steps: 6k–8k • Sleep: 7h</div>
     out.textContent = g + " g";
     showToast("Calculated");
   });
-
-  (async()=>{ await guardTrainer(); })();
 </script>
 </body>
 </html>

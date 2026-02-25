@@ -58,6 +58,15 @@
       <span class="nav-label">Schedule</span>
     </a>
 
+    <!-- ✅ Notifications (badge auto-updates via trainer_layout.js) -->
+    <a class="nav-item" data-key="notifications" href="notifications.html">
+      <span class="nav-ico chip-amber">
+        <i class="bi bi-bell"></i>
+        <span id="notifBadge">0</span>
+      </span>
+      <span class="nav-label">Notifications</span>
+    </a>
+
     <a class="nav-item" data-key="back" href="../../index.html">
       <span class="nav-ico chip-slate"><i class="bi bi-globe"></i></span>
       <span class="nav-label">Back to Website</span>
@@ -100,6 +109,7 @@
       </div>
     </div>
 
+    <!-- Search + Members list -->
     <div class="card-soft p-3 mt-3">
       <div class="fw-bold mb-2"><i class="bi bi-search me-2"></i>Search</div>
 
@@ -120,13 +130,13 @@
       </div>
 
       <div class="table-responsive mt-3">
-        <table class="table table-sm mb-0">
+        <table class="table table-sm mb-0 align-middle">
           <thead>
             <tr>
               <th>#</th>
               <th>Member</th>
               <th>Email</th>
-              <th style="width:180px;">Action</th>
+              <th style="width:220px;">Action</th>
             </tr>
           </thead>
           <tbody id="rows">
@@ -136,23 +146,102 @@
       </div>
     </div>
 
+    <!-- Recent assignments -->
+    <div class="card-soft p-3 mt-3">
+      <div class="fw-bold mb-2"><i class="bi bi-clock-history me-2"></i>Recent Assigned Workouts <span class="subtitle">(latest 10)</span></div>
+
+      <div class="table-responsive">
+        <table class="table table-sm mb-0 align-middle">
+          <thead>
+            <tr>
+              <th style="width:70px;">ID</th>
+              <th>Member</th>
+              <th>Workout</th>
+              <th>Status</th>
+              <th>Assigned</th>
+            </tr>
+          </thead>
+          <tbody id="recentRows">
+            <tr><td colspan="5" class="subtitle">Loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
   </main>
 </div>
 
-<!-- ✅ keep only one include -->
+<!-- ✅ Assign Modal -->
+<div class="modal fade" id="assignModal" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content" style="border-radius:16px;">
+      <div class="modal-header">
+        <h5 class="modal-title">Assign Workout</h5>
+        <button class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <div class="modal-body">
+        <div class="alert alert-info py-2 mb-3">
+          Member: <b id="selMemberName">-</b> (<span id="selMemberEmail">-</span>)
+        </div>
+
+        <div class="row g-2">
+          <div class="col-md-8">
+            <label class="form-label fw-semibold">Workout</label>
+            <select id="workoutSelect" class="form-select"></select>
+            <div class="small text-muted mt-1" id="workoutMeta"></div>
+          </div>
+          <div class="col-md-4">
+            <label class="form-label fw-semibold">Status</label>
+            <input class="form-control" value="assigned" disabled />
+          </div>
+        </div>
+
+        <div class="mt-3" id="assignMsg"></div>
+      </div>
+
+      <div class="modal-footer">
+        <button class="btn btn-outline-dark" data-bs-dismiss="modal">Close</button>
+        <button class="btn btn-dark" id="btnDoAssign"><i class="bi bi-plus-circle me-2"></i>Assign</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- scripts -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
 <script src="trainer_layout.js"></script>
 
 <script>
-  // ✅ Always use CAPITAL base
-  const API_BASE = (window.API && typeof window.API === "string" && window.API.trim() !== "")
-    ? window.API
-    : "/SMART_FIT/backend/";
+  const API_BASE = "/SMART_FIT/backend/";
 
-  // Elements
+  // endpoints
+  const ENDPOINTS = {
+    members: API_BASE + "trainer_members_list.php",
+    workouts: API_BASE + "trainer_workouts_list.php",
+    assign: API_BASE + "trainer_assign_workout.php",
+    recent: API_BASE + "trainer_recent_assignments.php"
+  };
+
+  // UI
   const q = document.getElementById("q");
   const btnSearch = document.getElementById("btnSearch");
   const btnReload = document.getElementById("btnReload");
   const rows = document.getElementById("rows");
+
+  const recentRows = document.getElementById("recentRows");
+
+  const assignModalEl = document.getElementById("assignModal");
+  const assignModal = new bootstrap.Modal(assignModalEl);
+
+  const selMemberName = document.getElementById("selMemberName");
+  const selMemberEmail = document.getElementById("selMemberEmail");
+  const workoutSelect = document.getElementById("workoutSelect");
+  const workoutMeta = document.getElementById("workoutMeta");
+  const assignMsg = document.getElementById("assignMsg");
+  const btnDoAssign = document.getElementById("btnDoAssign");
+
+  let selectedMemberId = null;
 
   function esc(s){
     return String(s ?? "")
@@ -163,67 +252,190 @@
       .replaceAll("'","&#039;");
   }
 
+  // ✅ NEW: status badge colors
+  function statusBadge(status){
+    const s = String(status || "assigned").toLowerCase();
+    if(s === "completed") return `<span class="badge bg-success">completed</span>`;
+    if(s === "started")   return `<span class="badge bg-primary">started</span>`;
+    return `<span class="badge bg-warning text-dark">assigned</span>`;
+  }
+
   async function safeJson(res){
     const txt = await res.text();
     try { return JSON.parse(txt); }
-    catch {
-      console.error("Invalid JSON:", txt);
-      return { ok:false, message:"Invalid JSON from server" };
-    }
+    catch { console.log("Invalid JSON:", txt); return { ok:false, message:"Invalid JSON" }; }
   }
 
-  async function load(){
+  function showAssignMsg(t, ok=true){
+    assignMsg.innerHTML = `<div class="alert ${ok?'alert-success':'alert-danger'} py-2 mb-0">${esc(t)}</div>`;
+  }
+
+  // ✅ load members
+  async function loadMembers(){
+    rows.innerHTML = `<tr><td colspan="4" class="subtitle">Loading...</td></tr>`;
+
+    const params = new URLSearchParams();
+    if(q.value.trim()) params.set("q", q.value.trim());
+
+    const url = ENDPOINTS.members + (params.toString() ? ("?" + params.toString()) : "");
+    const r = await fetch(url, { credentials:"include" });
+    const d = await safeJson(r);
+
+    if(!d.ok){
+      rows.innerHTML = `<tr><td colspan="4" class="text-danger">${esc(d.message || "Failed")}</td></tr>`;
+      return;
+    }
+
+    const items = d.members || [];
+    if(!items.length){
+      rows.innerHTML = `<tr><td colspan="4" class="subtitle">No members</td></tr>`;
+      return;
+    }
+
+    rows.innerHTML = items.map((it,i)=>`
+      <tr>
+        <td>${i+1}</td>
+        <td class="fw-bold">${esc(it.name || ((it.first_name||"") + " " + (it.last_name||"")).trim() || "Member")}</td>
+        <td class="subtitle">${esc(it.email||"")}</td>
+        <td class="d-flex gap-2">
+          <button class="btn btn-sm btn-dark btn-pill"
+            onclick="openAssign(${Number(it.id)}, '${esc(it.name || "Member")}', '${esc(it.email || "")}')">
+            <i class="bi bi-plus-circle me-1"></i>Assign Workout
+          </button>
+          <a class="btn btn-sm btn-outline-dark btn-pill" href="member_progress.html?user_id=${encodeURIComponent(it.id)}">
+            <i class="bi bi-graph-up-arrow me-1"></i>Progress
+          </a>
+        </td>
+      </tr>
+    `).join("");
+  }
+
+  // ✅ load workouts for dropdown
+  async function loadWorkouts(){
+    workoutSelect.innerHTML = `<option value="">Loading...</option>`;
+    workoutMeta.textContent = "";
+
+    const r = await fetch(ENDPOINTS.workouts, { credentials:"include" });
+    const d = await safeJson(r);
+
+    if(!d.ok){
+      workoutSelect.innerHTML = `<option value="">Failed</option>`;
+      return;
+    }
+
+    const items = d.items || [];
+    if(!items.length){
+      workoutSelect.innerHTML = `<option value="">No workouts</option>`;
+      return;
+    }
+
+    workoutSelect.innerHTML = items.map(w => `
+      <option value="${w.id}" data-level="${esc(w.level)}" data-dur="${w.duration_min}" data-cal="${w.calories}">
+        ${esc(w.title)} • ${esc(w.level)} • ${w.duration_min}m • ${w.calories}cal
+      </option>
+    `).join("");
+
+    updateWorkoutMeta();
+  }
+
+  function updateWorkoutMeta(){
+    const opt = workoutSelect.selectedOptions[0];
+    if(!opt) { workoutMeta.textContent=""; return; }
+    const lvl = opt.getAttribute("data-level") || "";
+    const dur = opt.getAttribute("data-dur") || "";
+    const cal = opt.getAttribute("data-cal") || "";
+    workoutMeta.textContent = `Level: ${lvl} • Duration: ${dur} min • Calories: ${cal}`;
+  }
+
+  workoutSelect.addEventListener("change", updateWorkoutMeta);
+
+  // ✅ open modal
+  async function openAssign(memberId, name, email){
+    selectedMemberId = memberId;
+    selMemberName.textContent = name || "Member";
+    selMemberEmail.textContent = email || "-";
+    assignMsg.innerHTML = "";
+
+    await loadWorkouts();
+    assignModal.show();
+  }
+  window.openAssign = openAssign;
+
+  // ✅ assign action
+  btnDoAssign.addEventListener("click", async ()=>{
+    const workoutId = Number(workoutSelect.value || 0);
+    if(!selectedMemberId || !workoutId){
+      showAssignMsg("Select a workout", false);
+      return;
+    }
+
+    btnDoAssign.disabled = true;
+    btnDoAssign.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>Assigning...`;
+
     try{
-      rows.innerHTML = `<tr><td colspan="4" class="subtitle">Loading...</td></tr>`;
+      const r = await fetch(ENDPOINTS.assign, {
+        method:"POST",
+        headers:{ "Content-Type":"application/json" },
+        credentials:"include",
+        body: JSON.stringify({
+          user_id: selectedMemberId,
+          workout_id: workoutId,
+          status: "assigned"
+        })
+      });
 
-      const params = new URLSearchParams();
-      if (q.value.trim()) params.set("q", q.value.trim());
-
-      const url = API_BASE + "trainer_members_list.php" + (params.toString() ? ("?" + params.toString()) : "");
-      console.log("Calling:", url);
-
-      const r = await fetch(url, { credentials:"include" });
       const d = await safeJson(r);
-      console.log("Response:", d);
-
       if(!d.ok){
-        rows.innerHTML = `<tr><td colspan="4" class="text-danger">${esc(d.message || "Failed")}</td></tr>`;
-        return;
+        showAssignMsg(d.message || "Assign failed", false);
+      }else{
+        showAssignMsg("Workout assigned ✅", true);
+        await loadRecent();
+        setTimeout(()=>assignModal.hide(), 700);
       }
-
-      const items = Array.isArray(d.members) ? d.members : [];
-      if(!items.length){
-        rows.innerHTML = `<tr><td colspan="4" class="subtitle">No members</td></tr>`;
-        return;
-      }
-
-      rows.innerHTML = items.map((it,i)=>`
-        <tr>
-          <td>${i+1}</td>
-          <td class="fw-bold">${esc(it.name || ((it.first_name||"") + " " + (it.last_name||"")).trim())}</td>
-          <td class="subtitle">${esc(it.email||"")}</td>
-          <td>
-            <a class="btn btn-sm btn-outline-dark btn-pill"
-               href="members.html?select=${encodeURIComponent(it.id)}">
-              Assign
-            </a>
-          </td>
-        </tr>
-      `).join("");
-
-    } catch (err){
-      console.error(err);
-      rows.innerHTML = `<tr><td colspan="4" class="text-danger">Network/JS error (see Console)</td></tr>`;
+    }catch(e){
+      showAssignMsg("Server error", false);
+    }finally{
+      btnDoAssign.disabled = false;
+      btnDoAssign.innerHTML = `<i class="bi bi-plus-circle me-2"></i>Assign`;
     }
+  });
+
+  // ✅ recent assignments
+  async function loadRecent(){
+    recentRows.innerHTML = `<tr><td colspan="5" class="subtitle">Loading...</td></tr>`;
+    const r = await fetch(ENDPOINTS.recent, { credentials:"include" });
+    const d = await safeJson(r);
+
+    if(!d.ok){
+      recentRows.innerHTML = `<tr><td colspan="5" class="text-danger">${esc(d.message || "Failed")}</td></tr>`;
+      return;
+    }
+
+    const items = d.items || [];
+    if(!items.length){
+      recentRows.innerHTML = `<tr><td colspan="5" class="subtitle">No assignments yet</td></tr>`;
+      return;
+    }
+
+    recentRows.innerHTML = items.map(it=>`
+      <tr>
+        <td>${it.id}</td>
+        <td class="fw-bold">${esc(it.member_name || it.member_email || "Member")}</td>
+        <td>${esc(it.workout_title || "")}</td>
+        <td>${statusBadge(it.status)}</td>
+        <td>${esc(it.assigned_at || "")}</td>
+      </tr>
+    `).join("");
   }
 
-  btnSearch.addEventListener("click", load);
-  btnReload.addEventListener("click", ()=>{ q.value=""; load(); });
+  btnSearch.addEventListener("click", loadMembers);
+  btnReload.addEventListener("click", ()=>{ q.value=""; loadMembers(); });
 
-  // Enter key search
-  q.addEventListener("keydown", (e)=>{ if(e.key==="Enter") load(); });
+  q.addEventListener("keydown", (e)=>{ if(e.key==="Enter") loadMembers(); });
 
-  load();
+  // init
+  loadMembers();
+  loadRecent();
 </script>
 
 </body>
